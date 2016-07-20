@@ -458,6 +458,11 @@
               <FileType>1</FileType>
               <FilePath>..\MODULES\uart\usart.c</FilePath>
             </File>
+            <File>
+              <FileName>malloc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\malloc\malloc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

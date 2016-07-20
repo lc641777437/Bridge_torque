@@ -73,6 +73,30 @@ Section Cross References
     usart.o(i.fputc) refers to stm32f4xx_usart.o(i.USART_SendData) for USART_SendData
     usart.o(i.fputc) refers to usart.o(.data) for printf_state
     usart.o(i.select_USART) refers to usart.o(.data) for printf_state
+    malloc.o(i.mem_perused) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mem_perused) refers to malloc.o(.constdata) for memtblsize
+    malloc.o(i.myfree) refers to malloc.o(i.mymem_free) for mymem_free
+    malloc.o(i.myfree) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mymalloc) refers to malloc.o(i.mymem_malloc) for mymem_malloc
+    malloc.o(i.mymalloc) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mymem_free) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mymem_free) refers to malloc.o(.constdata) for memsize
+    malloc.o(i.mymem_init) refers to malloc.o(i.mymemset) for mymemset
+    malloc.o(i.mymem_init) refers to malloc.o(.constdata) for memtblsize
+    malloc.o(i.mymem_init) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mymem_malloc) refers to malloc.o(.data) for mallco_dev
+    malloc.o(i.mymem_malloc) refers to malloc.o(.constdata) for memblksize
+    malloc.o(i.myrealloc) refers to malloc.o(i.mymem_malloc) for mymem_malloc
+    malloc.o(i.myrealloc) refers to malloc.o(i.mymemcpy) for mymemcpy
+    malloc.o(i.myrealloc) refers to malloc.o(i.myfree) for myfree
+    malloc.o(i.myrealloc) refers to malloc.o(.data) for mallco_dev
+    malloc.o(.data) refers to malloc.o(i.mymem_init) for mymem_init
+    malloc.o(.data) refers to malloc.o(i.mem_perused) for mem_perused
+    malloc.o(.data) refers to malloc.o(.bss) for mem1base
+    malloc.o(.data) refers to malloc.o(.ARM.__AT_0x68000000) for mem2base
+    malloc.o(.data) refers to malloc.o(.ARM.__AT_0x10000000) for mem3base
+    malloc.o(.data) refers to malloc.o(.ARM.__AT_0x68032000) for mem2mapbase
+    malloc.o(.data) refers to malloc.o(.ARM.__AT_0x1000F000) for mem3mapbase
     stm32f4x7_eth.o(i.ETH_CheckFrameReceived) refers to stm32f4x7_eth.o(.data) for DMARxDescToGet
     stm32f4x7_eth.o(i.ETH_DMARxDescChainInit) refers to stm32f4x7_eth.o(.data) for DMARxDescToGet
     stm32f4x7_eth.o(i.ETH_DMARxDescChainInit) refers to stm32f4x7_eth.o(.bss) for RX_Frame_Descriptor
@@ -561,6 +585,21 @@ Removing Unused input sections from the image.
     Removing usart.o(.revsh_text), (4 bytes).
     Removing usart.o(.rrx_text), (6 bytes).
     Removing usart.o(i.GetKey), (28 bytes).
+    Removing malloc.o(.rev16_text), (4 bytes).
+    Removing malloc.o(.revsh_text), (4 bytes).
+    Removing malloc.o(.rrx_text), (6 bytes).
+    Removing malloc.o(i.mem_perused), (64 bytes).
+    Removing malloc.o(i.myfree), (36 bytes).
+    Removing malloc.o(i.mymalloc), (40 bytes).
+    Removing malloc.o(i.mymem_free), (108 bytes).
+    Removing malloc.o(i.mymem_init), (68 bytes).
+    Removing malloc.o(i.mymem_malloc), (176 bytes).
+    Removing malloc.o(i.mymemcpy), (26 bytes).
+    Removing malloc.o(i.mymemset), (20 bytes).
+    Removing malloc.o(i.myrealloc), (68 bytes).
+    Removing malloc.o(.bss), (108800 bytes).
+    Removing malloc.o(.constdata), (36 bytes).
+    Removing malloc.o(.data), (36 bytes).
     Removing stm32f4x7_eth.o(.rev16_text), (4 bytes).
     Removing stm32f4x7_eth.o(.revsh_text), (4 bytes).
     Removing stm32f4x7_eth.o(.rrx_text), (6 bytes).
@@ -1330,7 +1369,7 @@ Removing Unused input sections from the image.
     Removing cdrcmple.o(.text), (48 bytes).
     Removing depilogue.o(.text), (186 bytes).
 
-801 unused section(s) (total 33504 bytes) removed from the image.
+816 unused section(s) (total 142996 bytes) removed from the image.
 
 ==============================================================================
 
@@ -1340,34 +1379,34 @@ Image Symbol Table
 
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
-    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/division.c              0x00000000   Number         0  uidiv.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
+    ../clib/microlib/division.c              0x00000000   Number         0  uldiv.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7a.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry7b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry2.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry5.o ABSOLUTE
-    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry8b.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry9b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11a.o ABSOLUTE
+    ../clib/microlib/init/entry.s            0x00000000   Number         0  entry11b.o ABSOLUTE
     ../clib/microlib/init/entry.s            0x00000000   Number         0  entry10b.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llsshr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llushr.o ABSOLUTE
     ../clib/microlib/longlong.c              0x00000000   Number         0  llshl.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf1.o ABSOLUTE
+    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf0.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfb.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf2.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf7.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printfa.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf8.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf6.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf5.o ABSOLUTE
-    ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf4.o ABSOLUTE
     ../clib/microlib/printf/printf.c         0x00000000   Number         0  printf3.o ABSOLUTE
     ../clib/microlib/printf/stubs.s          0x00000000   Number         0  stubs.o ABSOLUTE
     ../clib/microlib/stubs.s                 0x00000000   Number         0  useno.o ABSOLUTE
@@ -1412,6 +1451,7 @@ Image Symbol Table
     ..\MODULES\adc\ads1258.c                 0x00000000   Number         0  ads1258.o ABSOLUTE
     ..\MODULES\adc\spi.c                     0x00000000   Number         0  spi.o ABSOLUTE
     ..\MODULES\delay\delay.c                 0x00000000   Number         0  delay.o ABSOLUTE
+    ..\MODULES\malloc\malloc.c               0x00000000   Number         0  malloc.o ABSOLUTE
     ..\MODULES\sys\sys.c                     0x00000000   Number         0  sys.o ABSOLUTE
     ..\MODULES\uart\usart.c                  0x00000000   Number         0  usart.o ABSOLUTE
     ..\USER\startup_stm32f40_41xxx.s         0x00000000   Number         0  startup_stm32f40_41xxx.o ABSOLUTE
@@ -1450,6 +1490,7 @@ Image Symbol Table
     ..\\FWLIB\\STM32F4xx_StdPeriph_Driver\\src\\stm32f4xx_wwdg.c 0x00000000   Number         0  stm32f4xx_wwdg.o ABSOLUTE
     ..\\MODULES\\adc\\spi.c                  0x00000000   Number         0  spi.o ABSOLUTE
     ..\\MODULES\\delay\\delay.c              0x00000000   Number         0  delay.o ABSOLUTE
+    ..\\MODULES\\malloc\\malloc.c            0x00000000   Number         0  malloc.o ABSOLUTE
     ..\\MODULES\\sys\\sys.c                  0x00000000   Number         0  sys.o ABSOLUTE
     ..\\MODULES\\uart\\usart.c               0x00000000   Number         0  usart.o ABSOLUTE
     ..\\USER\\system_stm32f4xx.c             0x00000000   Number         0  system_stm32f4xx.o ABSOLUTE
@@ -1516,11 +1557,15 @@ Image Symbol Table
     i.fputc                                  0x08000ae4   Section        0  usart.o(i.fputc)
     i.main                                   0x08000b38   Section        0  main.o(i.main)
     i.select_USART                           0x08000b40   Section        0  usart.o(i.select_USART)
+    .ARM.__AT_0x10000000                     0x10000000   Section    61440  malloc.o(.ARM.__AT_0x10000000)
+    .ARM.__AT_0x1000F000                     0x1000f000   Section     3840  malloc.o(.ARM.__AT_0x1000F000)
     .data                                    0x20000000   Section        8  usart.o(.data)
     printf_state                             0x20000001   Data           1  usart.o(.data)
     .data                                    0x20000008   Section       16  stm32f4xx_rcc.o(.data)
     APBAHBPrescTable                         0x20000008   Data          16  stm32f4xx_rcc.o(.data)
     STACK                                    0x20000018   Section     1024  startup_stm32f40_41xxx.o(STACK)
+    .ARM.__AT_0x68000000                     0x68000000   Section    204800  malloc.o(.ARM.__AT_0x68000000)
+    .ARM.__AT_0x68032000                     0x68032000   Section    12800  malloc.o(.ARM.__AT_0x68032000)
 
     Global Symbols
 
@@ -1719,9 +1764,13 @@ Image Symbol Table
     select_USART                             0x08000b41   Thumb Code     6  usart.o(i.select_USART)
     Region$$Table$$Base                      0x08000b4c   Number         0  anon$$obj.o(Region$$Table)
     Region$$Table$$Limit                     0x08000b6c   Number         0  anon$$obj.o(Region$$Table)
+    mem3base                                 0x10000000   Data       61440  malloc.o(.ARM.__AT_0x10000000)
+    mem3mapbase                              0x1000f000   Data        3840  malloc.o(.ARM.__AT_0x1000F000)
     res                                      0x20000000   Data           1  usart.o(.data)
     __stdout                                 0x20000004   Data           4  usart.o(.data)
     __initial_sp                             0x20000418   Data           0  startup_stm32f40_41xxx.o(STACK)
+    mem2base                                 0x68000000   Data       204800  malloc.o(.ARM.__AT_0x68000000)
+    mem2mapbase                              0x68032000   Data       12800  malloc.o(.ARM.__AT_0x68032000)
 
 
 
@@ -1738,33 +1787,33 @@ Memory Map of the image
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x08000000   0x00000188   Data   RO          255    RESET               startup_stm32f40_41xxx.o
-    0x08000188   0x00000000   Code   RO         5161  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
-    0x08000188   0x00000004   Code   RO         5425    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
-    0x0800018c   0x00000004   Code   RO         5428    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
-    0x08000190   0x00000000   Code   RO         5430    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
-    0x08000190   0x00000000   Code   RO         5432    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
-    0x08000190   0x00000008   Code   RO         5433    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
-    0x08000198   0x00000000   Code   RO         5435    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
-    0x08000198   0x00000000   Code   RO         5437    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
-    0x08000198   0x00000004   Code   RO         5426    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
+    0x08000188   0x00000000   Code   RO         5245  * .ARM.Collect$$$$00000000  mc_w.l(entry.o)
+    0x08000188   0x00000004   Code   RO         5509    .ARM.Collect$$$$00000001  mc_w.l(entry2.o)
+    0x0800018c   0x00000004   Code   RO         5512    .ARM.Collect$$$$00000004  mc_w.l(entry5.o)
+    0x08000190   0x00000000   Code   RO         5514    .ARM.Collect$$$$00000008  mc_w.l(entry7b.o)
+    0x08000190   0x00000000   Code   RO         5516    .ARM.Collect$$$$0000000A  mc_w.l(entry8b.o)
+    0x08000190   0x00000008   Code   RO         5517    .ARM.Collect$$$$0000000B  mc_w.l(entry9a.o)
+    0x08000198   0x00000000   Code   RO         5519    .ARM.Collect$$$$0000000D  mc_w.l(entry10a.o)
+    0x08000198   0x00000000   Code   RO         5521    .ARM.Collect$$$$0000000F  mc_w.l(entry11a.o)
+    0x08000198   0x00000004   Code   RO         5510    .ARM.Collect$$$$00002712  mc_w.l(entry2.o)
     0x0800019c   0x00000024   Code   RO          256    .text               startup_stm32f40_41xxx.o
-    0x080001c0   0x00000024   Code   RO         5454    .text               mc_w.l(init.o)
+    0x080001c0   0x00000024   Code   RO         5538    .text               mc_w.l(init.o)
     0x080001e4   0x00000004   Code   RO          124    i.BusFault_Handler  stm32f4xx_it.o
     0x080001e8   0x00000002   Code   RO          125    i.DebugMon_Handler  stm32f4xx_it.o
-    0x080001ea   0x00000090   Code   RO         2553    i.GPIO_Init         stm32f4xx_gpio.o
-    0x0800027a   0x00000046   Code   RO         2554    i.GPIO_PinAFConfig  stm32f4xx_gpio.o
+    0x080001ea   0x00000090   Code   RO         2637    i.GPIO_Init         stm32f4xx_gpio.o
+    0x0800027a   0x00000046   Code   RO         2638    i.GPIO_PinAFConfig  stm32f4xx_gpio.o
     0x080002c0   0x00000004   Code   RO          126    i.HardFault_Handler  stm32f4xx_it.o
     0x080002c4   0x00000004   Code   RO          127    i.MemManage_Handler  stm32f4xx_it.o
     0x080002c8   0x00000002   Code   RO          128    i.NMI_Handler       stm32f4xx_it.o
     0x080002ca   0x00000002   PAD
-    0x080002cc   0x00000078   Code   RO          996    i.NVIC_Init         misc.o
-    0x08000344   0x00000014   Code   RO          997    i.NVIC_PriorityGroupConfig  misc.o
+    0x080002cc   0x00000078   Code   RO         1080    i.NVIC_Init         misc.o
+    0x08000344   0x00000014   Code   RO         1081    i.NVIC_PriorityGroupConfig  misc.o
     0x08000358   0x00000002   Code   RO          129    i.PendSV_Handler    stm32f4xx_it.o
     0x0800035a   0x00000002   PAD
-    0x0800035c   0x00000020   Code   RO         3203    i.RCC_AHB1PeriphClockCmd  stm32f4xx_rcc.o
-    0x0800037c   0x00000020   Code   RO         3212    i.RCC_APB1PeriphClockCmd  stm32f4xx_rcc.o
-    0x0800039c   0x00000020   Code   RO         3215    i.RCC_APB2PeriphClockCmd  stm32f4xx_rcc.o
-    0x080003bc   0x000000e8   Code   RO         3224    i.RCC_GetClocksFreq  stm32f4xx_rcc.o
+    0x0800035c   0x00000020   Code   RO         3287    i.RCC_AHB1PeriphClockCmd  stm32f4xx_rcc.o
+    0x0800037c   0x00000020   Code   RO         3296    i.RCC_APB1PeriphClockCmd  stm32f4xx_rcc.o
+    0x0800039c   0x00000020   Code   RO         3299    i.RCC_APB2PeriphClockCmd  stm32f4xx_rcc.o
+    0x080003bc   0x000000e8   Code   RO         3308    i.RCC_GetClocksFreq  stm32f4xx_rcc.o
     0x080004a4   0x00000002   Code   RO          130    i.SVC_Handler       stm32f4xx_it.o
     0x080004a6   0x00000002   PAD
     0x080004a8   0x000000ec   Code   RO          193    i.SetSysClock       system_stm32f4xx.o
@@ -1774,26 +1823,26 @@ Memory Map of the image
     0x080006c0   0x00000040   Code   RO          393    i.USART1_IRQHandler  usart.o
     0x08000700   0x000000b4   Code   RO          394    i.USART3_Configuration  usart.o
     0x080007b4   0x00000040   Code   RO          395    i.USART3_IRQHandler  usart.o
-    0x080007f4   0x0000001e   Code   RO         4907    i.USART_ClearITPendingBit  stm32f4xx_usart.o
-    0x08000812   0x00000018   Code   RO         4910    i.USART_Cmd         stm32f4xx_usart.o
-    0x0800082a   0x0000001a   Code   RO         4913    i.USART_GetFlagStatus  stm32f4xx_usart.o
-    0x08000844   0x00000054   Code   RO         4914    i.USART_GetITStatus  stm32f4xx_usart.o
-    0x08000898   0x0000004a   Code   RO         4916    i.USART_ITConfig    stm32f4xx_usart.o
+    0x080007f4   0x0000001e   Code   RO         4991    i.USART_ClearITPendingBit  stm32f4xx_usart.o
+    0x08000812   0x00000018   Code   RO         4994    i.USART_Cmd         stm32f4xx_usart.o
+    0x0800082a   0x0000001a   Code   RO         4997    i.USART_GetFlagStatus  stm32f4xx_usart.o
+    0x08000844   0x00000054   Code   RO         4998    i.USART_GetITStatus  stm32f4xx_usart.o
+    0x08000898   0x0000004a   Code   RO         5000    i.USART_ITConfig    stm32f4xx_usart.o
     0x080008e2   0x00000002   PAD
-    0x080008e4   0x000000d4   Code   RO         4917    i.USART_Init        stm32f4xx_usart.o
-    0x080009b8   0x0000000a   Code   RO         4924    i.USART_ReceiveData  stm32f4xx_usart.o
-    0x080009c2   0x00000008   Code   RO         4927    i.USART_SendData    stm32f4xx_usart.o
+    0x080008e4   0x000000d4   Code   RO         5001    i.USART_Init        stm32f4xx_usart.o
+    0x080009b8   0x0000000a   Code   RO         5008    i.USART_ReceiveData  stm32f4xx_usart.o
+    0x080009c2   0x00000008   Code   RO         5011    i.USART_SendData    stm32f4xx_usart.o
     0x080009ca   0x00000004   Code   RO          131    i.UsageFault_Handler  stm32f4xx_it.o
     0x080009ce   0x00000002   PAD
-    0x080009d0   0x00000020   Code   RO         5231    i.__0printf$2       mc_w.l(printf2.o)
-    0x080009f0   0x0000000e   Code   RO         5466    i.__scatterload_copy  mc_w.l(handlers.o)
-    0x080009fe   0x00000002   Code   RO         5467    i.__scatterload_null  mc_w.l(handlers.o)
-    0x08000a00   0x0000000e   Code   RO         5468    i.__scatterload_zeroinit  mc_w.l(handlers.o)
-    0x08000a0e   0x000000d6   Code   RO         5238    i._printf_core      mc_w.l(printf2.o)
+    0x080009d0   0x00000020   Code   RO         5315    i.__0printf$2       mc_w.l(printf2.o)
+    0x080009f0   0x0000000e   Code   RO         5550    i.__scatterload_copy  mc_w.l(handlers.o)
+    0x080009fe   0x00000002   Code   RO         5551    i.__scatterload_null  mc_w.l(handlers.o)
+    0x08000a00   0x0000000e   Code   RO         5552    i.__scatterload_zeroinit  mc_w.l(handlers.o)
+    0x08000a0e   0x000000d6   Code   RO         5322    i._printf_core      mc_w.l(printf2.o)
     0x08000ae4   0x00000054   Code   RO          396    i.fputc             usart.o
     0x08000b38   0x00000008   Code   RO            5    i.main              main.o
     0x08000b40   0x0000000c   Code   RO          397    i.select_USART      usart.o
-    0x08000b4c   0x00000020   Data   RO         5464    Region$$Table       anon$$obj.o
+    0x08000b4c   0x00000020   Data   RO         5548    Region$$Table       anon$$obj.o
 
 
     Execution Region RW_IRAM1 (Base: 0x20000000, Size: 0x00000418, Max: 0x00020000, ABSOLUTE)
@@ -1801,8 +1850,48 @@ Memory Map of the image
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
     0x20000000   0x00000008   Data   RW          398    .data               usart.o
-    0x20000008   0x00000010   Data   RW         3247    .data               stm32f4xx_rcc.o
+    0x20000008   0x00000010   Data   RW         3331    .data               stm32f4xx_rcc.o
     0x20000018   0x00000400   Zero   RW          253    STACK               startup_stm32f40_41xxx.o
+
+
+
+  Load Region LR$$.ARM.__AT_0x10000000 (Base: 0x10000000, Size: 0x00000000, Max: 0x0000f000, ABSOLUTE)
+
+    Execution Region ER$$.ARM.__AT_0x10000000 (Base: 0x10000000, Size: 0x0000f000, Max: 0x0000f000, ABSOLUTE, UNINIT)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x10000000   0x0000f000   Zero   RW          467    .ARM.__AT_0x10000000  malloc.o
+
+
+
+  Load Region LR$$.ARM.__AT_0x1000F000 (Base: 0x1000f000, Size: 0x00000000, Max: 0x00000f00, ABSOLUTE)
+
+    Execution Region ER$$.ARM.__AT_0x1000F000 (Base: 0x1000f000, Size: 0x00000f00, Max: 0x00000f00, ABSOLUTE, UNINIT)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x1000f000   0x00000f00   Zero   RW          468    .ARM.__AT_0x1000F000  malloc.o
+
+
+
+  Load Region LR$$.ARM.__AT_0x68000000 (Base: 0x68000000, Size: 0x00000000, Max: 0x00032000, ABSOLUTE)
+
+    Execution Region ER$$.ARM.__AT_0x68000000 (Base: 0x68000000, Size: 0x00032000, Max: 0x00032000, ABSOLUTE, UNINIT)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x68000000   0x00032000   Zero   RW          469    .ARM.__AT_0x68000000  malloc.o
+
+
+
+  Load Region LR$$.ARM.__AT_0x68032000 (Base: 0x68032000, Size: 0x00000000, Max: 0x00003200, ABSOLUTE)
+
+    Execution Region ER$$.ARM.__AT_0x68032000 (Base: 0x68032000, Size: 0x00003200, Max: 0x00003200, ABSOLUTE, UNINIT)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x68032000   0x00003200   Zero   RW          470    .ARM.__AT_0x68032000  malloc.o
 
 
 ==============================================================================
@@ -1813,6 +1902,7 @@ Image component sizes
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
         28          0          0          0          0      30649   main.o
+         0          0          0          0     282880       1746   malloc.o
        140         24          0          0          0       1683   misc.o
          0          0          0          0          0     209176   spi.o
         36          8        392          0       1024        820   startup_stm32f40_41xxx.o
@@ -1824,7 +1914,7 @@ Image component sizes
        580         58          0          8          0       5263   usart.o
 
     ----------------------------------------------------------------------
-      2168        166        424         24       1024     265701   Object Totals
+      2168        166        424         24     283904     267447   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         10          0          0          0          0          0   (incl. Padding)
 
@@ -1864,14 +1954,14 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-      2500        192        424         24       1024     263197   Grand Totals
-      2500        192        424         24       1024     263197   ELF Image Totals
+      2500        192        424         24     283904     264943   Grand Totals
+      2500        192        424         24     283904     264943   ELF Image Totals
       2500        192        424         24          0          0   ROM Totals
 
 ==============================================================================
 
     Total RO  Size (Code + RO Data)                 2924 (   2.86kB)
-    Total RW  Size (RW Data + ZI Data)              1048 (   1.02kB)
+    Total RW  Size (RW Data + ZI Data)            283928 ( 277.27kB)
     Total ROM Size (Code + RO Data + RW Data)       2948 (   2.88kB)
 
 ==============================================================================

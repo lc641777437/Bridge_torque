@@ -8,6 +8,7 @@
 ".\objects\delay.o"
 ".\objects\sys.o"
 ".\objects\usart.o"
+".\objects\malloc.o"
 ".\objects\stm32f4x7_eth.o"
 ".\objects\misc.o"
 ".\objects\stm32f4xx_adc.o"

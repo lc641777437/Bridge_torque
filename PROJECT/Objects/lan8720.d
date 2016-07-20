@@ -28,10 +28,5 @@
 .\objects\lan8720.o: ..\USER\stm32f4x7_eth_conf.h
 .\objects\lan8720.o: ..\USER\stm32f4xx.h
 .\objects\lan8720.o: ..\MODULES\inc\usart.h
-.\objects\lan8720.o: ..\USER\main.h
-.\objects\lan8720.o: D:\software\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\lan8720.o: ..\MODULES\inc\delay.h
-.\objects\lan8720.o: ..\USER\main.h
-.\objects\lan8720.o: ..\MODULES\inc\spi.h
-.\objects\lan8720.o: ..\MODULES\inc\ads1258.h
-.\objects\lan8720.o: ..\MODULES\inc\usart.h
+.\objects\lan8720.o: ..\MODULES\inc\malloc.h
