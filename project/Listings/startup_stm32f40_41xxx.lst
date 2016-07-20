@@ -857,11 +857,11 @@ ARM Macro Assembler    Page 14
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=.\objects\startup_stm32f40_41xxx.d -o.\objects\startup_stm32f40
-_41xxx.o -IF:\Ñ¸²â×é\²É¼¯Æ÷\BridgeTorque\PROJECT\RTE -ID:\software\Keil_v5\ARM\
-PACK\ARM\CMSIS\4.3.0\CMSIS\Include -ID:\software\Keil_v5\ARM\PACK\Keil\STM32F4x
-x_DFP\2.4.0 --predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA
- 514" --predefine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --list=.\list
-ings\startup_stm32f40_41xxx.lst ..\USER\startup_stm32f40_41xxx.s
+_41xxx.o -IE:\dian_project\bridgetorque\project\RTE -I"D:\keil MDK\ARM\PACK\ARM
+\CMSIS\4.2.0\CMSIS\Include" -I"D:\keil MDK\ARM\PACK\Keil\STM32F4xx_DFP\2.5.0" -
+-predefine="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 514" --prede
+fine="_RTE_ SETA 1" --predefine="STM32F407xx SETA 1" --list=.\listings\startup_
+stm32f40_41xxx.lst ..\USER\startup_stm32f40_41xxx.s
 
 
 

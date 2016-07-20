@@ -14,7 +14,7 @@
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.5.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -428,6 +428,11 @@
               <FileType>2</FileType>
               <FilePath>..\USER\startup_stm32f40_41xxx.s</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\user\stm32f4xx_conf.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -462,6 +467,11 @@
               <FileName>malloc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MODULES\malloc\malloc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\sd\sdio_sdcard.c</FilePath>
             </File>
           </Files>
         </Group>
