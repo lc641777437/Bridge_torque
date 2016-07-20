@@ -25,7 +25,6 @@
 .\objects\main.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
 .\objects\main.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\misc.h
 .\objects\main.o: ..\MODULES\inc\delay.h
-.\objects\main.o: ..\USER\main.h
 .\objects\main.o: ..\MODULES\inc\spi.h
 .\objects\main.o: ..\MODULES\inc\ads1258.h
 .\objects\main.o: ..\MODULES\inc\usart.h

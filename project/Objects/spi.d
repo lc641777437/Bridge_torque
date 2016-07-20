@@ -1,14 +1,12 @@
 .\objects\spi.o: ..\MODULES\adc\spi.c
 .\objects\spi.o: ..\MODULES\inc\spi.h
-.\objects\spi.o: ..\USER\main.h
-.\objects\spi.o: D:\software\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-.\objects\spi.o: ..\USER\stm32f4xx.h
+.\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx.h
 .\objects\spi.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cm4.h
 .\objects\spi.o: D:\software\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\spi.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmInstr.h
 .\objects\spi.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmFunc.h
 .\objects\spi.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmSimd.h
-.\objects\spi.o: ..\USER\system_stm32f4xx.h
+.\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\system_stm32f4xx.h
 .\objects\spi.o: ..\USER\stm32f4xx_conf.h
 .\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h
 .\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx.h
@@ -25,8 +23,3 @@
 .\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h
 .\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
 .\objects\spi.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\misc.h
-.\objects\spi.o: ..\MODULES\inc\delay.h
-.\objects\spi.o: ..\USER\main.h
-.\objects\spi.o: ..\MODULES\inc\spi.h
-.\objects\spi.o: ..\MODULES\inc\ads1258.h
-.\objects\spi.o: ..\MODULES\inc\usart.h

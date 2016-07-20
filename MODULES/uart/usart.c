@@ -1,5 +1,6 @@
-#include "usart.h"
+#include <stdio.h>
 
+#include "usart.h"
 
 u8 res;
 static u8 printf_state;

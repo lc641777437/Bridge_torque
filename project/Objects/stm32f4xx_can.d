@@ -25,7 +25,6 @@
 .\objects\stm32f4xx_can.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
 .\objects\stm32f4xx_can.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\misc.h
 .\objects\stm32f4xx_can.o: ..\MODULES\inc\delay.h
-.\objects\stm32f4xx_can.o: ..\USER\main.h
 .\objects\stm32f4xx_can.o: ..\MODULES\inc\spi.h
 .\objects\stm32f4xx_can.o: ..\MODULES\inc\ads1258.h
 .\objects\stm32f4xx_can.o: ..\MODULES\inc\usart.h

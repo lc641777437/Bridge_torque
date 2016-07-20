@@ -1,9 +1,6 @@
 #ifndef __USART_H
 #define __USART_H
-
-
-#include "main.h"
-
+#include "stm32f4xx.h"
 
 void select_USART(int channel);
 void USART1_Configuration(void);
