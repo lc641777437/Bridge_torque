@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-void delay_ms(unsigned int t);
-void delay_us(unsigned int t);
+void delay_us(u32 nus);
+void delay_ms(u16 nms);
 
 #endif
