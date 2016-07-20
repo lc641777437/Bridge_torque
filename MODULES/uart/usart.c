@@ -1,6 +1,5 @@
-#include <stdio.h>
-
 #include "usart.h"
+
 
 u8 res;
 static u8 printf_state;
@@ -27,6 +26,11 @@ int fputc(int ch, FILE *f)
     {
         while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
         USART_SendData(USART1, (uint8_t)ch);
+	}
+	else if(printf_state==2)
+	{
+		while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
+		USART_SendData(USART2, (uint8_t)ch);
 	}
 	else if(printf_state==3)
 	{
@@ -94,6 +98,52 @@ void USART1_IRQHandler(void)
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 		res=USART_ReceiveData(USART1);
         send_Gps("%c",res);
+    }
+}
+
+void USART2_Configuration(void)
+{
+    USART_InitTypeDef usart2;
+    GPIO_InitTypeDef  gpio;
+    NVIC_InitTypeDef  nvic;
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2,ENABLE);
+
+    GPIO_PinAFConfig(GPIOD,GPIO_PinSource5,GPIO_AF_USART2);
+    GPIO_PinAFConfig(GPIOD,GPIO_PinSource6,GPIO_AF_USART2); 
+
+    gpio.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6;
+    gpio.GPIO_Mode = GPIO_Mode_AF;
+    gpio.GPIO_OType = GPIO_OType_PP;
+    gpio.GPIO_Speed = GPIO_Speed_50MHz;
+    gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOD,&gpio);
+
+    usart2.USART_BaudRate = 115200;
+    usart2.USART_WordLength = USART_WordLength_8b;
+    usart2.USART_StopBits = USART_StopBits_1;
+    usart2.USART_Parity = USART_Parity_No;
+    usart2.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;
+    usart2.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+    USART_Init(USART2,&usart2);
+
+    USART_ITConfig(USART2,USART_IT_RXNE,ENABLE);
+    USART_Cmd(USART2,ENABLE);
+
+    nvic.NVIC_IRQChannel = USART2_IRQn;
+    nvic.NVIC_IRQChannelPreemptionPriority = 3;
+    nvic.NVIC_IRQChannelSubPriority = 3;
+    nvic.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&nvic);
+}
+
+void USART2_IRQHandler(void)
+{
+    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
+    {
+        USART_ClearITPendingBit(USART2,USART_IT_RXNE);
+		//res=USART_ReceiveData(USART2);
     }
 }
 
