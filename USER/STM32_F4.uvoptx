@@ -400,7 +400,7 @@
 
   <Group>
     <GroupName>FATFS</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -438,7 +438,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MODULES\fatfs\src\option\cc936.c</PathWithFileName>
+      <PathWithFileName>..\MODULES\fatfs\src\cc936.c</PathWithFileName>
       <FilenameWithoutPath>cc936.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -451,7 +451,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MODULES\fatfs\exfuns\exfuns.c</PathWithFileName>
+      <PathWithFileName>..\MODULES\fatfs\src\exfuns.c</PathWithFileName>
       <FilenameWithoutPath>exfuns.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -464,7 +464,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\MODULES\fatfs\exfuns\fatfs_api.c</PathWithFileName>
+      <PathWithFileName>..\MODULES\fatfs\src\fatfs_api.c</PathWithFileName>
       <FilenameWithoutPath>fatfs_api.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

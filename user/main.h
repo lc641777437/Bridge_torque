@@ -13,7 +13,6 @@
 #include "malloc.h"
 #include "fatfs_api.h"
 #include "exfuns.h"
-#include "fatfs.h"
 
 
 void SystemConfiguration(void);

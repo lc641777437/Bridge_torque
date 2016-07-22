@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\FWLIB\STM32F4x7_ETH_Driver\inc;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\MODULES\inc;..\USER;.\RTE\Device\STM32F407VETx;..\MODULES\fatfs\src;..\MODULES\fatfs\exfuns</IncludePath>
+              <IncludePath>..\FWLIB\STM32F4x7_ETH_Driver\inc;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\MODULES\inc;..\USER;..\MODULES\fatfs\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -486,17 +486,17 @@
             <File>
               <FileName>cc936.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\src\option\cc936.c</FilePath>
+              <FilePath>..\MODULES\fatfs\src\cc936.c</FilePath>
             </File>
             <File>
               <FileName>exfuns.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\exfuns\exfuns.c</FilePath>
+              <FilePath>..\MODULES\fatfs\src\exfuns.c</FilePath>
             </File>
             <File>
               <FileName>fatfs_api.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\exfuns\fatfs_api.c</FilePath>
+              <FilePath>..\MODULES\fatfs\src\fatfs_api.c</FilePath>
             </File>
           </Files>
         </Group>
