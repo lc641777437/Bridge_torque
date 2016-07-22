@@ -1,6 +1,6 @@
 #ifndef __SDIO_SDCARD_H
 #define __SDIO_SDCARD_H																			   
-#include "main.h" 													   
+#include "stm32f4xx.h" 													   
 
 
 //SDIO相关标志位,拷贝自:stm32f4xx_sdio.h

@@ -428,11 +428,6 @@
               <FileType>2</FileType>
               <FilePath>..\USER\startup_stm32f40_41xxx.s</FilePath>
             </File>
-            <File>
-              <FileName>stm32f4xx_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\user\stm32f4xx_conf.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -473,10 +468,35 @@
               <FileType>1</FileType>
               <FilePath>..\MODULES\sd\sdio_sdcard.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>FATFS</GroupName>
+          <Files>
             <File>
-              <FileName>w25qxx.c</FileName>
+              <FileName>diskio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\W25QXX\w25qxx.c</FilePath>
+              <FilePath>..\MODULES\fatfs\src\diskio.c</FilePath>
+            </File>
+            <File>
+              <FileName>ff.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\fatfs\src\ff.c</FilePath>
+            </File>
+            <File>
+              <FileName>cc936.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\fatfs\src\option\cc936.c</FilePath>
+            </File>
+            <File>
+              <FileName>exfuns.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\fatfs\exfuns\exfuns.c</FilePath>
+            </File>
+            <File>
+              <FileName>fatfs_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\fatfs\exfuns\fatfs_api.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -642,36 +662,6 @@
               <FileName>stm32f4xx_wwdg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FWLIB\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_wwdg.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>FATFS</GroupName>
-          <Files>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\src\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\src\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\src\option\cc936.c</FilePath>
-            </File>
-            <File>
-              <FileName>exfuns.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\exfuns\exfuns.c</FilePath>
-            </File>
-            <File>
-              <FileName>fattester.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\fatfs\exfuns\fattester.c</FilePath>
             </File>
           </Files>
         </Group>

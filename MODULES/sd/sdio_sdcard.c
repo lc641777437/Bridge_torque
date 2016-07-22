@@ -1,7 +1,10 @@
+#include <string.h>
 #include "sdio_sdcard.h"
-#include "w25qxx.h" 
 #include "ff.h"  
 #include "exfuns.h"
+#include "delay.h"
+#include "usart.h"
+#include "malloc.h"
 
 /*用于sdio初始化的结构体*/
 SDIO_InitTypeDef SDIO_InitStructure;
@@ -84,26 +87,28 @@ SD_Error SD_Init(void)
     SDIO_Register_Deinit();
 
     NVIC_InitStructure.NVIC_IRQChannel = SDIO_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;//抢占优先级3
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//子优先级3
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;//抢占优先级3
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;		//子优先级3
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
     NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器、
 
-    errorstatus=SD_PowerON();			//SD卡上电
-    if(errorstatus==SD_OK)errorstatus=SD_InitializeCards();			//初始化SD卡														  
-    if(errorstatus==SD_OK)errorstatus=SD_GetCardInfo(&SDCardInfo);	//获取卡信息
-    if(errorstatus==SD_OK)errorstatus=SD_SelectDeselect((u32)(SDCardInfo.RCA<<16));//选中SD卡   
-    if(errorstatus==SD_OK)errorstatus=SD_EnableWideBusOperation(SDIO_BusWide_4b);	//4位宽度,如果是MMC卡,则不能用4位模式 
-    if((errorstatus==SD_OK)||(SDIO_MULTIMEDIA_CARD==CardType))
+    errorstatus = SD_PowerON();			//SD卡上电
+    if(errorstatus == SD_OK)errorstatus = SD_InitializeCards();			//初始化SD卡														  
+    if(errorstatus == SD_OK)errorstatus = SD_GetCardInfo(&SDCardInfo);	//获取卡信息
+    if(errorstatus == SD_OK)errorstatus = SD_SelectDeselect((u32)(SDCardInfo.RCA<<16));//选中SD卡   
+    if(errorstatus == SD_OK)errorstatus = SD_EnableWideBusOperation(SDIO_BusWide_4b);	//4位宽度,如果是MMC卡,则不能用4位模式 
+    if((errorstatus == SD_OK)||(SDIO_MULTIMEDIA_CARD==CardType))
     {  		    
-        if(SDCardInfo.CardType==SDIO_STD_CAPACITY_SD_CARD_V1_1||SDCardInfo.CardType==SDIO_STD_CAPACITY_SD_CARD_V2_0)
+        if(SDCardInfo.CardType == SDIO_STD_CAPACITY_SD_CARD_V1_1 || SDCardInfo.CardType == SDIO_STD_CAPACITY_SD_CARD_V2_0)
         {
-            clkdiv=SDIO_TRANSFER_CLK_DIV+2;	//V1.1/V2.0卡，设置最高48/4=12Mhz
+            clkdiv = SDIO_TRANSFER_CLK_DIV + 2;	//V1.1/V2.0卡，设置最高48/4=12Mhz
         }
-        else clkdiv=SDIO_TRANSFER_CLK_DIV;	//SDHC等其他卡，设置最高48/2=24Mhz
+        else 
+        {
+            clkdiv = SDIO_TRANSFER_CLK_DIV;	//SDHC等其他卡，设置最高48/2=24Mhz
+        }
         SDIO_Clock_Set(clkdiv);	//设置时钟频率,SDIO时钟计算公式:SDIO_CK时钟=SDIOCLK/[clkdiv+2];其中,SDIOCLK固定为48Mhz 
-        //errorstatus=SD_SetDeviceMode(SD_DMA_MODE);	//设置为DMA模式
-        errorstatus=SD_SetDeviceMode(SD_POLLING_MODE);//设置为查询模式
+        errorstatus = SD_SetDeviceMode(SD_POLLING_MODE);//设置为查询模式
     }
     return errorstatus;		 
 }
@@ -112,10 +117,10 @@ SD_Error SD_Init(void)
 //CK时钟=SDIOCLK/[clkdiv+2];(SDIOCLK时钟固定为48Mhz)
 void SDIO_Clock_Set(u8 clkdiv)
 {
-	u32 tmpreg=SDIO->CLKCR; 
-  	tmpreg&=0XFFFFFF00; 
- 	tmpreg|=clkdiv;   
-	SDIO->CLKCR=tmpreg;
+	u32 tmpreg = SDIO->CLKCR; 
+  	tmpreg &= 0XFFFFFF00; 
+ 	tmpreg |= clkdiv;   
+	SDIO->CLKCR = tmpreg;
 } 
 
 
@@ -258,7 +263,8 @@ SD_Error SD_PowerOFF(void)
   SDIO_SetPowerState(SDIO_PowerState_OFF);//SDIO电源关闭,时钟停止	
 
   return SD_OK;	  
-}   
+}  
+
 //初始化所有的卡,并让卡进入就绪状态
 //返回值:错误代码
 SD_Error SD_InitializeCards(void)
@@ -337,6 +343,7 @@ SD_Error SD_InitializeCards(void)
     }
     return SD_OK;//卡初始化成功
 } 
+
 //得到卡信息
 //cardinfo:卡信息存储区
 //返回值:错误状态
@@ -386,7 +393,8 @@ SD_Error SD_GetCardInfo(SD_CardInfo *cardinfo)
 		cardinfo->CardCapacity*=(1<<(cardinfo->SD_csd.DeviceSizeMul+2));
 		cardinfo->CardBlockSize=1<<(cardinfo->SD_csd.RdBlockLen);//块大小
 		cardinfo->CardCapacity*=cardinfo->CardBlockSize;
-	}else if(CardType==SDIO_HIGH_CAPACITY_SD_CARD)	//高容量卡
+	}
+    else if(CardType==SDIO_HIGH_CAPACITY_SD_CARD)	//高容量卡
 	{
  		tmp=(u8)(CSD_Tab[1]&0x000000FF); 		//第7个字节	
 		cardinfo->SD_csd.DeviceSize=(tmp&0x3F)<<16;//C_SIZE
@@ -459,6 +467,8 @@ SD_Error SD_GetCardInfo(SD_CardInfo *cardinfo)
 	cardinfo->SD_cid.Reserved2=1;	 
 	return errorstatus;
 }
+
+
 //设置SDIO总线宽度(MMC卡不支持4bit模式)
 //wmode:位宽模式.0,1位数据宽度;1,4位数据宽度;2,8位数据宽度
 //返回值:SD卡错误状态
@@ -468,8 +478,6 @@ SD_Error SD_GetCardInfo(SD_CardInfo *cardinfo)
 //   @arg SDIO_BusWide_4b: 4-bit data transfer
 //   @arg SDIO_BusWide_1b: 1-bit data transfer (默认)
 //返回值:SD卡错误状态
-
-
 SD_Error SD_EnableWideBusOperation(u32 WideMode)
 {
   	SD_Error errorstatus=SD_OK;
@@ -499,6 +507,7 @@ SD_Error SD_EnableWideBusOperation(u32 WideMode)
 	}
 	return errorstatus; 
 }
+
 //设置SD卡工作模式
 //Mode:
 //返回值:错误状态
@@ -509,6 +518,7 @@ SD_Error SD_SetDeviceMode(u32 Mode)
 	else errorstatus=SD_INVALID_PARAMETER;
 	return errorstatus;
 }
+
 //选卡
 //发送CMD7,选择相对地址(rca)为addr的卡,取消其他卡.如果为0,则都不选择.
 //addr:卡的RCA地址
@@ -523,6 +533,7 @@ SD_Error SD_SelectDeselect(u32 addr)
 
     return CmdResp1Error(SD_CMD_SEL_DESEL_CARD);	  
 }
+
 //SD卡读取一个块 
 //buf:读数据缓存区(必须4字节对齐!!)
 //addr:读取地址
@@ -647,6 +658,7 @@ SD_Error SD_ReadBlock(u8 *buf,long long addr,u16 blksize)
     }   
  	return errorstatus; 
 }
+
 //SD卡读取多个块 
 //buf:读数据缓存区
 //addr:读取地址
@@ -731,7 +743,8 @@ SD_Error SD_ReadMultiBlocks(u8 *buf,long long addr,u16 blksize,u32 nblks)
 					}
 					tempbuff+=8;	 
 					timeout=0X7FFFFF; 	//读数据溢出时间
-				}else 	//处理超时
+				}
+                else 	//处理超时
 				{
 					if(timeout==0)return SD_DATA_TIMEOUT;
 					timeout--;
@@ -741,15 +754,18 @@ SD_Error SD_ReadMultiBlocks(u8 *buf,long long addr,u16 blksize,u32 nblks)
 		{										   
 	 		SDIO_ClearFlag(SDIO_FLAG_DTIMEOUT); 	//清错误标志
 			return SD_DATA_TIMEOUT;
-	 	}else if(SDIO_GetFlagStatus(SDIO_FLAG_DCRCFAIL) != RESET)	//数据块CRC错误
+	 	}
+        else if(SDIO_GetFlagStatus(SDIO_FLAG_DCRCFAIL) != RESET)	//数据块CRC错误
 		{
 	 		SDIO_ClearFlag(SDIO_FLAG_DCRCFAIL);  		//清错误标志
 			return SD_DATA_CRC_FAIL;		   
-		}else if(SDIO_GetFlagStatus(SDIO_FLAG_RXOVERR) != RESET) 	//接收fifo上溢错误
+		}
+        else if(SDIO_GetFlagStatus(SDIO_FLAG_RXOVERR) != RESET) 	//接收fifo上溢错误
 		{
 	 		SDIO_ClearFlag(SDIO_FLAG_RXOVERR);		//清错误标志
 			return SD_RX_OVERRUN;		 
-		}else if(SDIO_GetFlagStatus(SDIO_FLAG_STBITERR) != RESET) 	//接收起始位错误
+		}
+        else if(SDIO_GetFlagStatus(SDIO_FLAG_STBITERR) != RESET) 	//接收起始位错误
 		{
 	 		SDIO_ClearFlag(SDIO_FLAG_STBITERR);//清错误标志
 			return SD_START_BIT_ERR;		 
@@ -778,7 +794,8 @@ SD_Error SD_ReadMultiBlocks(u8 *buf,long long addr,u16 blksize,u32 nblks)
         }
         INTX_ENABLE();//开启总中断
         SDIO_ClearFlag(SDIO_STATIC_FLAGS);//清除所有标记
- 		}else if(DeviceMode==SD_DMA_MODE)
+ 		}
+        else if(DeviceMode==SD_DMA_MODE)
 		{
 	   		TransferError=SD_OK;
 			StopCondition=1;			//多块读,需要发送停止传输指令 
@@ -793,7 +810,8 @@ SD_Error SD_ReadMultiBlocks(u8 *buf,long long addr,u16 blksize,u32 nblks)
 		}		 
   	}
 	return errorstatus;
-}			    																  
+}	
+
 //SD卡写1个块 
 //buf:数据缓存区
 //addr:写地址
@@ -847,7 +865,11 @@ SD_Error SD_WriteBlock(u8 *buf,long long addr,  u16 blksize)
 		
 		if(errorstatus!=SD_OK)return errorstatus;   	//响应错误	 
 		
-	}else return SD_INVALID_PARAMETER;	
+	}
+    else
+    {        
+        return SD_INVALID_PARAMETER;	
+    }
 	
     SDIO_CmdInitStructure.SDIO_Argument = (u32)RCA<<16;//发送CMD13,查询卡的状态,短响应 	
     SDIO_CmdInitStructure.SDIO_CmdIndex = SD_CMD_SEND_STATUS;
@@ -982,6 +1004,7 @@ SD_Error SD_WriteBlock(u8 *buf,long long addr,  u16 blksize)
 	}   
 	return errorstatus;
 }
+
 //SD卡写多个块 
 //buf:数据缓存区
 //addr:写地址
@@ -1173,11 +1196,13 @@ SD_Error SD_WriteMultiBlocks(u8 *buf,long long addr,u16 blksize,u32 nblks)
 	}   
 	return errorstatus;	   
 }
+
 //SDIO中断服务函数		  
 void SDIO_IRQHandler(void) 
 {											
  	SD_ProcessIRQSrc();//处理所有SDIO相关中断
-}	 																    
+}	 		
+
 //SDIO中断处理函数
 //处理SDIO传输过程中的各种中断事务
 //返回值:错误代码
@@ -1253,6 +1278,7 @@ SD_Error CmdError(void)
 	SDIO_ClearFlag(SDIO_STATIC_FLAGS);//清除所有标记
 	return errorstatus;
 }	 
+
 //检查R7响应的错误状态
 //返回值:sd卡错误码
 SD_Error CmdResp7Error(void)
@@ -1278,6 +1304,7 @@ SD_Error CmdResp7Error(void)
  	}
 	return errorstatus;
 }	   
+
 //检查R1响应的错误状态
 //cmd:当前命令
 //返回值:sd卡错误码
@@ -1303,6 +1330,7 @@ SD_Error CmdResp1Error(u8 cmd)
     SDIO_ClearFlag(SDIO_STATIC_FLAGS);//清除所有标记
 	return (SD_Error)(SDIO->RESP1&SD_OCR_ERRORBITS);//返回卡响应
 }
+
 //检查R3响应的错误状态
 //返回值:错误状态
 SD_Error CmdResp3Error(void)
@@ -1321,6 +1349,7 @@ SD_Error CmdResp3Error(void)
    SDIO_ClearFlag(SDIO_STATIC_FLAGS);//清除所有标记
  	return SD_OK;								  
 }
+
 //检查R2响应的错误状态
 //返回值:错误状态
 SD_Error CmdResp2Error(void)
@@ -1347,6 +1376,7 @@ SD_Error CmdResp2Error(void)
 	SDIO_ClearFlag(SDIO_STATIC_FLAGS);//清除所有标记
  	return errorstatus;								    		 
 } 
+
 //检查R6响应的错误状态
 //cmd:之前发送的命令
 //prca:卡返回的RCA地址
@@ -1425,7 +1455,8 @@ SD_Error SDEnWideBus(u8 enx)
 		
 		return errorstatus;
 	}else return SD_REQUEST_NOT_APPLICABLE;				//不支持宽总线设置 	 
-}												   
+}			
+
 //检查卡是否正在执行写操作
 //pstatus:当前状态.
 //返回值:错误代码
@@ -1459,6 +1490,7 @@ SD_Error IsCardProgramming(u8 *pstatus)
 	*pstatus=(u8)((respR1>>9)&0x0000000F);
 	return SD_OK;
 }
+
 //读取当前卡状态
 //pcardstatus:卡状态
 //返回值:错误代码
@@ -1483,6 +1515,7 @@ SD_Error SD_SendStatus(uint32_t *pcardstatus)
 	*pcardstatus=SDIO->RESP1;//读取响应值
 	return errorstatus;
 } 
+
 //返回SD卡的状态
 //返回值:SD卡状态
 SDCardState SD_GetState(void)
@@ -1491,6 +1524,7 @@ SDCardState SD_GetState(void)
 	if(SD_SendStatus(&resp1)!=SD_OK)return SD_CARD_ERROR;
 	else return (SDCardState)((resp1>>9) & 0x0F);
 }
+
 //查找SD卡的SCR寄存器值
 //rca:卡相对地址
 //pscr:数据缓存区(存储SCR内容)
@@ -1571,6 +1605,7 @@ SD_Error FindSCR(u16 rca,u32 *pscr)
 	*(pscr)=((tempscr[1]&SD_0TO7BITS)<<24)|((tempscr[1]&SD_8TO15BITS)<<8)|((tempscr[1]&SD_16TO23BITS)>>8)|((tempscr[1]&SD_24TO31BITS)>>24);
  	return errorstatus;
 }
+
 //得到NumberOfBytes以2为底的指数.
 //NumberOfBytes:字节数.
 //返回值:以2为底的指数值
@@ -1649,6 +1684,7 @@ u8 SD_ReadDisk(u8*buf,u32 sector,u8 cnt)
 	}
 	return sta;
 }
+
 //写SD卡
 //buf:写数据缓存区
 //sector:扇区地址
@@ -1675,18 +1711,15 @@ u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
 	}
 	return sta;
 }
+
 void check_SD_Card(void)
 {
-    u32 total,free;
-//	u8 t=0;	
-	u8 res=0;	
-
     while(SD_Init())
 	{
         LOG_DEBUG("%s","SD Card Error!");
-		delay_ms(50);
+		delay_ms(10);
         LOG_DEBUG("%s","Please Check!\r\n");
-        delay_ms(50);
+        delay_ms(10);
 	}
     switch(SDCardInfo.CardType)
 	{
@@ -1695,47 +1728,12 @@ void check_SD_Card(void)
 		case SDIO_HIGH_CAPACITY_SD_CARD:LOG_DEBUG("Card Type:SDHC V2.0\r\n");break;
 		case SDIO_MULTIMEDIA_CARD:LOG_DEBUG("Card Type:MMC Card\r\n");break;
 	}	
-    delay_ms(50);
+    delay_ms(10);
   	LOG_DEBUG("Card ManufacturerID:%d\r\n",SDCardInfo.SD_cid.ManufacturerID);	
-    delay_ms(50);
+    delay_ms(10);
  	LOG_DEBUG("Card RCA:%d\r\n",SDCardInfo.RCA);								
-    delay_ms(50);
+    delay_ms(10);
 	LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));	
-    delay_ms(50);
- 	LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);
-
-
-//	W25QXX_Init();				//初始化W25Q128
-
- 	exfuns_init();							//为fatfs相关变量申请内存				 
-  	res = f_mount(fs[0],"0:",1); 					//挂载SD卡 
-// 	res=f_mount(fs[1],"1:",1); 				//挂载FLASH.	
-//	if(res==0X0D)//FLASH磁盘,FAT文件系统错误,重新格式化FLASH
-//	{
-//		LOG_DEBUG("Flash Disk Formatting...");	//格式化FLASH
-//		res=f_mkfs("1:",1,4096);//格式化FLASH,1,盘符;1,不需要引导区,8个扇区为1个簇
-//		if(res==0)
-//		{
-//			f_setlabel((const TCHAR *)"1:ALIENTEK");	//设置Flash磁盘的名字为：ALIENTEK
-//			LOG_DEBUG("Flash Disk Format Finish");	//格式化完成
-//		}
-//        else
-//        {            
-//            LOG_DEBUG("Flash Disk Format Error ");	//格式化失败
-//        }
-//		delay_ms(1000);
-//	}		
-LOG_DEBUG("RESULT : %d\r\n",res);												    
-
-	while(exf_getfree("0",&total,&free))	//得到SD卡的总容量和剩余容量
-	{
-		LOG_DEBUG("SD Card Fatfs Error!");
-		delay_ms(200);
-		delay_ms(200);
-	}													  			    
-	LOG_DEBUG("FATFS OK!\r\n");	 
-	LOG_DEBUG("SD Total Size:%d MB",total>>10);	 
-	LOG_DEBUG("SD  Free Size:%d MB",free>>10); 	    
-
-    
+    delay_ms(10);
+ 	LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);  
 }

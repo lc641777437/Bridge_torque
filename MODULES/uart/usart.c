@@ -1,14 +1,7 @@
-#include <stdio.h>
 #include "usart.h"
 
 
-u8 res;
 static u8 printf_state;
-
-/*-----USART1_TX-----PB6-----*/
-/*-----USART1_RX-----PB7-----*/
-
-
 
 #if 1
 #pragma import(__use_no_semihosting)             
@@ -94,6 +87,7 @@ void USART1_Configuration(void)
 
 void USART1_IRQHandler(void)
 {
+    u8 res;
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
@@ -141,10 +135,13 @@ void USART2_Configuration(void)
 
 void USART2_IRQHandler(void)
 {
+    u8 res;
+
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART2,USART_IT_RXNE);
-		//res=USART_ReceiveData(USART2);
+		res=USART_ReceiveData(USART2);
+        LOG_DEBUG("%c",res);
     }
 }
 
@@ -188,6 +185,8 @@ void USART3_Configuration(void)
 
 void USART3_IRQHandler(void)
 {
+    u8 res;
+
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART3,USART_IT_RXNE);

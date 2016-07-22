@@ -1,8 +1,5 @@
 #ifndef __MAIN_H__
 #define __MAIN_H__
-
-
-
 #include <stdio.h>
 #include <string.h>
 
@@ -14,8 +11,9 @@
 #include "usart.h"
 #include "sdio_sdcard.h"
 #include "malloc.h"
-#include "fattester.h"
+#include "fatfs_api.h"
 #include "exfuns.h"
+#include "fatfs.h"
 
 
 void SystemConfiguration(void);

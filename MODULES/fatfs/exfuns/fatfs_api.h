@@ -38,6 +38,7 @@ void mf_setlabel(u8 *path);
 void mf_gets(u16 size);
 u8 mf_putc(u8 c);
 u8 mf_puts(u8*c);
+void fatfs_init(void);
  
 #endif
 
