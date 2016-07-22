@@ -1,5 +1,7 @@
 #include "sdio_sdcard.h"
-
+#include "w25qxx.h" 
+#include "ff.h"  
+#include "exfuns.h"
 
 /*用于sdio初始化的结构体*/
 SDIO_InitTypeDef SDIO_InitStructure;
@@ -1673,10 +1675,70 @@ u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
 	}
 	return sta;
 }
+void check_SD_Card(void)
+{
+    u32 total,free;
+	u8 t=0;	
+	u8 res=0;	
+
+    while(SD_Init())
+	{
+        LOG_DEBUG("%s","SD Card Error!");
+		delay_ms(50);
+        LOG_DEBUG("%s","Please Check!\r\n");
+        delay_ms(50);
+	}
+    switch(SDCardInfo.CardType)
+	{
+		case SDIO_STD_CAPACITY_SD_CARD_V1_1:LOG_DEBUG("Card Type:SDSC V1.1\r\n");break;
+		case SDIO_STD_CAPACITY_SD_CARD_V2_0:LOG_DEBUG("Card Type:SDSC V2.0\r\n");break;
+		case SDIO_HIGH_CAPACITY_SD_CARD:LOG_DEBUG("Card Type:SDHC V2.0\r\n");break;
+		case SDIO_MULTIMEDIA_CARD:LOG_DEBUG("Card Type:MMC Card\r\n");break;
+	}	
+    delay_ms(50);
+  	LOG_DEBUG("Card ManufacturerID:%d\r\n",SDCardInfo.SD_cid.ManufacturerID);	
+    delay_ms(50);
+ 	LOG_DEBUG("Card RCA:%d\r\n",SDCardInfo.RCA);								
+    delay_ms(50);
+	LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));	
+    delay_ms(50);
+ 	LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);
 
 
 
+	W25QXX_Init();				//初始化W25Q128
 
-
-
-
+ 	exfuns_init();							//为fatfs相关变量申请内存				 
+  	f_mount(fs[0],"0:",1); 					//挂载SD卡 
+ 	res=f_mount(fs[1],"1:",1); 				//挂载FLASH.	
+	if(res==0X0D)//FLASH磁盘,FAT文件系统错误,重新格式化FLASH
+	{
+		LOG_DEBUG("Flash Disk Formatting...");	//格式化FLASH
+		res=f_mkfs("1:",1,4096);//格式化FLASH,1,盘符;1,不需要引导区,8个扇区为1个簇
+		if(res==0)
+		{
+			f_setlabel((const TCHAR *)"1:ALIENTEK");	//设置Flash磁盘的名字为：ALIENTEK
+			LOG_DEBUG("Flash Disk Format Finish");	//格式化完成
+		}
+        else
+        {            
+            LOG_DEBUG("Flash Disk Format Error ");	//格式化失败
+        }
+		delay_ms(1000);
+	}													    
+	while(exf_getfree("0",&total,&free))	//得到SD卡的总容量和剩余容量
+	{
+		LOG_DEBUG("SD Card Fatfs Error!");
+		delay_ms(200);
+		delay_ms(200);
+	}													  			    
+	LOG_DEBUG("FATFS OK!");	 
+	LOG_DEBUG("SD Total Size:%d MB",total>>10);	 
+	LOG_DEBUG("SD  Free Size:%d MB",free>>10); 	    
+	while(1)
+	{
+		t++; 
+		delay_ms(200);		 			   
+	} 
+    
+}
