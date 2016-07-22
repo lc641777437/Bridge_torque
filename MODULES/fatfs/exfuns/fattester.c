@@ -50,7 +50,10 @@ u8 mf_read(u16 len)
 		}else
 		{
 			tlen+=br;
-			for(t=0;t<br;t++)LOG_DEBUG("%c",fatbuf[t]); 
+			for(t=0;t<br;t++)
+            {
+                LOG_DEBUG("%c",fatbuf[t]); 
+            }
 		}
 	}
 	if(len%512)
@@ -62,7 +65,10 @@ u8 mf_read(u16 len)
 		}else
 		{
 			tlen+=br;
-			for(t=0;t<br;t++)LOG_DEBUG("%c",fatbuf[t]); 
+			for(t=0;t<br;t++)
+            {
+                LOG_DEBUG("%c",fatbuf[t]); 
+            }
 		}	 
 	}
 	if(tlen)LOG_DEBUG("\r\nReaded data len:%d\r\n",tlen);//读到的数据长度

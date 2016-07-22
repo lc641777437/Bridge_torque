@@ -14,6 +14,8 @@
 #include "usart.h"
 #include "sdio_sdcard.h"
 #include "malloc.h"
+#include "fattester.h"
+#include "exfuns.h"
 
 
 void SystemConfiguration(void);
