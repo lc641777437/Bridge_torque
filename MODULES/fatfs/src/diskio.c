@@ -1,6 +1,5 @@
 #include "diskio.h"		/* FatFs lower layer API */
 #include "sdio_sdcard.h"
-#include "w25qxx.h"
 #include "malloc.h"		
 
 
