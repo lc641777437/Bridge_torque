@@ -1,25 +1,25 @@
-.\objects\system_stm32f4xx.o: ..\USER\system_stm32f4xx.c
-.\objects\system_stm32f4xx.o: ..\USER\stm32f4xx.h
-.\objects\system_stm32f4xx.o: D:\keil MDK\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cm4.h
-.\objects\system_stm32f4xx.o: D:\keil MDK\ARM\ARMCC\Bin\..\include\stdint.h
-.\objects\system_stm32f4xx.o: D:\keil MDK\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmInstr.h
-.\objects\system_stm32f4xx.o: D:\keil MDK\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmFunc.h
-.\objects\system_stm32f4xx.o: D:\keil MDK\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include\core_cmSimd.h
-.\objects\system_stm32f4xx.o: ..\USER\system_stm32f4xx.h
-.\objects\system_stm32f4xx.o: ..\USER\stm32f4xx_conf.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dma.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_exti.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_iwdg.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sdio.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_spi.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_syscfg.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
-.\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\misc.h
+..\project\objects\system_stm32f4xx.o: ..\USER\system_stm32f4xx.c
+..\project\objects\system_stm32f4xx.o: ..\USER\stm32f4xx.h
+..\project\objects\system_stm32f4xx.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cm4.h
+..\project\objects\system_stm32f4xx.o: D:\software\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+..\project\objects\system_stm32f4xx.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmInstr.h
+..\project\objects\system_stm32f4xx.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmFunc.h
+..\project\objects\system_stm32f4xx.o: D:\software\Keil_v5\ARM\PACK\ARM\CMSIS\4.3.0\CMSIS\Include\core_cmSimd.h
+..\project\objects\system_stm32f4xx.o: ..\USER\system_stm32f4xx.h
+..\project\objects\system_stm32f4xx.o: ..\USER\stm32f4xx_conf.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_adc.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_can.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_dma.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_exti.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_flash.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_iwdg.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_sdio.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_spi.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_syscfg.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_tim.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_usart.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_wwdg.h
+..\project\objects\system_stm32f4xx.o: ..\FWLIB\STM32F4xx_StdPeriph_Driver\inc\misc.h
