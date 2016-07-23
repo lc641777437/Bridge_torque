@@ -1,7 +1,18 @@
 #include "usart.h"
 
 
+u8 res;
 static u8 printf_state;
+u8 USART1_RX_BUF[50];
+u8 USART1_Rec_Len=0;
+u8 USART1_Rec_Over_Flag=0;
+
+#define USART1_MAX_RECV_LEN 50
+
+/*-----USART1_TX-----PB6-----*/
+/*-----USART1_RX-----PB7-----*/
+
+
 
 #if 1
 #pragma import(__use_no_semihosting)             
@@ -87,12 +98,24 @@ void USART1_Configuration(void)
 
 void USART1_IRQHandler(void)
 {
-    u8 res;
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 		res=USART_ReceiveData(USART1);
-        send_Gps("%c",res);
+        if(USART1_Rec_Len<USART1_MAX_RECV_LEN)      
+        {  
+            TIM3->CNT=0;                             
+            if(USART1_Rec_Over_Flag==0)
+            {
+                TIM3_Set(1);        
+                USART1_RX_BUF[USART1_Rec_Len++]=res;   
+            }                
+        }
+        else   
+        {  
+            USART1_Rec_Over_Flag=1;                    
+        }
+//        send_Gps("%c",res);
     }
 }
 
@@ -135,13 +158,10 @@ void USART2_Configuration(void)
 
 void USART2_IRQHandler(void)
 {
-    u8 res;
-
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART2,USART_IT_RXNE);
-		res=USART_ReceiveData(USART2);
-        LOG_DEBUG("%c",res);
+		//res=USART_ReceiveData(USART2);
     }
 }
 
@@ -185,14 +205,20 @@ void USART3_Configuration(void)
 
 void USART3_IRQHandler(void)
 {
-    u8 res;
-
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
     {
         USART_ClearITPendingBit(USART3,USART_IT_RXNE);
         res=USART_ReceiveData(USART3);
         send_Gprs("%c",res);
     }
+}
+
+void USART1_REC_timeout(void)
+{
+    USART1_Rec_Len=0;
+    USART1_Rec_Over_Flag=0;
+    send_Gps("%s",USART1_RX_BUF);
+    memset(USART1_RX_BUF,'\0',sizeof(USART1_RX_BUF));
 }
 
 

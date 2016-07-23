@@ -1,8 +1,9 @@
 #ifndef __USART_H
 #define __USART_H
+
 #include <stdio.h>
 #include "stm32f4xx.h"
-
+#include "timer.h"
 
 void select_USART(int channel);
 void USART1_Configuration(void);
@@ -11,6 +12,7 @@ void USART2_Configuration(void);
 void USART2_IRQHandler(void);
 void USART3_Configuration(void);
 void USART3_IRQHandler(void);
+void USART1_REC_timeout(void);
 
 #define send_Gps(fmt, ...) select_USART(1);\
 									printf (fmt, ##__VA_ARGS__)
