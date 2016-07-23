@@ -35,7 +35,7 @@ void delay_us(u32 nus)
 //nms<=0xffffff*8*1000/SYSCLK
 //SYSCLK单位为Hz,nms单位为ms
 //对72M条件下,nms<=1864 
-void delay_ms(u16 nms)
+void delay_xms(u16 nms)
 {	 		  	  
 	u32 temp;		   
 	SysTick->LOAD=(u32)nms*fac_ms;//时间加载(SysTick->LOAD为24bit)
@@ -49,3 +49,16 @@ void delay_ms(u16 nms)
 	SysTick->CTRL&=~SysTick_CTRL_ENABLE_Msk;       //关闭计数器
 	SysTick->VAL =0X00;       //清空计数器	  	    
 }
+
+void delay_ms(u16 nms)
+{
+    u8 repeat=nms/540;	
+	u16 remain=nms%540;
+	while(repeat)
+	{
+		delay_xms(540);
+		repeat--;
+	}
+	if(remain)delay_xms(remain);
+}
+
