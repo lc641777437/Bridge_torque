@@ -4,8 +4,6 @@
 //这是一个注释
 int main(void)
 {
-//    u8 res;
-    int j;
 	SystemConfiguration();
     
 	while(1)

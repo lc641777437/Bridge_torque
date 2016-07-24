@@ -1,4 +1,5 @@
 #include "timer.h"
+#include "usart.h"
 
 
 void TIM3_Init(void)
@@ -25,22 +26,25 @@ void TIM3_Init(void)
     TIM_Cmd(TIM3,ENABLE); 
 }
 
-void TIM3_Set(u8 sta)  
-{  
+void TIM3_set(u8 sta)  
+{
+    TIM3->CNT=0;            
     if(sta)  
     {  
-        TIM3->CNT=0;        
         TIM3->CR1|=1<<0;     
     }
-    else TIM3->CR1&=~(1<<0);
+    else 
+    {
+        TIM3->CR1&=~(1<<0);
+    }
 }  
 
 void TIM3_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM3,TIM_IT_Update)==SET)
     {
-        USART1_REC_timeout();
-        TIM3_Set(0); 
+        USART3_RECV_Timeout();
+        TIM3_set(0); 
     }
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);  
 }

@@ -1,18 +1,18 @@
 #include "usart.h"
+#include "timer.h"
 
 
-u8 res;
+#define USART_MAX_RECV_LEN 256
+
 static u8 printf_state;
-u8 USART1_RX_BUF[50];
-u8 USART1_Rec_Len=0;
-u8 USART1_Rec_Over_Flag=0;
 
-#define USART1_MAX_RECV_LEN 50
+static u16 USART3_RX_STA = 0;//接收状态标记    
+static u16 USART1_RX_STA = 0;//接收状态标记    
+static u16 USART2_RX_STA = 0;//接收状态标记
 
-/*-----USART1_TX-----PB6-----*/
-/*-----USART1_RX-----PB7-----*/
-
-
+static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];    
+static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
+static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];    
 
 #if 1
 #pragma import(__use_no_semihosting)             
@@ -27,33 +27,31 @@ FILE __stdout;
 //重定义fputc函数
 int fputc(int ch, FILE *f)
 {
-    if(printf_state==1)
+    switch(printf_state)
     {
-        while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
-        USART_SendData(USART1, (uint8_t)ch);
-	}
-	else if(printf_state==2)
-	{
-		while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
-		USART_SendData(USART2, (uint8_t)ch);
-	}
-	else if(printf_state==3)
-	{
-		while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
-		USART_SendData(USART3, (uint8_t)ch);
-	}
+        case 1:
+            while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
+            USART_SendData(USART1, (uint8_t)ch);
+            break;
+        
+        case 2:  		
+            while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
+            USART_SendData(USART2, (uint8_t)ch);
+            break;
+        
+        case 3:
+            while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
+            USART_SendData(USART3, (uint8_t)ch);
+
+            break;
+    }
 	return ch;
 }
 
-int GetKey (void) 
-{
-	while (!(USART1->SR & USART_FLAG_RXNE));
-	return ((int)(USART1->DR & 0x1FF));
-}
 #endif
 
 
-void select_USART(int channel)
+void select_USART(u8 channel)
 {
 	printf_state = channel;
 }
@@ -95,29 +93,47 @@ void USART1_Configuration(void)
     NVIC_Init(&nvic);
 }
 
+void USART1_proc()    
+{
+    send_USART1("%s",USART1_RX_BUF);
+    
+    memset(USART1_RX_BUF,'\0',strlen((const char*)USART1_RX_BUF));
+    return;
+}
 
 void USART1_IRQHandler(void)
 {
-    if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)
-    {
+    u8 res;
+
+    if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+	{
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
-		res=USART_ReceiveData(USART1);
-        if(USART1_Rec_Len<USART1_MAX_RECV_LEN)      
-        {  
-            TIM3->CNT=0;                             
-            if(USART1_Rec_Over_Flag==0)
+
+		res = USART_ReceiveData(USART1);//(USART2->DR);	//读取接收到的数据
+		
+        if(USART1_RX_STA & 0x4000)      //之前接收到了0x0d
+        {
+            USART1_RX_STA = 0;
+            if(res == 0x0a)             //接收完成了
             {
-                TIM3_Set(1);        
-                USART1_RX_BUF[USART1_Rec_Len++]=res;   
-            }                
+                USART1_proc();
+            }
         }
-        else   
-        {  
-            USART1_Rec_Over_Flag=1;                    
-        }
-//        send_Gps("%c",res);
+        else                            //之前还没收到0X0d
+        {	
+            if(res == 0x0d)
+                USART1_RX_STA |= 0x4000;
+            else
+            {
+                USART1_RX_BUF[USART1_RX_STA++ & 0X3FFF] = res;
+                if(USART1_RX_STA > (USART_MAX_RECV_LEN - 1))
+                    USART1_RX_STA = 0;  //接收数据错误,重新开始接收	  
+            }		 
+        }	  		 
     }
 }
+
+
 
 void USART2_Configuration(void)
 {
@@ -155,15 +171,49 @@ void USART2_Configuration(void)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
+  
+void USART2_proc()
+{
+    LOG_DEBUG("%s",USART2_RX_BUF);
+    
+    memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
+    return;
+}
 
 void USART2_IRQHandler(void)
 {
-    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)
-    {
+    u8 res;
+ 
+    if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+	{
         USART_ClearITPendingBit(USART2,USART_IT_RXNE);
-		//res=USART_ReceiveData(USART2);
+
+		res = USART_ReceiveData(USART2);//(USART2->DR);	//读取接收到的数据
+		
+
+        if(USART2_RX_STA & 0x4000)      //之前接收到了0x0d
+        {
+            USART2_RX_STA = 0;
+            if(res == 0x0a)             //接收完成了
+            {
+                USART2_proc();
+            }
+        }
+        else                            //之前还没收到0X0d
+        {	
+            if(res == 0x0d)
+                USART2_RX_STA |= 0x4000;
+            else
+            {
+                USART2_RX_BUF[USART2_RX_STA++ & 0X3FFF] = res;
+                if(USART2_RX_STA > (USART_MAX_RECV_LEN - 1))
+                    USART2_RX_STA = 0;  //接收数据错误,重新开始接收	  
+            }		 
+        }	  		 
     }
 }
+
+
 
 void USART3_Configuration(void)
 {
@@ -202,23 +252,49 @@ void USART3_Configuration(void)
     NVIC_Init(&nvic);
 }
 
+void USART3_proc(void)
+{
+    send_USART3("%s",USART3_RX_BUF);
+    
+    USART3_RX_STA = 0;
+    memset(USART3_RX_BUF,'\0',strlen((const char*)USART3_RX_BUF));
+    return;
+}
 
 void USART3_IRQHandler(void)
 {
-    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)
-    {
+    u8 res;
+ 
+    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+	{
         USART_ClearITPendingBit(USART3,USART_IT_RXNE);
-        res=USART_ReceiveData(USART3);
-        send_Gprs("%c",res);
+
+		res = USART_ReceiveData(USART3);//(USART3->DR);	//读取接收到的数据
+		
+        if(USART3_RX_STA & 0x4000)      //之前接收到了0x0d
+        {
+            USART3_RX_STA = 0;
+            if(res == 0x0a)             //接收完成了
+            {
+                USART3_proc();
+            }
+        }
+        else                            //之前还没收到0X0d
+        {	
+            if(res == 0x0d)
+                USART3_RX_STA |= 0x4000;
+            else
+            {
+                TIM3_set(1);
+                USART3_RX_BUF[USART3_RX_STA++ & 0X3FFF] = res;
+                if(USART3_RX_STA > (USART_MAX_RECV_LEN - 1))
+                    USART3_RX_STA = 0;  //接收数据错误,重新开始接收	  
+            }		 
+        }	  		 
     }
 }
 
-void USART1_REC_timeout(void)
+void USART3_RECV_Timeout(void)
 {
-    USART1_Rec_Len=0;
-    USART1_Rec_Over_Flag=0;
-    send_Gps("%s",USART1_RX_BUF);
-    memset(USART1_RX_BUF,'\0',sizeof(USART1_RX_BUF));
+     USART3_proc();
 }
-
-
