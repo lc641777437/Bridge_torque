@@ -96,9 +96,14 @@ void USART1_Configuration(void)
 void USART1_proc()    
 {
     send_USART1("%s",USART1_RX_BUF);
-    
+    USART1_RX_STA = 0;
     memset(USART1_RX_BUF,'\0',strlen((const char*)USART1_RX_BUF));
     return;
+}
+
+void USART1_RECV_Timeout(void)
+{
+     USART1_proc();
 }
 
 void USART1_IRQHandler(void)
@@ -116,6 +121,7 @@ void USART1_IRQHandler(void)
             USART1_RX_STA = 0;
             if(res == 0x0a)             //接收完成了
             {
+                TIM4_set(0);
                 USART1_proc();
             }
         }
@@ -125,6 +131,7 @@ void USART1_IRQHandler(void)
                 USART1_RX_STA |= 0x4000;
             else
             {
+                TIM4_set(1);
                 USART1_RX_BUF[USART1_RX_STA++ & 0X3FFF] = res;
                 if(USART1_RX_STA > (USART_MAX_RECV_LEN - 1))
                     USART1_RX_STA = 0;  //接收数据错误,重新开始接收	  
@@ -132,6 +139,8 @@ void USART1_IRQHandler(void)
         }	  		 
     }
 }
+
+
 
 
 
@@ -276,6 +285,7 @@ void USART3_IRQHandler(void)
             USART3_RX_STA = 0;
             if(res == 0x0a)             //接收完成了
             {
+                TIM3_set(0);
                 USART3_proc();
             }
         }

@@ -112,7 +112,7 @@ typedef int sys_prot_t;
 #endif
 
 #ifndef LWIP_PLATFORM_DIAG
-#define LWIP_PLATFORM_DIAG(x) do {printf x;} while(0)
+#define LWIP_PLATFORM_DIAG(x) do {LOG_DEBUG x;} while(0)
 #endif
 
 #endif /* __CC_H__ */
