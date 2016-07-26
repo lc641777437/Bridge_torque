@@ -14,7 +14,7 @@ static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];    
 
-#if 1
+
 #pragma import(__use_no_semihosting)             
                
 struct __FILE 
@@ -47,9 +47,6 @@ int fputc(int ch, FILE *f)
     }
 	return ch;
 }
-
-#endif
-
 
 void select_USART(u8 channel)
 {
@@ -270,6 +267,11 @@ void USART3_proc(void)
     return;
 }
 
+void USART3_RECV_Timeout(void)
+{
+     USART3_proc();
+}
+
 void USART3_IRQHandler(void)
 {
     u8 res;
@@ -304,7 +306,9 @@ void USART3_IRQHandler(void)
     }
 }
 
-void USART3_RECV_Timeout(void)
+void UART_Init(void)
 {
-     USART3_proc();
+    USART1_Configuration();
+    USART2_Configuration();
+	USART3_Configuration();
 }

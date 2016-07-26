@@ -4,6 +4,7 @@
 #include <string.h>
 #include "stm32f4xx.h"
 
+void TIM_Init(void);
 
 void TIM3_Init(void);
 void TIM3_set(u8 sta);

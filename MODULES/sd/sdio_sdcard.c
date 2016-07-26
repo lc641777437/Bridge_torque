@@ -5,6 +5,8 @@
 #include "delay.h"
 #include "usart.h"
 #include "malloc.h"
+#include "fatfs_api.h"
+
 
 /*用于sdio初始化的结构体*/
 SDIO_InitTypeDef SDIO_InitStructure;
@@ -1736,4 +1738,13 @@ void check_SD_Card(void)
 	LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));	
     delay_ms(10);
  	LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);  
+}
+
+void SD_Card_Init(void)
+{
+    mymem_init(SRAMIN);
+    mymem_init(SRAMCCM);
+    check_SD_Card();
+    fatfs_init();
+
 }

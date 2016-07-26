@@ -16,10 +16,7 @@
 #include "malloc.h"
 #include "exfuns.h"
 #include "timer.h"
-#include "fatfs_api.h"
 #include "lwip_comm.h" 
-#include "httpd.h"
-
 
 void SystemConfiguration(void);
 

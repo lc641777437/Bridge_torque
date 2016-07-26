@@ -3,6 +3,12 @@
 
 extern u32 lwip_localtime;
 
+void TIM_Init(void)
+{    
+    TIM3_Init();
+    TIM4_Init();
+    TIM5_Init();    
+}
 void TIM3_Init(void)
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;

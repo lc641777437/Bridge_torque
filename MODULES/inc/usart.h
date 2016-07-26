@@ -6,13 +6,10 @@
 
 void select_USART(u8 channel);
 
-void USART1_Configuration(void);
 void USART1_RECV_Timeout(void);
-
-void USART2_Configuration(void);
-
-void USART3_Configuration(void);
 void USART3_RECV_Timeout(void);
+
+void UART_Init(void);
 
 #define send_USART1(fmt, ...) select_USART(1);\
 									printf (fmt, ##__VA_ARGS__)

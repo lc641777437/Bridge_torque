@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "lwip_comm.h" 
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
@@ -12,22 +14,8 @@
 #include "malloc.h"
 #include "delay.h"
 #include "usart.h"  
-#include <stdio.h>
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
-//lwip通用驱动 代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/8/15
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-//*******************************************************************************
-//修改信息
-//无
-////////////////////////////////////////////////////////////////////////////////// 	   
+#include "httpd.h"
+
    
 __lwip_dev lwipdev;						//lwip控制结构体 
 struct netif lwip_netif;				//定义一个全局的网络接口
@@ -259,6 +247,41 @@ void lwip_dhcp_process_handle(void)
 	}
 }
 #endif 
+
+void LWIP_Init(void)
+{
+    while(lwip_comm_init()!=0)
+	{
+		LOG_DEBUG("lwIP Init failed!\r\n");
+		delay_ms(1200);
+		LOG_DEBUG("Retrying...\r\n"); 
+	}
+    LOG_DEBUG("lwIP Init Successed\r\n");
+ 	LOG_DEBUG("DHCP IP configing...\r\n");
+    while((lwipdev.dhcpstatus!=2)&&(lwipdev.dhcpstatus!=0XFF))
+	{
+		lwip_periodic_handle();
+	}
+    LOG_DEBUG("DHCP IP Successed\r\n");
+    if(lwipdev.dhcpstatus==2)
+    {
+        LOG_DEBUG("DHCP IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+    }
+	else 
+    {
+        LOG_DEBUG("Static IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+    }
+	if(LAN8720_Get_Speed()&1<<1)
+    {
+        LOG_DEBUG("Ethernet Speed:100M");
+    }
+	else 
+    {
+        LOG_DEBUG("Ethernet Speed:10M");
+    }
+    httpd_init();
+}
+
 
 
 
