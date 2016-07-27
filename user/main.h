@@ -17,6 +17,7 @@
 #include "exfuns.h"
 #include "timer.h"
 #include "lwip_comm.h" 
+#include "exti.h"
 
 void SystemConfiguration(void);
 
