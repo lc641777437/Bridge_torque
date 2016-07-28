@@ -3,7 +3,7 @@
 #include "delay.h"
 #include "exti.h"
 
-int ad_Data[16];
+static int ad_Data[16];
 
 void ads1258_Init(void)
 {
@@ -14,10 +14,8 @@ void ads1258_Init(void)
 
 u8 ads1258_ReadRegister(u8 addr)
 {
-    u8 res;
     SPI2_ReadWriteByte(0x40|addr);
-    res=SPI2_ReadWriteByte(0xA0);
-    return res;
+    return SPI2_ReadWriteByte(0xA0);
 }
 
 void ads1258_WriteRegister(u8 addr,u8 data)
@@ -26,25 +24,25 @@ void ads1258_WriteRegister(u8 addr,u8 data)
     SPI2_ReadWriteByte(data);
 }
 
-void ad_DataConvert(u8 result[4],int Data[16])
+void ad_DataConvert(u8 result[4])
 {
-    Data[result[0]-8]&=0x00000000;
-    Data[result[0]-8]|=result[1];
-    Data[result[0]-8]<<=8;
-    Data[result[0]-8]|=result[2];
-    Data[result[0]-8]<<=8;
-    Data[result[0]-8]|=result[3];
+    ad_Data[result[0]-8]&=0x00000000;
+    ad_Data[result[0]-8]|=result[1];
+    ad_Data[result[0]-8]<<=8;
+    ad_Data[result[0]-8]|=result[2];
+    ad_Data[result[0]-8]<<=8;
+    ad_Data[result[0]-8]|=result[3];
 }
 
 void ads1258_ReadData(void)
 {
-    u8 res[4];
-    res[0]=SPI2_ReadWriteByte(0xA0);
-    res[1]=SPI2_ReadWriteByte(0xA0);
-    res[2]=SPI2_ReadWriteByte(0xA0);
-    res[3]=SPI2_ReadWriteByte(0xA0);
-    res[0]&=0x1f;
-    ad_DataConvert(res,ad_Data);
+    u8 iData[4];
+    iData[0]=SPI2_ReadWriteByte(0xA0);
+    iData[1]=SPI2_ReadWriteByte(0xA0);
+    iData[2]=SPI2_ReadWriteByte(0xA0);
+    iData[3]=SPI2_ReadWriteByte(0xA0);
+    iData[0]&=0x1f;
+    ad_DataConvert(iData);
 }
 
 

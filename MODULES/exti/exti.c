@@ -3,7 +3,6 @@
 #include "ads1258.h"
 
 
-
 void EXTI_Configuration(void)
 {
 		GPIO_InitTypeDef GPIO_InitStructure;
@@ -28,8 +27,8 @@ void EXTI_Configuration(void)
 		EXTI_Init(&EXTI_InitStructure);
 		
 		NVIC_InitStructure.NVIC_IRQChannel=EXTI9_5_IRQn;
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;//?????3
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority =2;		//????2
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority =2;		
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;		
 		NVIC_Init(&NVIC_InitStructure);	
 }
