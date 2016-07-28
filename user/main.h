@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "lwip_comm.h" 
 #include "exti.h"
+#include "rtc.h"
 
 void SystemConfiguration(void);
 

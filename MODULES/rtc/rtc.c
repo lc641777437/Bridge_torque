@@ -1,5 +1,6 @@
 #include "rtc.h"
 #include "delay.h"
+#include "usart.h"
 
 NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -60,13 +61,13 @@ u8 My_RTC_Init(void)
         RCC_RTCCLKConfig(RCC_RTCCLKSource_LSE);		//设置RTC时钟(RTCCLK),选择LSE作为RTC时钟    
         RCC_RTCCLKCmd(ENABLE);	//使能RTC时钟 
 
-        RTC_InitStructure.RTC_AsynchPrediv = 0x7F;//RTC异步分频系数(1~0X7F)
-        RTC_InitStructure.RTC_SynchPrediv  = 0xFF;//RTC同步分频系数(0~7FFF)
+        RTC_InitStructure.RTC_AsynchPrediv = 0x1F;//RTC异步分频系数(1~0X7F)
+        RTC_InitStructure.RTC_SynchPrediv  = 0x3FF;//RTC同步分频系数(0~7FFF)
         RTC_InitStructure.RTC_HourFormat   = RTC_HourFormat_24;//RTC设置为,24小时格式
         RTC_Init(&RTC_InitStructure);
 
-        RTC_Set_Time(23,59,56,RTC_H12_AM);	//设置时间
-        RTC_Set_Date(14,5,5,1);		//设置日期
+        RTC_Set_Time(21,15,56,RTC_H12_AM);	//设置时间
+        RTC_Set_Date(16,7,27,3);		//设置日期
 
         RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//标记已经初始化过了
     } 
@@ -160,9 +161,11 @@ void RTC_Set_WakeUp(u32 wksel,u16 cnt)
 //RTC闹钟中断服务函数
 void RTC_Alarm_IRQHandler(void)
 {    
+    
 	if(RTC_GetFlagStatus(RTC_FLAG_ALRAF)==SET)//ALARM A中断?
 	{
 		RTC_ClearFlag(RTC_FLAG_ALRAF);//清除中断标志
+        LOG_DEBUG("ALARM OK\r\n");
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line17);	//清除中断线17的中断标志 											 
 }
@@ -170,9 +173,13 @@ void RTC_Alarm_IRQHandler(void)
 //RTC WAKE UP中断服务函数
 void RTC_WKUP_IRQHandler(void)
 {    
+    RTC_TimeTypeDef RTC_TimeStruct;
+    RTC_DateTypeDef RTC_DateStruct;
+
 	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WK_UP中断?
 	{ 
 		RTC_ClearFlag(RTC_FLAG_WUTF);	//清除中断标志
+        LOG_DEBUG("WAKEUP OK\r\n");
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line22);//清除中断线22的中断标志 								
 }
