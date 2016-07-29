@@ -1,6 +1,5 @@
 #include "main.h"
 
-int i;
 
 int main(void)
 {
@@ -8,6 +7,7 @@ int main(void)
 //    RTC_TimeTypeDef RTC_TimeStruct;
 //    RTC_DateTypeDef RTC_DateStruct;
 	SystemConfiguration();
+    
     
 	while(1)
 	{
@@ -35,7 +35,6 @@ void SystemConfiguration(void)
     RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,9);		//配置WAKE UP中断,1秒钟中断一次
     RTC_Set_AlarmA(3,21,16,59);
     GPIO_init();
-    TIM2_Init();
 }
 
 

@@ -1,5 +1,6 @@
 #include "usart.h"
 #include "timer.h"
+#include "stmflash.h"
 
 
 #define USART_MAX_RECV_LEN 256
@@ -172,7 +173,7 @@ void USART2_Configuration(void)
     USART_Cmd(USART2,ENABLE);
 
     nvic.NVIC_IRQChannel = USART2_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 3;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 3;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
@@ -180,8 +181,25 @@ void USART2_Configuration(void)
   
 void USART2_proc()
 {
-    LOG_DEBUG("%s",USART2_RX_BUF);
-    
+    char command[20];
+    int data;
+    //LOG_DEBUG("%s",USART2_RX_BUF);
+    if(strstr((char *)USART2_RX_BUF, "SampleRate:"))
+    {
+        sscanf((const char*)&USART2_RX_BUF,"%11s%d",command,&data);
+        LOG_DEBUG("%s\r\n",command);
+        LOG_DEBUG("%d\r\n",data);
+        set_Frequent(data);
+        LOG_DEBUG("Set sample rate OK\r\n");
+    }
+    if(strstr((char *)USART2_RX_BUF, "SetDeviceID:"))
+    {
+        sscanf((const char*)&USART2_RX_BUF,"%12s%d",command,&data);
+        LOG_DEBUG("%s\r\n",command);
+        LOG_DEBUG("%d\r\n",data);
+        Set_DeviceID(data);
+        LOG_DEBUG("Set device ID OK\r\n");
+    }
     memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
     return;
 }

@@ -8,6 +8,7 @@ int time_Set=500;
 
 void TIM_Init(void)
 {    
+    TIM2_Init();
     TIM3_Init();
     TIM4_Init();
     TIM5_Init();    

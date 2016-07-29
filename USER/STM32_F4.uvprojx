@@ -428,6 +428,11 @@
               <FileType>2</FileType>
               <FilePath>..\USER\startup_stm32f40_41xxx.s</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\stm32f4xx_conf.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -492,6 +497,11 @@
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MODULES\gpio\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\flash\stmflash.c</FilePath>
             </File>
           </Files>
         </Group>

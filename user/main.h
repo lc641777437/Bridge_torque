@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #include "stm32f4xx.h"
 #include "delay.h"
 #include "sys.h"
@@ -20,6 +21,7 @@
 #include "exti.h"
 #include "rtc.h"
 #include "gpio.h"
+#include "stmflash.h"
 
 void SystemConfiguration(void);
 

@@ -3,12 +3,18 @@
 #include "delay.h"
 #include "exti.h"
 #include "usart.h"
+#include "sys.h"
+#include "gpio.h"
+#include "stmflash.h"
 
+#define DeviceID *(vu32*)FALSH_SAVE_ADDR
 static int ad_Data[16];
 static int ad_Data_Max[16];
-static int ad_Data_Min[16]={0x7FFFFF};
+static int ad_Data_Min[16];
 static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
+static char ad_State[16];
+
 
 void ads1258_Init(void)
 {
@@ -77,9 +83,28 @@ void ad_Data_Proc(void)
 void send_AD_RawData(void)
 {
     int i;
+    ad_State[0]=STATE_0;
+    ad_State[1]=STATE_1;
+    ad_State[2]=STATE_2;
+    ad_State[3]=STATE_3;
+    ad_State[4]=STATE_4;
+    ad_State[5]=STATE_5;
+    ad_State[6]=STATE_6;
+    ad_State[7]=STATE_7;
+    ad_State[8]=STATE_8;
+    ad_State[9]=STATE_9;
+    ad_State[10]=STATE_10;
+    ad_State[11]=STATE_11;
+    ad_State[12]=STATE_12;
+    ad_State[13]=STATE_13;
+    ad_State[14]=STATE_14;
+    ad_State[15]=STATE_15;
     for(i=0;i<16;i++)
     {
-        LOG_DEBUG("[DEV][%d]:%d\r\n",i,ad_Data[i]);
+        if(ad_State[i]==0)
+        {
+            LOG_DEBUG("[DEVID:%d][%d]:%d\r\n",DeviceID,i+1,ad_Data[i]);
+        }
     }
 }
 
