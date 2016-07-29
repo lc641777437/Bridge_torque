@@ -2,8 +2,13 @@
 #include "spi.h"
 #include "delay.h"
 #include "exti.h"
+#include "usart.h"
 
 static int ad_Data[16];
+static int ad_Data_Max[16];
+static int ad_Data_Min[16]={0x7FFFFF};
+static long long int ad_Data_Sum[16];
+static long int ad_Data_Num[16];
 
 void ads1258_Init(void)
 {
@@ -32,6 +37,12 @@ void ad_DataConvert(u8 result[4])
     ad_Data[result[0]-8]|=result[2];
     ad_Data[result[0]-8]<<=8;
     ad_Data[result[0]-8]|=result[3];
+    if(ad_Data[result[0]-8]>ad_Data_Max[result[0]-8])
+        ad_Data_Max[result[0]-8]=ad_Data[result[0]-8];
+    if(ad_Data[result[0]-8]<ad_Data_Min[result[0]-8])
+        ad_Data_Min[result[0]-8]=ad_Data[result[0]-8];
+    ad_Data_Sum[result[0]-8]+=ad_Data[result[0]-8];
+    ad_Data_Num[result[0]-8]++;
 }
 
 void ads1258_ReadData(void)
@@ -45,6 +56,32 @@ void ads1258_ReadData(void)
     ad_DataConvert(iData);
 }
 
+void ad_Data_Proc(void)
+{
+    int n;
+    int avr;
+    for(n=0;n<16;n++)
+    {
+        avr=ad_Data_Sum[n]/ad_Data_Num[n];
+        LOG_DEBUG("CHANNEL ID: %d\r\n",n);
+        LOG_DEBUG("MAX: %d\r\n",ad_Data_Max[n]);
+        LOG_DEBUG("MIN: %d\r\n",ad_Data_Min[n]);
+        LOG_DEBUG("AVR: %d\r\n",avr);
+        ad_Data_Sum[n]=0;
+        ad_Data_Max[n]=0;
+        ad_Data_Min[n]=0x7FFFFF;
+        ad_Data_Num[n]=0;
+    }
+}
+
+void send_AD_RawData(void)
+{
+    int i;
+    for(i=0;i<16;i++)
+    {
+        LOG_DEBUG("[DEV][%d]:%d\r\n",i,ad_Data[i]);
+    }
+}
 
 
 

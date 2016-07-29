@@ -1,6 +1,8 @@
 #include "rtc.h"
 #include "delay.h"
 #include "usart.h"
+#include "ads1258.h"
+
 
 NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -173,13 +175,11 @@ void RTC_Alarm_IRQHandler(void)
 //RTC WAKE UP中断服务函数
 void RTC_WKUP_IRQHandler(void)
 {    
-    RTC_TimeTypeDef RTC_TimeStruct;
-    RTC_DateTypeDef RTC_DateStruct;
 
-	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WK_UP中断?
+	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WAKE_UP中断
 	{ 
 		RTC_ClearFlag(RTC_FLAG_WUTF);	//清除中断标志
-        LOG_DEBUG("WAKEUP OK\r\n");
+        //ad_Data_Proc();
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line22);//清除中断线22的中断标志 								
 }

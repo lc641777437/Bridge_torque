@@ -1,7 +1,10 @@
 #include "exti.h"
 #include "spi.h"
 #include "ads1258.h"
+#include "sys.h"
+#include "usart.h"
 
+int Count=0;
 
 void EXTI_Configuration(void)
 {
@@ -37,7 +40,20 @@ void EXTI9_5_IRQHandler(void)
 {
     if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
     {
-        ads1258_ReadData();
+        if(PBout(12)==1)
+        {
+            if(Count<16)
+            {
+                ads1258_ReadData();
+                Count++;
+            }
+            else
+            {
+                PBout(12)=0;
+                Count=0;
+                send_AD_RawData();
+            }
+        }
 		EXTI_ClearITPendingBit(EXTI_Line8);
     }
 }

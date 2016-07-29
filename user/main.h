@@ -19,6 +19,7 @@
 #include "lwip_comm.h" 
 #include "exti.h"
 #include "rtc.h"
+#include "gpio.h"
 
 void SystemConfiguration(void);
 
