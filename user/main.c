@@ -28,13 +28,18 @@ void SystemConfiguration(void)
     delay_init();
     UART_Init();
     TIM_Init();
-    //SD_Card_Init();
+    SD_Card_Init();
     //LWIP_Init();
     ads1258_Init();
     My_RTC_Init();		 		//初始化RTC
-    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,9);		//配置WAKE UP中断,1秒钟中断一次
-    RTC_Set_AlarmA(3,21,16,59);
     GPIO_init();
+    SysTick_Config(336000);
+}
+
+void SysTick_Handler(void)
+{
+    static int count;
+    send_AD_RawData(count++%16);
 }
 
 

@@ -187,16 +187,12 @@ void USART2_proc()
     if(strstr((char *)USART2_RX_BUF, "SampleRate:"))
     {
         sscanf((const char*)&USART2_RX_BUF,"%11s%d",command,&data);
-        LOG_DEBUG("%s\r\n",command);
-        LOG_DEBUG("%d\r\n",data);
         set_Frequent(data);
         LOG_DEBUG("Set sample rate OK\r\n");
     }
     if(strstr((char *)USART2_RX_BUF, "SetDeviceID:"))
     {
         sscanf((const char*)&USART2_RX_BUF,"%12s%d",command,&data);
-        LOG_DEBUG("%s\r\n",command);
-        LOG_DEBUG("%d\r\n",data);
         Set_DeviceID(data);
         LOG_DEBUG("Set device ID OK\r\n");
     }

@@ -51,7 +51,8 @@ void EXTI9_5_IRQHandler(void)
             {
                 PBout(12)=0;
                 Count=0;
-                send_AD_RawData();
+                //Save_AD_RawData();//to save Data
+                //send_AD_RawData();
             }
         }
 		EXTI_ClearITPendingBit(EXTI_Line8);

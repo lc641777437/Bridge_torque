@@ -85,21 +85,7 @@ u8 mf_read(u16 len)
 //返回值:执行结果
 u8 mf_write(u8*dat,u16 len)
 {			    
-	u8 res;	   					   
-
-	LOG_DEBUG("\r\nBegin Write file...\r\n");
-	LOG_DEBUG("Write data len:%d\r\n",len);	 
-	res=f_write(file,dat,len,&bw);
-	if(res)
-	{
-		LOG_DEBUG("Write Error:%d\r\n",res);   
-	}
-    else 
-    {
-        LOG_DEBUG("Writed data len:%d\r\n",bw);
-    }
-	LOG_DEBUG("Write data over.\r\n");
-	return res;
+	return f_write(file,dat,len,&bw);
 }
 
 //打开目录
