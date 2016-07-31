@@ -19,7 +19,6 @@ int main(void)
 //        LOG_DEBUG("Date:20%02d-%02d-%02d\r\n",RTC_DateStruct.RTC_Year,RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date); 
         delay_ms(5050);        
 	}
-    
 }
 
 void SystemConfiguration(void)
@@ -28,18 +27,12 @@ void SystemConfiguration(void)
     delay_init();
     UART_Init();
     TIM_Init();
-    SD_Card_Init();
+    //SD_Card_Init();
     //LWIP_Init();
     ads1258_Init();
     My_RTC_Init();		 		//≥ı ºªØRTC
     GPIO_init();
-    SysTick_Config(336000);
-}
-
-void SysTick_Handler(void)
-{
-    static int count;
-    send_AD_RawData(count++%16);
+    //SysTick_Config(336000);
 }
 
 

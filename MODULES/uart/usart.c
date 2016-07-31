@@ -85,7 +85,7 @@ void USART1_Configuration(void)
     USART_Cmd(USART1,ENABLE);
 
     nvic.NVIC_IRQChannel = USART1_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 3;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
     nvic.NVIC_IRQChannelSubPriority = 3;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
@@ -266,8 +266,8 @@ void USART3_Configuration(void)
     USART_Cmd(USART3,ENABLE);
 
     nvic.NVIC_IRQChannel = USART3_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 3;
-    nvic.NVIC_IRQChannelSubPriority = 2;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;
+    nvic.NVIC_IRQChannelSubPriority = 3;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }

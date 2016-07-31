@@ -1,17 +1,20 @@
 #include "timer.h"
 #include "usart.h"
 #include "sys.h"
+#include "ads1258.h"
 
 extern u32 lwip_localtime;
 int time_10us=0;
 int time_Set=500;
+static int send_Flag=0;
 
 void TIM_Init(void)
 {    
     TIM2_Init();
     TIM3_Init();
     TIM4_Init();
-    TIM5_Init();    
+    TIM5_Init();  
+    TIM14_Init();    
 }
 void TIM3_Init(void)
 {
@@ -124,7 +127,7 @@ void TIM5_Init(void)
 
     NVIC_InitStructure.NVIC_IRQChannel=TIM5_IRQn; 
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x01; 
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x03; 
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
@@ -157,7 +160,7 @@ void TIM2_Init(void)
 
     NVIC_InitStructure.NVIC_IRQChannel=TIM2_IRQn; 
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x01; 
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x03; 
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
@@ -185,3 +188,47 @@ void set_Frequent(int fre)
 {
     time_Set=100000/fre;
 }
+
+void TIM14_Init(void)
+{
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
+    
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14,ENABLE);
+
+    TIM_TimeBaseInitStructure.TIM_Period = 5000 - 1;  
+    TIM_TimeBaseInitStructure.TIM_Prescaler= 84 - 1;  
+    TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
+    TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
+    TIM_TimeBaseInit(TIM14,&TIM_TimeBaseInitStructure);
+    
+    TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE); 
+
+    NVIC_InitStructure.NVIC_IRQChannel=TIM8_TRG_COM_TIM14_IRQn; 
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x01; 
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
+    NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
+    
+    TIM_Cmd(TIM14,ENABLE); 
+}
+
+void TIM8_TRG_COM_TIM14_IRQHandler(void)
+{
+    if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
+    {
+        if(send_Flag==1)
+        {
+            static int count;
+            send_AD_RawData(count++%16);
+            send_Flag=0;
+        }
+    }
+    TIM_ClearITPendingBit(TIM14,TIM_IT_Update); 
+}
+
+void set_sendFlag(void)
+{
+    send_Flag=1;
+}
+

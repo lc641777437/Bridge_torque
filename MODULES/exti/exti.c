@@ -3,6 +3,7 @@
 #include "ads1258.h"
 #include "sys.h"
 #include "usart.h"
+#include "timer.h"
 
 int Count=0;
 
@@ -31,7 +32,7 @@ void EXTI_Configuration(void)
 		
 		NVIC_InitStructure.NVIC_IRQChannel=EXTI9_5_IRQn;
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
-		NVIC_InitStructure.NVIC_IRQChannelSubPriority =2;		
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority =1;		
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;		
 		NVIC_Init(&NVIC_InitStructure);	
 }
@@ -42,6 +43,7 @@ void EXTI9_5_IRQHandler(void)
     {
         if(PBout(12)==1)
         {
+            set_sendFlag();
             if(Count<16)
             {
                 ads1258_ReadData();
