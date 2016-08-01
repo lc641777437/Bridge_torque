@@ -48,7 +48,15 @@ int fputc(int ch, FILE *f)
     }
 	return ch;
 }
-
+void Send_Data(u8 *SendBuf)
+{
+    int i;
+    for(i = 0;i<52;i++)
+    {
+        while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
+        USART_SendData(USART2, (uint8_t)SendBuf[i]);
+    }
+}
 void select_USART(u8 channel)
 {
 	printf_state = channel;

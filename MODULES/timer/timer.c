@@ -5,8 +5,7 @@
 
 extern u32 lwip_localtime;
 int time_10us=0;
-int time_Set=500;
-static int send_Flag=0;
+int time_Set=100000;
 
 void TIM_Init(void)
 {    
@@ -217,18 +216,9 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
-        if(send_Flag==1)
-        {
-            static int count;
-            send_AD_RawData(count++%16);
-            send_Flag=0;
-        }
+        
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update); 
 }
 
-void set_sendFlag(void)
-{
-    send_Flag=1;
-}
 

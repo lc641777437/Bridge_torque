@@ -18,7 +18,7 @@ static int ad_Data_Max[16];
 static int ad_Data_Min[16];
 static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
-static char ad_State[16];
+static u8 ad_State[16];
 int Date_Now;
 char FileName[30];
 
@@ -86,26 +86,42 @@ void ad_Data_Proc(void)
     }
 }
 
-void send_AD_RawData(int i)
+void send_AD_RawData(void)
 {
-    ad_State[0]=STATE_0;
-    ad_State[1]=STATE_1;
-    ad_State[2]=STATE_2;
-    ad_State[3]=STATE_3;
-    ad_State[4]=STATE_4;
-    ad_State[5]=STATE_5;
-    ad_State[6]=STATE_6;
-    ad_State[7]=STATE_7;
-    ad_State[8]=STATE_8;
-    ad_State[9]=STATE_9;
-    ad_State[10]=STATE_10;
-    ad_State[11]=STATE_11;
-    ad_State[12]=STATE_12;
-    ad_State[13]=STATE_13;
-    ad_State[14]=STATE_14;
-    ad_State[15]=STATE_15;
-
-    LOG_DEBUG("[DEVID:%d][%d][%d]:%d\r\n",DeviceID,i+1,ad_State[i],ad_Data[i]);
+    int i;
+    int data_Buf;
+    u8 SendBuf[52] = {0};
+    u8 ad_State_send[2];
+    SendBuf[0] = 0xA5;
+    SendBuf[1] = 0xA5;
+    ad_State_send[0]=STATE_0;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_1;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_2;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_3;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_4;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_5;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_6;
+    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_7;
+    ad_State_send[1]=STATE_8;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_9;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_10;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_11;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_12;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_13;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_14;
+    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_15;
+    SendBuf[2] = ad_State_send[0];
+    SendBuf[3] = ad_State_send[1];
+    for(i=0;i<16;i++)
+    {
+        data_Buf = ad_Data[i];
+        SendBuf[4 + 3 * i + 0] = data_Buf>>16;
+        data_Buf = ad_Data[i];
+        SendBuf[4 + 3 * i + 1] = (data_Buf&0xff00)>>8;
+        data_Buf = ad_Data[i];
+        SendBuf[4 + 3 * i + 2] = data_Buf&0xff;
+    }
+    Send_Data(SendBuf);
 }
 
 void Save_AD_RawData(void)

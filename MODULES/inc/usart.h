@@ -8,7 +8,7 @@ void select_USART(u8 channel);
 
 void USART1_RECV_Timeout(void);
 void USART3_RECV_Timeout(void);
-
+void Send_Data(u8 *SendBuf);
 void UART_Init(void);
 
 #define send_USART1(fmt, ...) select_USART(1);\

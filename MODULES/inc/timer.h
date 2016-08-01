@@ -14,7 +14,6 @@ void TIM5_Init(void);
 void TIM2_Init(void);
 void TIM14_Init(void);
 void set_Frequent(int fre);
-void set_sendFlag(void);
 		 
 #endif
 

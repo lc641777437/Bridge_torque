@@ -43,7 +43,6 @@ void EXTI9_5_IRQHandler(void)
     {
         if(PBout(12)==1)
         {
-            set_sendFlag();
             if(Count<16)
             {
                 ads1258_ReadData();
@@ -54,7 +53,7 @@ void EXTI9_5_IRQHandler(void)
                 PBout(12)=0;
                 Count=0;
                 //Save_AD_RawData();//to save Data
-                //send_AD_RawData();
+                send_AD_RawData();
             }
         }
 		EXTI_ClearITPendingBit(EXTI_Line8);
