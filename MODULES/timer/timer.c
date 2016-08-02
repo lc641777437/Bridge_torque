@@ -5,7 +5,8 @@
 
 extern u32 lwip_localtime;
 int time_10us=0;
-int time_Set=100 * 100;
+int time_Set=5 * 100;
+u8 Sign_Flag=0;//0:master  1:slave
 
 void TIM_Init(void)
 {    
@@ -149,8 +150,8 @@ void TIM2_Init(void)
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 10 - 1;
-    TIM_TimeBaseInitStructure.TIM_Prescaler= 84 - 1;  
+    TIM_TimeBaseInitStructure.TIM_Period = 420 - 1;
+    TIM_TimeBaseInitStructure.TIM_Prescaler= 2 - 1;  
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
@@ -177,7 +178,15 @@ void TIM2_IRQHandler(void)
         else
         {
             time_10us=0;
-            START=1;
+            if(Sign_Flag==0)
+            {
+                Sign_OUT=1;
+                START=1;
+            }
+            else
+            {
+                Sign_Flag--;
+            }
         }
 	}
 	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);  //清除中断标志位

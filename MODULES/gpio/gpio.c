@@ -24,6 +24,11 @@ void GPIO_init(void)
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
     
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_Init(GPIOF, &GPIO_InitStructure);
+    
     PBout(12)=0;
 }
 
