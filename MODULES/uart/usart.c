@@ -53,8 +53,8 @@ void Send_Data(u8 *SendBuf)
     int i;
     for(i = 0;i<52;i++)
     {
-        while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
-        USART_SendData(USART2, (uint8_t)SendBuf[i]);
+        while (USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
+        USART_SendData(USART1, (uint8_t)SendBuf[i]);
     }
 }
 void select_USART(u8 channel)
@@ -81,7 +81,7 @@ void USART1_Configuration(void)
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOB,&gpio);
 
-    usart1.USART_BaudRate = 115200;
+    usart1.USART_BaudRate = 921600;
     usart1.USART_WordLength = USART_WordLength_8b;
     usart1.USART_StopBits = USART_StopBits_1;
     usart1.USART_Parity = USART_Parity_No;
@@ -99,18 +99,27 @@ void USART1_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-void USART1_proc()    
+void USART1_proc()
 {
-    send_USART1("%s",USART1_RX_BUF);
-    USART1_RX_STA = 0;
+    char command[20];
+    int data;
+	
+    if(strstr((char *)USART1_RX_BUF, "SampleRate:"))
+    {
+        sscanf((const char*)&USART1_RX_BUF,"%11s%d",command,&data);
+        set_Frequent(data);
+        LOG_DEBUG("Set sample rate OK\r\n");
+    }
+    if(strstr((char *)USART1_RX_BUF, "SetDeviceID:"))
+    {
+        sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
+        Set_DeviceID(data);
+        LOG_DEBUG("Set device ID OK\r\n");
+    }
     memset(USART1_RX_BUF,'\0',strlen((const char*)USART1_RX_BUF));
     return;
 }
 
-void USART1_RECV_Timeout(void)
-{
-     USART1_proc();
-}
 
 void USART1_IRQHandler(void)
 {
@@ -127,7 +136,6 @@ void USART1_IRQHandler(void)
             USART1_RX_STA = 0;
             if(res == 0x0a)             //接收完成了
             {
-                TIM4_set(0);
                 USART1_proc();
             }
         }
@@ -137,7 +145,6 @@ void USART1_IRQHandler(void)
                 USART1_RX_STA |= 0x4000;
             else
             {
-                TIM4_set(1);
                 USART1_RX_BUF[USART1_RX_STA++ & 0X3FFF] = res;
                 if(USART1_RX_STA > (USART_MAX_RECV_LEN - 1))
                     USART1_RX_STA = 0;  //接收数据错误,重新开始接收	  
@@ -145,6 +152,7 @@ void USART1_IRQHandler(void)
         }	  		 
     }
 }
+
 
 
 
@@ -186,26 +194,17 @@ void USART2_Configuration(void)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
-  
-void USART2_proc()
+void USART2_proc()    
 {
-    char command[20];
-    int data;
-    //LOG_DEBUG("%s",USART2_RX_BUF);
-    if(strstr((char *)USART2_RX_BUF, "SampleRate:"))
-    {
-        sscanf((const char*)&USART2_RX_BUF,"%11s%d",command,&data);
-        set_Frequent(data);
-        LOG_DEBUG("Set sample rate OK\r\n");
-    }
-    if(strstr((char *)USART2_RX_BUF, "SetDeviceID:"))
-    {
-        sscanf((const char*)&USART2_RX_BUF,"%12s%d",command,&data);
-        Set_DeviceID(data);
-        LOG_DEBUG("Set device ID OK\r\n");
-    }
+    send_USART2("%s",USART1_RX_BUF);
+    USART1_RX_STA = 0;
     memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
     return;
+}
+
+void USART2_RECV_Timeout(void)
+{
+     USART2_proc();
 }
 
 void USART2_IRQHandler(void)
@@ -224,6 +223,7 @@ void USART2_IRQHandler(void)
             USART2_RX_STA = 0;
             if(res == 0x0a)             //接收完成了
             {
+								TIM4_set(0);
                 USART2_proc();
             }
         }
@@ -233,6 +233,7 @@ void USART2_IRQHandler(void)
                 USART2_RX_STA |= 0x4000;
             else
             {
+							  TIM4_set(1);
                 USART2_RX_BUF[USART2_RX_STA++ & 0X3FFF] = res;
                 if(USART2_RX_STA > (USART_MAX_RECV_LEN - 1))
                     USART2_RX_STA = 0;  //接收数据错误,重新开始接收	  
@@ -240,6 +241,10 @@ void USART2_IRQHandler(void)
         }	  		 
     }
 }
+
+
+
+
 
 
 
@@ -332,5 +337,5 @@ void UART_Init(void)
 {
     USART1_Configuration();
     USART2_Configuration();
-	USART3_Configuration();
+		USART3_Configuration();
 }

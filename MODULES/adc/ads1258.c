@@ -156,9 +156,7 @@ void Save_AD_RawData(void)
         snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
         RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,".csv");
         mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
-        mf_write("channel,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,",47);
-        mf_write("\r\n",2);
-        
+        mf_write("channel,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,\r\n",49);
     }
     else
     {

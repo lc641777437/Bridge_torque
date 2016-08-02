@@ -5,7 +5,7 @@
 
 extern u32 lwip_localtime;
 int time_10us=0;
-int time_Set=100000;
+int time_Set=5 * 100;
 
 void TIM_Init(void)
 {    
@@ -103,7 +103,7 @@ void TIM4_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM4,TIM_IT_Update)==SET)
     {
-        USART1_RECV_Timeout();
+        USART2_RECV_Timeout();
         TIM4_set(0); 
     }
     TIM_ClearITPendingBit(TIM4,TIM_IT_Update);  

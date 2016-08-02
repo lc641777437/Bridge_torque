@@ -27,7 +27,7 @@ void SystemConfiguration(void)
     delay_init();
     UART_Init();
     TIM_Init();
-    //SD_Card_Init();
+    SD_Card_Init();
     //LWIP_Init();
     ads1258_Init();
     My_RTC_Init();		 		//≥ı ºªØRTC

@@ -91,7 +91,7 @@ void SPI2_Init(void)
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;		//串行同步时钟空闲状态
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;	//数据采样的跳变沿
     SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;		//内部NSS信号有SSI位控制
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;		//波特率预分频值为256
+    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;		//波特率预分频值为256
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;	//数据传输从MSB位开始
     SPI_InitStructure.SPI_CRCPolynomial = 7;	//CRC值的计算多项式
     SPI_Init(SPI2, &SPI_InitStructure);  //初始化SPI寄存器

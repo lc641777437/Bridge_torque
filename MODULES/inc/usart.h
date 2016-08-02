@@ -6,7 +6,7 @@
 
 void select_USART(u8 channel);
 
-void USART1_RECV_Timeout(void);
+void USART2_RECV_Timeout(void);
 void USART3_RECV_Timeout(void);
 void Send_Data(u8 *SendBuf);
 void UART_Init(void);
@@ -19,7 +19,7 @@ void UART_Init(void);
 									printf (fmt, ##__VA_ARGS__)
                                     
 //#define LOG_DEBUG(fmt, ...) send_USART2("[%s][%d]"fmt,__FILE__,__LINE__,##__VA_ARGS__)
-#define LOG_DEBUG(fmt, ...) send_USART2(fmt, ##__VA_ARGS__)
+#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
 
 
                                     
