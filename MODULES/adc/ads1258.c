@@ -19,6 +19,7 @@ static int ad_Data_Min[16];
 static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
 static u8 ad_State[16];
+static u8 SendBuf[52];
 int Date_Now;
 char FileName[30];
 
@@ -86,11 +87,10 @@ void ad_Data_Proc(void)
     }
 }
 
-void send_AD_RawData(void)
+void convert_AD_RawData(void)
 {
     int i;
     int data_Buf;
-    u8 SendBuf[52] = {0};
     u8 ad_State_send[2];
     SendBuf[0] = 0xA5;
     SendBuf[1] = 0xA5;
@@ -121,8 +121,13 @@ void send_AD_RawData(void)
         data_Buf = ad_Data[i];
         SendBuf[4 + 3 * i + 2] = data_Buf&0xff;
     }
-    Send_Data(SendBuf);
 }
+
+void Send_AD_RawData(u8 i)
+{
+    USART_SendData(USART1, (uint8_t)SendBuf[i]);
+}
+
 
 void Save_AD_RawData(void)
 {

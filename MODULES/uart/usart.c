@@ -1,11 +1,13 @@
 #include "usart.h"
 #include "timer.h"
 #include "stmflash.h"
+#include "ads1258.h"
 
 
 #define USART_MAX_RECV_LEN 256
 
 static u8 printf_state;
+static u8 data_Count;
 
 static u16 USART3_RX_STA = 0;//接收状态标记    
 static u16 USART1_RX_STA = 0;//接收状态标记    
@@ -48,15 +50,7 @@ int fputc(int ch, FILE *f)
     }
 	return ch;
 }
-void Send_Data(u8 *SendBuf)
-{
-    int i;
-    for(i = 0;i<52;i++)
-    {
-        while (USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
-        USART_SendData(USART1, (uint8_t)SendBuf[i]);
-    }
-}
+
 void select_USART(u8 channel)
 {
 	printf_state = channel;
@@ -81,7 +75,7 @@ void USART1_Configuration(void)
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOB,&gpio);
 
-    usart1.USART_BaudRate = 921600;
+    usart1.USART_BaudRate = 115200;
     usart1.USART_WordLength = USART_WordLength_8b;
     usart1.USART_StopBits = USART_StopBits_1;
     usart1.USART_Parity = USART_Parity_No;
@@ -93,7 +87,7 @@ void USART1_Configuration(void)
     USART_Cmd(USART1,ENABLE);
 
     nvic.NVIC_IRQChannel = USART1_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 1;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
     nvic.NVIC_IRQChannelSubPriority = 3;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
@@ -124,12 +118,11 @@ void USART1_proc()
 void USART1_IRQHandler(void)
 {
     u8 res;
-
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 
-		res = USART_ReceiveData(USART1);//(USART2->DR);	//读取接收到的数据
+		res = USART_ReceiveData(USART1);//(USART1->DR);	//读取接收到的数据
 		
         if(USART1_RX_STA & 0x4000)      //之前接收到了0x0d
         {
@@ -150,6 +143,19 @@ void USART1_IRQHandler(void)
                     USART1_RX_STA = 0;  //接收数据错误,重新开始接收	  
             }		 
         }	  		 
+    }
+    if( USART_GetITStatus(USART1, USART_IT_TXE) == SET  )
+    {
+        if( data_Count>51 )
+        {
+            data_Count=0;
+            USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+        }
+        else
+        {
+            Send_AD_RawData(data_Count);
+            data_Count++;
+        }
     }
 }
 
@@ -196,8 +202,8 @@ void USART2_Configuration(void)
 }
 void USART2_proc()    
 {
-    send_USART2("%s",USART1_RX_BUF);
-    USART1_RX_STA = 0;
+    send_USART2("%s",USART2_RX_BUF);
+    USART2_RX_STA = 0;
     memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
     return;
 }
@@ -233,7 +239,7 @@ void USART2_IRQHandler(void)
                 USART2_RX_STA |= 0x4000;
             else
             {
-							  TIM4_set(1);
+				TIM4_set(1);
                 USART2_RX_BUF[USART2_RX_STA++ & 0X3FFF] = res;
                 if(USART2_RX_STA > (USART_MAX_RECV_LEN - 1))
                     USART2_RX_STA = 0;  //接收数据错误,重新开始接收	  
@@ -337,5 +343,5 @@ void UART_Init(void)
 {
     USART1_Configuration();
     USART2_Configuration();
-		USART3_Configuration();
+	USART3_Configuration();
 }

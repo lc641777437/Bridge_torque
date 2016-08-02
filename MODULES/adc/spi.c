@@ -65,6 +65,7 @@ void SPI2_Init(void)
 {	 
     GPIO_InitTypeDef GPIO_InitStructure;
     SPI_InitTypeDef  SPI_InitStructure;
+    NVIC_InitTypeDef NVIC_InitStructure;
 
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);//
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);//
@@ -95,6 +96,15 @@ void SPI2_Init(void)
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;	//数据传输从MSB位开始
     SPI_InitStructure.SPI_CRCPolynomial = 7;	//CRC值的计算多项式
     SPI_Init(SPI2, &SPI_InitStructure);  //初始化SPI寄存器
+    
+    NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; 
+    NVIC_Init(&NVIC_InitStructure);
+    
+//    SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_RXNE,ENABLE);
+//    SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,ENABLE);
 
     SPI_Cmd(SPI2, ENABLE); //使能SPI外设
 }   

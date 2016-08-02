@@ -31,7 +31,7 @@ void EXTI_Configuration(void)
 		EXTI_Init(&EXTI_InitStructure);
 		
 		NVIC_InitStructure.NVIC_IRQChannel=EXTI9_5_IRQn;
-		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1;
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority =1;		
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;		
 		NVIC_Init(&NVIC_InitStructure);	
@@ -41,7 +41,7 @@ void EXTI9_5_IRQHandler(void)
 {
     if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
     {
-        if(PBout(12)==1)
+        if(START==1)
         {
             if(Count<16)
             {
@@ -50,10 +50,11 @@ void EXTI9_5_IRQHandler(void)
             }
             else
             {
-                PBout(12)=0;
+                START=0;
                 Count=0;
+                convert_AD_RawData();
+                USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
                 Save_AD_RawData();//to save Data
-                send_AD_RawData();
             }
         }
 		EXTI_ClearITPendingBit(EXTI_Line8);
