@@ -13,12 +13,13 @@
 
 
 #define DeviceID *(vu32*)FALSH_SAVE_ADDR
-static int ad_Data[16];
+int ad_Data[16];
 static int ad_Data_Max[16];
 static int ad_Data_Min[16];
 static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
-static u8 SendBuf[52];
+static u8 ad_State[16];
+static u8 SendBuf[53];
 int Date_Now;
 char FileName[30];
 
@@ -59,13 +60,7 @@ void ad_DataConvert(u8 result[4])
 
 void ads1258_ReadData(void)
 {
-    u8 iData[4];
-    iData[0]=SPI2_ReadWriteByte(0xA0);
-    iData[1]=SPI2_ReadWriteByte(0xA0);
-    iData[2]=SPI2_ReadWriteByte(0xA0);
-    iData[3]=SPI2_ReadWriteByte(0xA0);
-    iData[0]&=0x1f;
-    ad_DataConvert(iData);
+    SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,ENABLE);
 }
 
 void ad_Data_Proc(void)
@@ -130,23 +125,34 @@ void Send_AD_RawData(u8 i)
 
 void Save_AD_RawData(void)
 {
-    RTC_DateTypeDef RTC_DateStruct;
-    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
-    if(Date_Now!=RTC_DateStruct.RTC_Date)
-    {
-        mf_close();
-        Date_Now=RTC_DateStruct.RTC_Date;
-        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,".txt");
-        mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
-    }
+//    RTC_DateTypeDef RTC_DateStruct;
+//    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
+//    if(Date_Now!=RTC_DateStruct.RTC_Date)
+//    {
+//        Date_Now=RTC_DateStruct.RTC_Date;
+//        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
+//        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,".txt");
+//        mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
+//    }
 //    else
 //    {
-//        //mf_open((u8 *)FileName,FA_WRITE);
-//        //f_lseek(file,file->fsize);
+//        mf_open((u8 *)FileName,FA_WRITE);
+//        f_lseek(file,file->fsize);
 //    }
-    mf_write((u8 *)SendBuf,strlen((char *)SendBuf));//TODO:time
+//    mf_write((u8 *)SendBuf,52);//TODO:time
+//    mf_write("\r\n",2);
+//    mf_close();
+    RTC_TimeTypeDef RTC_TimeStruct;
+    RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
+    if(Date_Now!=RTC_TimeStruct.RTC_Minutes)
+    {
+        mf_close();
+        Date_Now=RTC_TimeStruct.RTC_Minutes;
+        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
+    }
+    mf_write((u8 *)SendBuf,52);//TODO:time
     mf_write("\r\n",2);
-    //mf_close();
 }
 

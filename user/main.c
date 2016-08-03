@@ -3,21 +3,14 @@
 
 int main(void)
 {
-//    float time_s;
-//    RTC_TimeTypeDef RTC_TimeStruct;
-//    RTC_DateTypeDef RTC_DateStruct;
 	SystemConfiguration();
-    
-    
 	while(1)
 	{
-//        RTC_GetTime(RTC_Format_BIN,&RTC_TimeStruct);
-//        time_s=(1023-RTC->SSR)/1024.f;
-//        LOG_DEBUG("Time:%02d:%02d:%02d\r\n",RTC_TimeStruct.RTC_Hours,RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds);
-//        LOG_DEBUG("%f\r\n",time_s);
-//        RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
-//        LOG_DEBUG("Date:20%02d-%02d-%02d\r\n",RTC_DateStruct.RTC_Year,RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date); 
-        delay_ms(5050);        
+        if(get_Save_Flag()==1)
+        {
+            set_Save_Flag(0);
+            Save_AD_RawData();
+        }       
 	}
 }
 

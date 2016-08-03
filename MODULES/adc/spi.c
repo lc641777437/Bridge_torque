@@ -1,4 +1,9 @@
 #include "spi.h"
+#include "ads1258.h"
+
+static u8 spi_Count_S;
+static u8 iData[4];
+extern int Count;
 
 void SPI1_Init(void)
 {	 
@@ -131,4 +136,31 @@ u8 SPI2_ReadWriteByte(u8 TxData)
     SPI_I2S_SendData(SPI2, TxData); //发送数据
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收一个byte
     return SPI_I2S_ReceiveData(SPI2); //返回接收的数据
+}
+
+void SPI2_IRQHandler(void)
+{    
+    if(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==SET)
+    {
+        if(spi_Count_S==0)
+        {
+            SPI_I2S_SendData(SPI2,0xA0);
+            spi_Count_S++;
+        }
+        else if(spi_Count_S<4)
+        {
+            iData[spi_Count_S-1]=SPI_I2S_ReceiveData(SPI2);
+            SPI_I2S_SendData(SPI2,0xA0);
+            spi_Count_S++;
+        }
+        else
+        {
+            iData[spi_Count_S-1]=SPI_I2S_ReceiveData(SPI2);
+            spi_Count_S=0;
+            iData[0]&=0x1f;
+            Count++;
+            ad_DataConvert(iData);
+            SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,DISABLE);
+        }
+    }
 }

@@ -13,6 +13,7 @@ void ad_Data_Proc(void);
 void convert_AD_RawData(void);
 void Send_AD_RawData(u8 i);
 void Save_AD_RawData(void);
+void ad_DataConvert(u8 result[4]);
 
 #endif
 

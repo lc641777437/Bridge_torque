@@ -7,6 +7,7 @@
 
 int Count=0;
 extern u8 Sign_Flag;
+static int save_Flag = 0;
 
 void EXTI_Configuration(void)
 {
@@ -47,7 +48,6 @@ void EXTI9_5_IRQHandler(void)
             if(Count<16)
             {
                 ads1258_ReadData();
-                Count++;
             }
             else
             {
@@ -55,11 +55,21 @@ void EXTI9_5_IRQHandler(void)
                 Count=0;
                 convert_AD_RawData();
                 USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-                Save_AD_RawData();//to save Data
+                set_Save_Flag(1);
             }
         }
 		EXTI_ClearITPendingBit(EXTI_Line8);
     }
+}
+
+void set_Save_Flag(int i)
+{
+    save_Flag=i;
+}
+
+int get_Save_Flag(void)
+{
+    return save_Flag;
 }
 
 void EXTI_Sign_Configuration(void)

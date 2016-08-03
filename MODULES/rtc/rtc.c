@@ -167,7 +167,6 @@ void RTC_Alarm_IRQHandler(void)
 	if(RTC_GetFlagStatus(RTC_FLAG_ALRAF)==SET)//ALARM A中断?
 	{
 		RTC_ClearFlag(RTC_FLAG_ALRAF);//清除中断标志
-        LOG_DEBUG("ALARM OK\r\n");
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line17);	//清除中断线17的中断标志 											 
 }

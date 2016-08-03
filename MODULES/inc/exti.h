@@ -3,7 +3,9 @@
 #include "stm32f4xx.h"
    													  
 void EXTI_Configuration(void);
-		 
+void set_Save_Flag(int i);
+int get_Save_Flag(void);
+
 #endif
 
 
