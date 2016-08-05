@@ -22,6 +22,7 @@
 #include "rtc.h"
 #include "gpio.h"
 #include "stmflash.h"
+#include "initstate.h"
 
 void SystemConfiguration(void);
 

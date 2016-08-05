@@ -15,6 +15,9 @@
 #include "delay.h"
 #include "usart.h"  
 #include "httpd.h"
+#include "tcp_client_demo.h"
+#include "timer.h"
+#include "initstate.h"
 
    
 __lwip_dev lwipdev;						//lwip控制结构体 
@@ -78,7 +81,7 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 	//默认本地IP为:192.168.1.30
 	lwipx->ip[0]=192;	
 	lwipx->ip[1]=168;
-	lwipx->ip[2]=1;
+	lwipx->ip[2]=0;
 	lwipx->ip[3]=30;
 	//默认子网掩码:255.255.255.0
 	lwipx->netmask[0]=255;	
@@ -88,7 +91,7 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 	//默认网关:192.168.1.1
 	lwipx->gateway[0]=192;	
 	lwipx->gateway[1]=168;
-	lwipx->gateway[2]=1;
+	lwipx->gateway[2]=0;
 	lwipx->gateway[3]=1;	
 	lwipx->dhcpstatus=0;//没有DHCP	
 } 
@@ -104,8 +107,6 @@ u8 lwip_comm_init(void)
 	struct ip_addr ipaddr;  			//ip地址
 	struct ip_addr netmask; 			//子网掩码
 	struct ip_addr gw;      			//默认网关 
-	if(ETH_Mem_Malloc())return 1;		//内存申请失败
-	if(lwip_comm_mem_malloc())return 1;	//内存申请失败
 	if(LAN8720_Init())return 2;			//初始化LAN8720失败 
 	lwip_init();						//初始化LWIP内核
 	lwip_comm_default_ip_set(&lwipdev);	//设置默认IP等信息
@@ -209,25 +210,25 @@ void lwip_dhcp_process_handle(void)
 			if(ip!=0)			//正确获取到IP地址的时候
 			{
 				lwipdev.dhcpstatus=2;	//DHCP成功
-				printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+				LOG_DEBUG("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
 				//解析出通过DHCP获取到的IP地址
 				lwipdev.ip[3]=(uint8_t)(ip>>24); 
 				lwipdev.ip[2]=(uint8_t)(ip>>16);
 				lwipdev.ip[1]=(uint8_t)(ip>>8);
 				lwipdev.ip[0]=(uint8_t)(ip);
-				printf("通过DHCP获取到IP地址..............%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+				LOG_DEBUG("通过DHCP获取到IP地址..............%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
 				//解析通过DHCP获取到的子网掩码地址
 				lwipdev.netmask[3]=(uint8_t)(netmask>>24);
 				lwipdev.netmask[2]=(uint8_t)(netmask>>16);
 				lwipdev.netmask[1]=(uint8_t)(netmask>>8);
 				lwipdev.netmask[0]=(uint8_t)(netmask);
-				printf("通过DHCP获取到子网掩码............%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+				LOG_DEBUG("通过DHCP获取到子网掩码............%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
 				//解析出通过DHCP获取到的默认网关
 				lwipdev.gateway[3]=(uint8_t)(gw>>24);
 				lwipdev.gateway[2]=(uint8_t)(gw>>16);
 				lwipdev.gateway[1]=(uint8_t)(gw>>8);
 				lwipdev.gateway[0]=(uint8_t)(gw);
-				printf("通过DHCP获取到的默认网关..........%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+				LOG_DEBUG("通过DHCP获取到的默认网关..........%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 			}else if(lwip_netif.dhcp->tries>LWIP_MAX_DHCP_TRIES) //通过DHCP服务获取IP地址失败,且超过最大尝试次数
 			{
 				lwipdev.dhcpstatus=0XFF;//DHCP超时失败.
@@ -235,11 +236,11 @@ void lwip_dhcp_process_handle(void)
 				IP4_ADDR(&(lwip_netif.ip_addr),lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
 				IP4_ADDR(&(lwip_netif.netmask),lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
 				IP4_ADDR(&(lwip_netif.gw),lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
-				printf("DHCP服务超时,使用静态IP地址!\r\n");
-				printf("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
-				printf("静态IP地址........................%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
-				printf("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
-				printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
+				LOG_DEBUG("DHCP服务超时,使用静态IP地址!\r\n");
+				LOG_DEBUG("网卡en的MAC地址为:................%d.%d.%d.%d.%d.%d\r\n",lwipdev.mac[0],lwipdev.mac[1],lwipdev.mac[2],lwipdev.mac[3],lwipdev.mac[4],lwipdev.mac[5]);
+				LOG_DEBUG("静态IP地址........................%d.%d.%d.%d\r\n",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+				LOG_DEBUG("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
+				LOG_DEBUG("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 			}
 		}
 		break;
@@ -250,39 +251,52 @@ void lwip_dhcp_process_handle(void)
 
 void LWIP_Init(void)
 {
-    while(lwip_comm_init()!=0)
-	{
-		LOG_DEBUG("lwIP Init failed!\r\n");
-		delay_ms(1200);
-		LOG_DEBUG("Retrying...\r\n"); 
-	}
-    LOG_DEBUG("lwIP Init Successed\r\n");
- 	LOG_DEBUG("DHCP IP configing...\r\n");
-    while((lwipdev.dhcpstatus!=2)&&(lwipdev.dhcpstatus!=0XFF))
-	{
-		lwip_periodic_handle();
-	}
-    LOG_DEBUG("DHCP IP Successed\r\n");
-    if(lwipdev.dhcpstatus==2)
+    if(get_InitState(ETHSTATE)==NOTHING)
     {
-        LOG_DEBUG("DHCP IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+        if(lwip_comm_init()==0)
+        {
+            add_InitState(ETHSTATE);
+            LOG_DEBUG("lwIP Init Successed\r\n");
+        }
+        else
+        {
+            LOG_DEBUG("lwIP Init failed!\r\n");
+        }
     }
-	else 
+    if(get_InitState(ETHSTATE)==LWIP_OK)
     {
-        LOG_DEBUG("Static IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+        LOG_DEBUG("DHCP IP configing...\r\n");
+        while((lwipdev.dhcpstatus!=2)&&(lwipdev.dhcpstatus!=0XFF))
+        {
+            lwip_periodic_handle();
+        }
+        if(lwipdev.dhcpstatus==2)
+        {
+            LOG_DEBUG("DHCP IP Successed\r\n");
+            LOG_DEBUG("DHCP IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+            add_InitState(ETHSTATE);
+        }
+        else 
+        {
+            add_InitState(ETHSTATE);
+            LOG_DEBUG("Static IP:%d.%d.%d.%d",lwipdev.ip[0],lwipdev.ip[1],lwipdev.ip[2],lwipdev.ip[3]);
+        }
+        if(LAN8720_Get_Speed()&1<<1)
+        {
+            LOG_DEBUG("Ethernet Speed:100M");
+        }
+        else 
+        {
+            LOG_DEBUG("Ethernet Speed:10M");
+        }
     }
-	if(LAN8720_Get_Speed()&1<<1)
+    if(get_InitState(ETHSTATE)==DHCP_OK)
     {
-        LOG_DEBUG("Ethernet Speed:100M");
+        httpd_init();
+        tcp_client_test();
+        add_InitState(ETHSTATE);
     }
-	else 
-    {
-        LOG_DEBUG("Ethernet Speed:10M");
-    }
-    httpd_init();
 }
-
-
 
 
 

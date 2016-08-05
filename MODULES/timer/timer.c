@@ -1,12 +1,18 @@
+#include "sdio_sdcard.h"
 #include "timer.h"
 #include "usart.h"
 #include "sys.h"
 #include "ads1258.h"
+#include "initstate.h"
+#include "lwip_comm.h"
+
 
 extern u32 lwip_localtime;
 int time_10us=0;
+int time_1s=0;
 int time_Set=5 * 100;
 u8 Sign_Flag=0;//0:master  1:slave
+extern u8 tcp_client_flag;	 
 
 void TIM_Init(void)
 {    
@@ -204,8 +210,8 @@ void TIM14_Init(void)
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 5000 - 1;  
-    TIM_TimeBaseInitStructure.TIM_Prescaler= 84 - 1;  
+    TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1;  
+    TIM_TimeBaseInitStructure.TIM_Prescaler= 8400 - 1;  
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM14,&TIM_TimeBaseInitStructure);
@@ -225,7 +231,38 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
-        
+        if(time_1s<10)
+        {
+            time_1s++;
+        }
+        else
+        {
+            time_1s=0;
+            if(get_InitState(SDSTATE)==FATFS_OK)
+            {
+                if(SD_GetState()==SD_CARD_ERROR)
+                {
+                    reset_InitState(SDSTATE);
+                    LOG_DEBUG("SD LOST\r\n");
+                }
+            }
+            else
+            {
+                SD_Card_Init();
+            }
+            if(get_InitState(ETHSTATE)==TCP_OK)
+            {
+                if((tcp_client_flag&1<<5)==0x10)
+                {
+                    reset_InitState(ETHSTATE);
+                }
+                tcp_client_flag&=0xef;
+            }
+            else
+            {
+                LWIP_Init();
+            }
+        }
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update); 
 }

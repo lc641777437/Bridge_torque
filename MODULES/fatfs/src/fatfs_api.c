@@ -5,6 +5,7 @@
 #include "malloc.h"		  
 #include "ff.h"
 #include "delay.h"
+#include "initstate.h"
     
 //为磁盘注册工作区	 
 //path:磁盘路径，比如"0:"、"1:"
@@ -344,6 +345,7 @@ void fatfs_init(void)
 	LOG_DEBUG("SD Total Size:%d MB",total>>10);
     delay_ms(10);    
 	LOG_DEBUG("SD  Free Size:%d MB",free>>10); 	    
+    add_InitState(SDSTATE);
 }
 
 

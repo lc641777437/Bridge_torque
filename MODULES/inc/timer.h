@@ -7,6 +7,15 @@
 #define Sign_IN PFin(2)
 #define Sign_OUT PFout(3)
 
+#define NOTHING 0
+#define SDCARD_OK 1
+#define FATFS_OK 2
+
+#define LWIP_OK 1
+#define DHCP_OK 2
+#define TCP_OK 3
+
+
 void TIM_Init(void);
 
 void TIM3_Init(void);

@@ -10,7 +10,8 @@
 #include "string.h"
 #include "exfuns.h"
 
-
+extern u8 tcp_client_sendbuf[800];
+extern u8 tcp_client_flag;	
 
 #define DeviceID *(vu32*)FALSH_SAVE_ADDR
 int ad_Data[16];
@@ -67,18 +68,23 @@ void ad_Data_Proc(void)
 {
     int n;
     int avr;
+    char send_Data_Buf[100];
+    memset(tcp_client_sendbuf,'\0',strlen((char*)tcp_client_sendbuf));
     for(n=0;n<16;n++)
     {
         avr=ad_Data_Sum[n]/ad_Data_Num[n];
-        LOG_DEBUG("CHANNEL ID: %d\r\n",n);
-        LOG_DEBUG("MAX: %d\r\n",ad_Data_Max[n]);
-        LOG_DEBUG("MIN: %d\r\n",ad_Data_Min[n]);
-        LOG_DEBUG("AVR: %d\r\n",avr);
+        snprintf((char*)send_Data_Buf,100,"%s%d%s%d%s%d%s%d\r\n","ID:",n,"MAX:",ad_Data_Max[n],"MIN:",ad_Data_Min[n],"AVR:",avr);
+        strcat((char*)tcp_client_sendbuf,send_Data_Buf);
+//        LOG_DEBUG("CHANNEL ID: %d\r\n",n);
+//        LOG_DEBUG("MAX: %d\r\n",ad_Data_Max[n]);
+//        LOG_DEBUG("MIN: %d\r\n",ad_Data_Min[n]);
+//        LOG_DEBUG("AVR: %d\r\n",avr);
         ad_Data_Sum[n]=0;
         ad_Data_Max[n]=0;
         ad_Data_Min[n]=0x7FFFFF;
         ad_Data_Num[n]=0;
     }
+    tcp_client_flag|=1<<7;
 }
 
 void convert_AD_RawData(void)

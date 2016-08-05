@@ -2,7 +2,10 @@
 #include "delay.h"
 #include "usart.h"
 #include "ads1258.h"
+#include "initstate.h"
+#include "timer.h"
 
+ 
 
 NVIC_InitTypeDef   NVIC_InitStructure;
 
@@ -178,7 +181,10 @@ void RTC_WKUP_IRQHandler(void)
 	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WAKE_UP中断
 	{ 
 		RTC_ClearFlag(RTC_FLAG_WUTF);	//清除中断标志
-        //ad_Data_Proc();
+        if(get_InitState(ETHSTATE)==TCP_OK)
+        {
+            ad_Data_Proc();
+        }
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line22);//清除中断线22的中断标志 								
 }

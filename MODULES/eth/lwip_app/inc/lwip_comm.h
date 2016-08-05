@@ -2,7 +2,7 @@
 #define _LWIP_COMM_H 
 #include "lan8720.h" 
 
-#define LWIP_MAX_DHCP_TRIES		4   //DHCP服务器最大重试次数
+#define LWIP_MAX_DHCP_TRIES		1   //DHCP服务器最大重试次数
    
 //lwip控制结构体
 typedef struct  

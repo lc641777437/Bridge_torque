@@ -6,6 +6,8 @@
 #include "usart.h"
 #include "malloc.h"
 #include "fatfs_api.h"
+#include "initstate.h"
+#include "timer.h"
 
 
 /*用于sdio初始化的结构体*/
@@ -1716,35 +1718,46 @@ u8 SD_WriteDisk(u8*buf,u32 sector,u8 cnt)
 
 void check_SD_Card(void)
 {
-    while(SD_Init())
-	{
-        LOG_DEBUG("%s","SD Card Error!");
-		delay_ms(10);
-        LOG_DEBUG("%s","Please Check!\r\n");
+    if(SD_Init()==0)
+    {
+        add_InitState(1);
+        switch(SDCardInfo.CardType)
+        {
+            case SDIO_STD_CAPACITY_SD_CARD_V1_1:LOG_DEBUG("Card Type:SDSC V1.1\r\n");break;
+            case SDIO_STD_CAPACITY_SD_CARD_V2_0:LOG_DEBUG("Card Type:SDSC V2.0\r\n");break;
+            case SDIO_HIGH_CAPACITY_SD_CARD:LOG_DEBUG("Card Type:SDHC V2.0\r\n");break;
+            case SDIO_MULTIMEDIA_CARD:LOG_DEBUG("Card Type:MMC Card\r\n");break;
+        }	
         delay_ms(10);
-	}
-    switch(SDCardInfo.CardType)
-	{
-		case SDIO_STD_CAPACITY_SD_CARD_V1_1:LOG_DEBUG("Card Type:SDSC V1.1\r\n");break;
-		case SDIO_STD_CAPACITY_SD_CARD_V2_0:LOG_DEBUG("Card Type:SDSC V2.0\r\n");break;
-		case SDIO_HIGH_CAPACITY_SD_CARD:LOG_DEBUG("Card Type:SDHC V2.0\r\n");break;
-		case SDIO_MULTIMEDIA_CARD:LOG_DEBUG("Card Type:MMC Card\r\n");break;
-	}	
-    delay_ms(10);
-  	LOG_DEBUG("Card ManufacturerID:%d\r\n",SDCardInfo.SD_cid.ManufacturerID);	
-    delay_ms(10);
- 	LOG_DEBUG("Card RCA:%d\r\n",SDCardInfo.RCA);								
-    delay_ms(10);
-	LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));	
-    delay_ms(10);
- 	LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);  
+        LOG_DEBUG("Card ManufacturerID:%d\r\n",SDCardInfo.SD_cid.ManufacturerID);	
+        delay_ms(10);
+        LOG_DEBUG("Card RCA:%d\r\n",SDCardInfo.RCA);								
+        delay_ms(10);
+        LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));	
+        delay_ms(10);
+        LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize); 
+    }
+    else
+    {
+        LOG_DEBUG("%s","SD Card Error!Please Check!\r\n");
+    }
+//  while(SD_Init())
+//	{
+//        LOG_DEBUG("%s","SD Card Error!");
+//		delay_ms(10);
+//        LOG_DEBUG("%s","Please Check!\r\n");
+//        delay_ms(10);
+//	}
 }
 
 void SD_Card_Init(void)
 {
-    mymem_init(SRAMIN);
-    mymem_init(SRAMCCM);
-    check_SD_Card();
-    fatfs_init();
-
+    if(get_InitState(SDSTATE)==NOTHING)
+    {
+        check_SD_Card();
+    }
+    if(get_InitState(SDSTATE)==SDCARD_OK)
+    {
+        fatfs_init();
+    }
 }
