@@ -251,13 +251,13 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
             }
             if(get_InitState(ETHSTATE)==TCP_OK)
             {
-                u16 eth_sta;
-                eth_sta=ETH_ReadPHYRegister(0x00,1);
-                if((eth_sta&0x00f0)==0x0000)
-                {
-                    reset_InitState(ETHSTATE);
-                    LOG_DEBUG("ETH LOST\r\n");
-                }
+//                u16 eth_sta;
+//                eth_sta=ETH_ReadPHYRegister(0x00,1);
+//                if((eth_sta&0x00f0)==0x0000)
+//                {
+//                    reset_InitState(ETHSTATE);
+//                    LOG_DEBUG("ETH LOST\r\n");
+//                }
             }
             else
             {
