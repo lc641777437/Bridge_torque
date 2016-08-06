@@ -107,7 +107,7 @@ u8 lwip_comm_init(void)
 	struct ip_addr ipaddr;  			//ip地址
 	struct ip_addr netmask; 			//子网掩码
 	struct ip_addr gw;      			//默认网关 
-	if(LAN8720_Init())return 2;			//初始化LAN8720失败 
+	if(ETH_MACDMA_Config()==0)return 2;			//初始化LAN8720失败 
 	lwip_init();						//初始化LWIP内核
 	lwip_comm_default_ip_set(&lwipdev);	//设置默认IP等信息
 
@@ -251,10 +251,14 @@ void lwip_dhcp_process_handle(void)
 
 void LWIP_Init(void)
 {
+    u16 res;
     if(get_InitState(ETHSTATE)==NOTHING)
     {
-        if(lwip_comm_init()==0)
+        res=ETH_ReadPHYRegister(0x00,1);
+        if((res&0x00f0)==0x0020)
         {
+            LAN8720_Init();
+            lwip_comm_init();
             add_InitState(ETHSTATE);
             LOG_DEBUG("lwIP Init Successed\r\n");
         }

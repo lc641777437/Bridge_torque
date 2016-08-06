@@ -14,7 +14,10 @@ int main(void)
                 Save_AD_RawData();
             }
         }
-        lwip_periodic_handle();
+        if(get_InitState(ETHSTATE)==TCP_OK)
+        {
+            lwip_periodic_handle();
+        }
 	}
 }
 
@@ -29,6 +32,8 @@ void SystemConfiguration(void)
     SD_Card_Init();
     while(ETH_Mem_Malloc()){}		//申请内存
 	while(lwip_comm_mem_malloc()){}	//申请内存
+    LAN8720_Init();
+    delay_ms(2000);
     LWIP_Init();
     ads1258_Init();
     My_RTC_Init();		 		//初始化RTC

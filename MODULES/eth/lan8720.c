@@ -17,7 +17,7 @@ u8 LAN8720_Init(void)
 {
 	u8 rval=0;
 	GPIO_InitTypeDef GPIO_InitStructure;
-  
+    ETH_InitTypeDef ETH_InitStructure; 
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOG , ENABLE);//使能GPIO时钟 RMII接口
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);   //使能SYSCFG时钟
   
@@ -73,8 +73,15 @@ u8 LAN8720_Init(void)
 	delay_ms(50);	
 	LAN8720_RST=1;				 	//复位结束 
 	ETHERNET_NVICConfiguration();
-	rval=ETH_MACDMA_Config();
-	return !rval;					//ETH的规则为:0,失败;1,成功;所以要取反一下 
+	
+	//使能以太网时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_ETH_MAC | RCC_AHB1Periph_ETH_MAC_Tx |RCC_AHB1Periph_ETH_MAC_Rx, ENABLE);
+                        
+	ETH_DeInit();  								//AHB总线重启以太网
+	ETH_SoftwareReset();  						//软件重启网络
+	while (ETH_GetSoftwareResetStatus() == SET);//等待软件重启网络完成 
+	ETH_StructInit(&ETH_InitStructure); 	 	//初始化网络为默认值  
+	return 0;					//ETH的规则为:0,失败;1,成功;所以要取反一下 
 }
 
 //以太网中断分组配置

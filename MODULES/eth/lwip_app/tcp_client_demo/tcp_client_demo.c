@@ -24,8 +24,6 @@ void tcp_client_set_remoteip(u8 set_IP)
 
 	struct ip_addr rmtipaddr;  	//远端ip地址
 	
-	u8 res=0;		
-	u8 connflag=0;		//连接标记
     
 	lwipdev.remoteip[0]=lwipdev.ip[0];
 	lwipdev.remoteip[1]=lwipdev.ip[1];
@@ -38,7 +36,6 @@ void tcp_client_set_remoteip(u8 set_IP)
 		IP4_ADDR(&rmtipaddr,lwipdev.remoteip[0],lwipdev.remoteip[1],lwipdev.remoteip[2],lwipdev.remoteip[3]); 
 		tcp_connect(tcppcb,&rmtipaddr,TCP_CLIENT_PORT,tcp_client_connected);  //连接到目的地址的指定端口上,当连接成功后回调tcp_client_connected()函数
  	}
-    else res=1;
 }
  
 

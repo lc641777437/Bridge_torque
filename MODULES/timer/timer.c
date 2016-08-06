@@ -11,8 +11,7 @@ extern u32 lwip_localtime;
 int time_10us=0;
 int time_1s=0;
 int time_Set=5 * 100;
-u8 Sign_Flag=0;//0:master  1:slave
-extern u8 tcp_client_flag;	 
+u8 Sign_Flag=0;//0:master  1:slave 
 
 void TIM_Init(void)
 {    
@@ -219,7 +218,7 @@ void TIM14_Init(void)
     TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE); 
 
     NVIC_InitStructure.NVIC_IRQChannel=TIM8_TRG_COM_TIM14_IRQn; 
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x01; 
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x02; 
     NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
@@ -252,11 +251,13 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
             }
             if(get_InitState(ETHSTATE)==TCP_OK)
             {
-                if((tcp_client_flag&1<<5)==0x10)
+                u16 eth_sta;
+                eth_sta=ETH_ReadPHYRegister(0x00,1);
+                if((eth_sta&0x00f0)==0x0000)
                 {
                     reset_InitState(ETHSTATE);
+                    LOG_DEBUG("ETH LOST\r\n");
                 }
-                tcp_client_flag&=0xef;
             }
             else
             {
