@@ -8,9 +8,9 @@
 
 
 extern u32 lwip_localtime;
-int time_10us=0;
-int time_1s=0;
-int time_Set=5 * 100;
+int time_10us = 0;
+int time_s = 0;
+int sample_time = 5 * 100;
 u8 Sign_Flag=0;//0:master  1:slave 
 
 void TIM_Init(void)
@@ -21,15 +21,15 @@ void TIM_Init(void)
     TIM5_Init();  
     TIM14_Init();    
 }
-void TIM3_Init(void)
+void TIM3_Init(void)//10ms for identify uart3 end
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 99; 
-    TIM_TimeBaseInitStructure.TIM_Prescaler=8399;  
+    TIM_TimeBaseInitStructure.TIM_Period = 100 - 1; 
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 8400 - 1;  
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM3,&TIM_TimeBaseInitStructure);
@@ -68,15 +68,15 @@ void TIM3_IRQHandler(void)
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);  
 }
 
-void TIM4_Init(void)
+void TIM4_Init(void)//10ms for identify uart2 end
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 99; 
-    TIM_TimeBaseInitStructure.TIM_Prescaler=8399;  
+    TIM_TimeBaseInitStructure.TIM_Period = 100 - 1; 
+    TIM_TimeBaseInitStructure.TIM_Prescaler = 8400 - 1;  
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM4,&TIM_TimeBaseInitStructure);
@@ -115,15 +115,15 @@ void TIM4_IRQHandler(void)
     TIM_ClearITPendingBit(TIM4,TIM_IT_Update);  
 }
 
-void TIM5_Init(void)
+void TIM5_Init(void)//10ms
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
     
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 999; 
-    TIM_TimeBaseInitStructure.TIM_Prescaler=839;  
+    TIM_TimeBaseInitStructure.TIM_Period = 1000 - 1; 
+    TIM_TimeBaseInitStructure.TIM_Prescaler= 840 - 1;  
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up; 
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
     TIM_TimeBaseInit(TIM5,&TIM_TimeBaseInitStructure);
@@ -148,7 +148,7 @@ void TIM5_IRQHandler(void)
 	TIM_ClearITPendingBit(TIM5,TIM_IT_Update);  //清除中断标志位
 }
 
-void TIM2_Init(void)
+void TIM2_Init(void)//10us
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -176,7 +176,7 @@ void TIM2_IRQHandler(void)
 {
 	if(TIM_GetITStatus(TIM2,TIM_IT_Update)==SET) //溢出中断
 	{
-        if(time_10us<time_Set)
+        if(time_10us < sample_time)
         {
             time_10us++;
         }
@@ -199,10 +199,10 @@ void TIM2_IRQHandler(void)
 
 void set_Frequent(int fre)
 {
-    time_Set=100000/fre;
+    sample_time = 100000/fre;
 }
 
-void TIM14_Init(void)
+void TIM14_Init(void)//1s: for check the state of SD card and eth
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -230,13 +230,13 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
-        if(time_1s<10)
+        if(time_s<10)
         {
-            time_1s++;
+            time_s++;
         }
         else
         {
-            time_1s=0;
+            time_s=0;
             if(get_InitState(SDSTATE)==FATFS_OK)
             {
                 if(SD_GetState()==SD_CARD_ERROR)
@@ -249,17 +249,8 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
             {
                 SD_Card_Init();
             }
-            if(get_InitState(ETHSTATE)==TCP_OK)
-            {
-//                u16 eth_sta;
-//                eth_sta=ETH_ReadPHYRegister(0x00,1);
-//                if((eth_sta&0x00f0)==0x0000)
-//                {
-//                    reset_InitState(ETHSTATE);
-//                    LOG_DEBUG("ETH LOST\r\n");
-//                }
-            }
-            else
+            
+            if(get_InitState(ETHSTATE)!= TCP_OK)
             {
                 LWIP_Init();
             }

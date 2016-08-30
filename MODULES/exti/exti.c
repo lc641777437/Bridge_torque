@@ -17,7 +17,7 @@ void EXTI_Configuration(void)
 		
 		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
-		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8;
+		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8;//nDRDY exti
 		GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
 		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
@@ -41,7 +41,7 @@ void EXTI_Configuration(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
+    if(EXTI_GetITStatus(EXTI_Line8)!=RESET)//AD sample OK
     {
         if(START==1)
         {
@@ -59,6 +59,14 @@ void EXTI9_5_IRQHandler(void)
             }
         }
 		EXTI_ClearITPendingBit(EXTI_Line8);
+    }
+    
+    if(EXTI_GetITStatus(EXTI_Line9)!=RESET)// Signal IN 
+    {
+        Sign_OUT=1;
+        Sign_Flag=1 ;
+        START=1;
+        EXTI_ClearITPendingBit(EXTI_Line9);
     }
 }
 
@@ -78,37 +86,27 @@ void EXTI_Sign_Configuration(void)
 		EXTI_InitTypeDef EXTI_InitStructure;
 		NVIC_InitTypeDef NVIC_InitStructure;
 		
-		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF,ENABLE);
+		RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
 		RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
-		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_2;
+		GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9;//SignalIn exti
 		GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
 		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 		GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
 		GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_DOWN;
-		GPIO_Init(GPIOF,&GPIO_InitStructure);
+		GPIO_Init(GPIOG,&GPIO_InitStructure);
 		
 		SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOF,EXTI_PinSource2);
 		
-		EXTI_InitStructure.EXTI_Line=EXTI_Line2;
+		EXTI_InitStructure.EXTI_Line=EXTI_Line9;
 		EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
 		EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Rising;
 		EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 		EXTI_Init(&EXTI_InitStructure);
 		
-		NVIC_InitStructure.NVIC_IRQChannel=EXTI2_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannel=EXTI9_5_IRQn;
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1;
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority =1;		
 		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;		
 		NVIC_Init(&NVIC_InitStructure);	
 }
 
-void EXTI2_IRQHandler(void)
-{
-    if(EXTI_GetITStatus(EXTI_Line2)!=RESET)
-    {
-        Sign_OUT=1;
-        Sign_Flag=1 ;
-        START=1;
-		EXTI_ClearITPendingBit(EXTI_Line2);
-    }
-}
