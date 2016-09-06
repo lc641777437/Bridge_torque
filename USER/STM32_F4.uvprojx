@@ -508,6 +508,11 @@
               <FileType>1</FileType>
               <FilePath>..\MODULES\initstate\initstate.c</FilePath>
             </File>
+            <File>
+              <FileName>lcd12864.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\lcd12864\lcd12864.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

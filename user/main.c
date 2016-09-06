@@ -4,6 +4,11 @@
 int main(void)
 {
 	SystemConfiguration();
+    Write_String(0,0,"test");
+//    Write_Com(0x82);
+//    delay_ms(10);
+//    Write_Data(0x38);
+//    delay_ms(10);
 	while(1)
 	{
         if(get_InitState(SDSTATE)==FATFS_OK)
@@ -40,6 +45,8 @@ void SystemConfiguration(void)
     RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,9);      
     RTC_Set_AlarmA(1,0,0,0);
     GPIO_init();
+    lcd12864_GPIO_Init();
+    LCD_Init();
     //SysTick_Config(336000);
 }
 

@@ -23,6 +23,7 @@
 #include "gpio.h"
 #include "stmflash.h"
 #include "initstate.h"
+#include "lcd12864.h"
 
 void SystemConfiguration(void);
 

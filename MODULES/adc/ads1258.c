@@ -19,7 +19,7 @@ static int ad_Data_Max[16];
 static int ad_Data_Min[16];
 static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
-static u8 ad_State[16];
+//static u8 ad_State[16];
 static u8 SendBuf[53];
 int Date_Now;
 char FileName[30];
@@ -35,6 +35,7 @@ void ads1258_Init(void)
     PBout(12)=0;
     
     EXTI_Configuration();
+    EXTI_Sign_Configuration();
     SPI2_Init();
     SPI2_ReadWriteByte(0xC0);
 }
