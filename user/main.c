@@ -4,7 +4,6 @@
 int main(void)
 {
 	SystemConfiguration();
-    ShowString(0,0,"øµ“„…µX");
     
 	while(1)
 	{

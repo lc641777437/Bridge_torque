@@ -73,10 +73,6 @@ void Write_Data(u8 dat)
 
 void Clear_Screen(void)
 {
-    Write_Com(0x30);
-    delay_ms(5);
-    Write_Com(0x34);
-    delay_ms(5);
     Write_Com(0x01);
 }
 
@@ -90,6 +86,14 @@ void LCD_Init(void)
     delay_ms(5);
     Write_Com(0x01);
     delay_ms(5);
+    ShowString(0,0,"V   V   V   V");
+    delay_ms(70);
+    ShowString(1,0,"V   V   V   V");
+    delay_ms(70);
+    ShowString(2,0,"V   V   V   V");
+    delay_ms(70);
+    ShowString(3,0,"V   V   V   V");
+    delay_ms(70);
 }
 
 void ShowString(u8 line, u8 pos, u8 *s)

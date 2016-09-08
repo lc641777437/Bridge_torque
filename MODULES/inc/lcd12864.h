@@ -38,4 +38,21 @@ void LCD_Proc_10us(void);
 void LCD_Start_5ms(u8 flag);
 void LCD_Proc_5ms(void);
 
+#define SENSOR_1 0,0
+#define SENSOR_2 0,2
+#define SENSOR_3 0,4
+#define SENSOR_4 0,6
+#define SENSOR_5 1,0
+#define SENSOR_6 1,2
+#define SENSOR_7 1,4
+#define SENSOR_8 1,6
+#define SENSOR_9 2,0
+#define SENSOR_10 2,2
+#define SENSOR_11 2,4
+#define SENSOR_12 2,6
+#define SENSOR_13 3,0
+#define SENSOR_14 3,2
+#define SENSOR_15 3,4
+#define SENSOR_16 3,6
+
 #endif
