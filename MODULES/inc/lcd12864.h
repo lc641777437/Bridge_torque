@@ -3,7 +3,12 @@
 
 #include "stm32f4xx.h"
 #include "sys.h"
-
+enum
+{
+    LCD_NULL,
+    LCD_DATA,
+    LCD_END
+};
 #define LCD_RS PCout(2)
 #define LCD_RW PCout(3)
 #define LCD_EN PAout(0)
@@ -22,7 +27,14 @@ void Write_Com(u8 com);
 void Write_Data(u8 dat);
 void Clear_Screen(void);
 void LCD_Init(void);
-void Write_String(u8 y,u8 x,u8 *s);
+void ShowString(u8 line, u8 pos, u8 *s);
 
+
+u8 isLCDEN(void);
+void LCD_Start_10us(u8 flag);
+void LCD_Proc_10us(void);
+
+void LCD_Start_5ms(u8 flag);
+void LCD_Proc_5ms(void);
 
 #endif

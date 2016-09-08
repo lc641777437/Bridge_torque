@@ -1,5 +1,11 @@
 #include "lcd12864.h"
 #include "delay.h"
+#include "timer.h"
+
+static u8 LcdWriteFlag;
+static u8 lcd_data[16];
+static u8 pos;
+static u8 isLCDBusy;
 
 void lcd12864_GPIO_Init(void)
 {
@@ -35,17 +41,6 @@ void lcd12864_GPIO_Init(void)
     
 }
 
-//u8 LCD12864_busy(void)
-//{
-//	u8 x;
-//	LCD_RS=0; 
-//	LCD_RW=1;  
-//	LCD_EN=1; 
-//	x= PFin(12);
-//	LCD_EN=0; 
-//	return x;
-//}
-
 void DataPort_Write(u8 data)
 {
     LCD_DB0=data&0x01?1:0;
@@ -60,30 +55,20 @@ void DataPort_Write(u8 data)
 
 void Write_Com(u8 com)
 {
-    delay_ms(5);
     LCD_RS=0;
     LCD_RW=0;
     LCD_EN=0;
-    delay_us(10);
     DataPort_Write(com);
-    delay_us(10);
     LCD_EN=1;
-    delay_us(10);
-    LCD_EN=0;
 }
 
 void Write_Data(u8 dat)
 {
-    delay_ms(5);
     LCD_RS=1;
     LCD_RW=0;
     LCD_EN=0;
-    delay_us(10);
     DataPort_Write(dat);
-    delay_us(10);
     LCD_EN=1;
-    delay_us(10);
-    LCD_EN=0;
 }
 
 void Clear_Screen(void)
@@ -107,19 +92,47 @@ void LCD_Init(void)
     delay_ms(5);
 }
 
-void Write_String(u8 y,u8 x,u8 *s)
+void ShowString(u8 line, u8 pos, u8 *s)
 {
-    switch(y)
-    {
-        case 0:Write_Com(0x80+x);break;
-        case 1:Write_Com(0x90+x);break;
-        case 2:Write_Com(0x88+x);break;
-        case 3:Write_Com(0x98+x);break;
-        default:break;
+    if(isLCDBusy)return;
+    
+    switch(line)
+    {   
+        case 0:Write_Com(0x80+pos);break;
+        case 1:Write_Com(0x90+pos);break;
+        case 2:Write_Com(0x88+pos);break;
+        case 3:Write_Com(0x98+pos);break;
     }
-    while(*s)
+    
+    strncpy((char *)lcd_data, (char *)s, 16);
+    LcdWriteFlag = LCD_DATA;
+    TIM7_Enable(ENABLE);
+}
+
+u8 isLCDEN(void)
+{
+    return LCD_EN;
+}
+
+void LCD_Proc_10us(void)
+{
+    LCD_EN = 0;
+}
+
+void LCD_Proc_5ms(void)
+{
+    if(LcdWriteFlag == LCD_DATA)
     {
-        Write_Data(*s);
-        s++;
+        Write_Data(lcd_data[pos++]);     
+        if(pos > strlen((char *)lcd_data) - 1)
+        {
+            LcdWriteFlag = LCD_NULL;
+            TIM7_Enable(DISABLE);
+            pos = 0;
+            memset(lcd_data,'\0',16);
+            isLCDBusy = 0;
+
+        }
     }
 }
+

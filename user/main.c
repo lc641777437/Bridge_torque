@@ -4,11 +4,8 @@
 int main(void)
 {
 	SystemConfiguration();
-    Write_String(0,0,"test");
-//    Write_Com(0x82);
-//    delay_ms(10);
-//    Write_Data(0x38);
-//    delay_ms(10);
+    ShowString(0,0,"XXXXX");
+    
 	while(1)
 	{
         if(get_InitState(SDSTATE)==FATFS_OK)
