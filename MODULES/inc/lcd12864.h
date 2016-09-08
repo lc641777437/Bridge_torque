@@ -29,6 +29,7 @@ void Clear_Screen(void);
 void LCD_Init(void);
 void ShowString(u8 line, u8 pos, u8 *s);
 
+u8 isLCDBUSY(void);
 
 u8 isLCDEN(void);
 void LCD_Start_10us(u8 flag);

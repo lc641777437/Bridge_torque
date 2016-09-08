@@ -114,6 +114,11 @@ u8 isLCDEN(void)
     return LCD_EN;
 }
 
+u8 isLCDBUSY(void)
+{
+    return isLCDBusy;
+}
+
 void LCD_Proc_10us(void)
 {
     LCD_EN = 0;
@@ -125,13 +130,12 @@ void LCD_Proc_5ms(void)
     {
         Write_Data(lcd_data[pos++]);     
         if(pos > strlen((char *)lcd_data) - 1)
-        {
-            LcdWriteFlag = LCD_NULL;
-            TIM7_Enable(DISABLE);
+        {            
             pos = 0;
-            memset(lcd_data,'\0',16);
             isLCDBusy = 0;
-
+            TIM7_Enable(DISABLE);
+            LcdWriteFlag = LCD_NULL;
+            memset(lcd_data,'\0',16);
         }
     }
 }
