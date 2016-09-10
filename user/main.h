@@ -24,6 +24,8 @@
 #include "stmflash.h"
 #include "initstate.h"
 #include "lcd12864.h"
+#include "usbh_usr.h" 
+#include "fatfs_api.h"
 
 void SystemConfiguration(void);
 

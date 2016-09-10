@@ -331,8 +331,7 @@ void fatfs_init(void)
 {
     u8 res = 0;
     u32 total,free;
-
-    exfuns_init();							//为fatfs相关变量申请内存				 
+				 
   	res = f_mount(fs[0],"0:",1); 					//挂载SD卡 
     LOG_DEBUG("RESULT : %d\r\n",res);												    
 	while(exf_getfree("0",&total,&free))	//得到SD卡的总容量和剩余容量
