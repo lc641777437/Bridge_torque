@@ -189,7 +189,7 @@ void TIM2_IRQHandler(void)
             if(Sign_Flag==0)
             {
                 Sign_OUT=1;
-                //START=1;
+                START=1;
             }
             else
             {

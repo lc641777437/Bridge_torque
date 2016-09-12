@@ -1,6 +1,8 @@
 #include "usbh_usr.h" 
 #include "ff.h" 
 #include "usart.h" 
+#include "fatfs_api.h"
+#include "exfuns.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -55,8 +57,8 @@ USBH_Usr_cb_TypeDef USR_Callbacks=
 void USBH_USR_Init(void)
 {
 	LOG_DEBUG("USB OTG HS MSC Host\r\n");
-	LOG_DEBUG("> USB Host library started.\r\n");
-	LOG_DEBUG("  USB Host Library v2.1.0\r\n\r\n");
+	LOG_DEBUG("USB Host library started.\r\n");
+	LOG_DEBUG("USB Host Library v2.1.0\r\n\r\n");
 	
 }
 //检测到U盘插入
@@ -142,7 +144,7 @@ void USBH_USR_SerialNum_String(void *SerialNumString)
 //设备USB枚举完成
 void USBH_USR_EnumerationDone(void)
 { 
-	LOG_DEBUG("设备枚举完成!\r\n\r\n");    
+	LOG_DEBUG("设备枚举完成!\r\n");    
 } 
 //无法识别的USB设备
 void USBH_USR_DeviceNotSupported(void)
@@ -152,7 +154,6 @@ void USBH_USR_DeviceNotSupported(void)
 //等待用户输入按键,执行下一步操作
 USBH_USR_Status USBH_USR_UserInput(void)
 { 
-	LOG_DEBUG("跳过用户确认步骤!\r\n");
 	return USBH_USR_RESP_OK;
 } 
 //USB接口电流过载
@@ -169,7 +170,6 @@ int USBH_USR_MSC_Application(void)
   	switch(AppState)
   	{
     	case USH_USR_FS_INIT://初始化文件系统 
-			LOG_DEBUG("开始执行用户程序!!!\r\n");
 			AppState=USH_USR_FS_TEST;
       		break;
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
@@ -253,9 +253,20 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 	return res;
 }
 
+u8 USH_User_App(void)
+{ 
+//read
+    mf_open("2:/lccdsb.txt",FA_CREATE_NEW|FA_WRITE);
+    mf_write("lccdsb",6);
+    mf_close();
+	return 0;
+}
 
-
-
+void USB_Init(void)
+{
+    f_mount(fs[2],"2:",1); 	//挂载U盘
+    USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks); 
+}
 
 
 

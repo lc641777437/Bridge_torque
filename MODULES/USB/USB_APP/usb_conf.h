@@ -31,7 +31,6 @@
 
 /* Includes ------------------------------------------------------------------*/ 
 #include "stm32f4xx.h"
-#include "stm32f4xx.h"
 
 
 /** @addtogroup USB_OTG_DRIVER
@@ -59,7 +58,7 @@
 *  when FS core is used.
 *******************************************************************************/
 #ifndef USE_USB_OTG_FS
- //#define USE_USB_OTG_FS
+ #define USE_USB_OTG_FS
 #endif /* USE_USB_OTG_FS */
 
 #ifdef USE_USB_OTG_FS 
@@ -155,7 +154,7 @@
 
 #ifndef USB_OTG_FS_CORE
  #ifndef USB_OTG_HS_CORE
-    //#error  "USB_OTG_HS_CORE or USB_OTG_FS_CORE should be defined"
+    #error  "USB_OTG_HS_CORE or USB_OTG_FS_CORE should be defined"
  #endif
 #endif
 
@@ -167,12 +166,12 @@
 
 #ifndef USE_USB_OTG_HS
  #ifndef USE_USB_OTG_FS
-    //#error  "USE_USB_OTG_HS or USE_USB_OTG_FS should be defined"
+    #error  "USE_USB_OTG_HS or USE_USB_OTG_FS should be defined"
  #endif
 #else //USE_USB_OTG_HS
  #ifndef USE_ULPI_PHY
   #ifndef USE_EMBEDDED_PHY
-     //#error  "USE_ULPI_PHY or USE_EMBEDDED_PHY should be defined"
+     #error  "USE_ULPI_PHY or USE_EMBEDDED_PHY should be defined"
   #endif
  #endif
 #endif

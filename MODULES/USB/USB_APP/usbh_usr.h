@@ -124,6 +124,8 @@ u8 USBH_UDISK_Status(void);
 u8 USBH_UDISK_Read(u8* buf,u32 sector,u32 cnt);
 u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt);
 
+void USB_Init(void);
+
 /**
   * @}
   */ 
