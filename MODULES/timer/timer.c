@@ -7,6 +7,7 @@
 #include "lwip_comm.h"
 #include "usbh_usr.h" 
 #include "fatfs_api.h"
+#include "lcd12864.h"
 
 extern u32 lwip_localtime;
 int time_10us = 0;
