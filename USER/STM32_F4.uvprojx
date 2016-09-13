@@ -175,7 +175,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\FWLIB\STM32F4x7_ETH_Driver\inc;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\MODULES\inc;..\USER;..\MODULES\fatfs\inc;..\MODULES\eth\lwip_app\inc;..\MODULES\eth\lwip-1.4.1\src\include;..\MODULES\eth\lwip-1.4.1\src\include\ipv4;..\MODULES\eth</IncludePath>
+              <IncludePath>..\FWLIB\STM32F4x7_ETH_Driver\inc;..\FWLIB\STM32F4xx_StdPeriph_Driver\inc;..\MODULES\inc;..\USER;..\MODULES\fatfs\inc;..\MODULES\eth\lwip_app\inc;..\MODULES\eth\lwip-1.4.1\src\include;..\MODULES\eth\lwip-1.4.1\src\include\ipv4;..\MODULES\eth;..\MODULES\USB\USB_APP;..\MODULES\USB\STM32_USB_OTG_Driver\inc;..\MODULES\USB\STM32_USB_HOST_Library\Core\inc;..\MODULES\USB\STM32_USB_HOST_Library\Class\MSC\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -937,6 +937,81 @@
               <FileName>ethernetif.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MODULES\eth\lwip-1.4.1\src\netif\ethernetif.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB_OTG</GroupName>
+          <Files>
+            <File>
+              <FileName>usb_hcd_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_OTG_Driver\src\usb_hcd_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_hcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_OTG_Driver\src\usb_hcd.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USB_HOST</GroupName>
+          <Files>
+            <File>
+              <FileName>usbh_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Core\src\usbh_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_hcs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Core\src\usbh_hcs.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Core\src\usbh_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_stdreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Core\src\usbh_stdreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_msc_bot.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Class\MSC\src\usbh_msc_bot.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_msc_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Class\MSC\src\usbh_msc_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_msc_scsi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\STM32_USB_HOST_Library\Class\MSC\src\usbh_msc_scsi.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>USP_APP</GroupName>
+          <Files>
+            <File>
+              <FileName>usbh_usr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\USB_APP\usbh_usr.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_bsp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\USB\USB_APP\usb_bsp.c</FilePath>
             </File>
           </Files>
         </Group>

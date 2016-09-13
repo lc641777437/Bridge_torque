@@ -1,16 +1,14 @@
 #include "main.h"
 
+USBH_HOST  USB_Host;
+USB_OTG_CORE_HANDLE  USB_OTG_Core;
 
 int main(void)
 {
 	SystemConfiguration();
-    Write_String(0,0,"test");
-//    Write_Com(0x82);
-//    delay_ms(10);
-//    Write_Data(0x38);
-//    delay_ms(10);
 	while(1)
 	{
+        USBH_Process(&USB_OTG_Core, &USB_Host);
         if(get_InitState(SDSTATE)==FATFS_OK)
         {
             if(get_Save_Flag()==1)
@@ -34,6 +32,7 @@ void SystemConfiguration(void)
     TIM_Init();
     mymem_init(SRAMIN);
     mymem_init(SRAMCCM);
+    exfuns_init();							//为fatfs相关变量申请内存
     SD_Card_Init();
     while(ETH_Mem_Malloc()){}		//申请内存
 	while(lwip_comm_mem_malloc()){}	//申请内存
@@ -47,6 +46,7 @@ void SystemConfiguration(void)
     GPIO_init();
     lcd12864_GPIO_Init();
     LCD_Init();
+    USB_Init();
     //SysTick_Config(336000);
 }
 

@@ -5,13 +5,16 @@
 #include "ads1258.h"
 #include "initstate.h"
 #include "lwip_comm.h"
-
+#include "usbh_usr.h" 
+#include "fatfs_api.h"
 
 extern u32 lwip_localtime;
 int time_10us = 0;
 int time_s = 0;
 int sample_time = 5 * 100;
 u8 Sign_Flag=0;//0:master  1:slave 
+extern USBH_HOST  USB_Host;
+extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
 
 void TIM_Init(void)
 {    
@@ -230,9 +233,10 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
-        if(time_s<10)
+        if(time_s<9)
         {
             time_s++;
+//            USBH_Process(&USB_OTG_Core, &USB_Host);
         }
         else
         {
