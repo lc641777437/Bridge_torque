@@ -3,6 +3,7 @@
 #include "usart.h" 
 #include "fatfs_api.h"
 #include "exfuns.h"
+#include "initstate.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -69,6 +70,7 @@ void USBH_USR_DeviceAttached(void)//U盘插入
 //检测到U盘拔出
 void USBH_USR_DeviceDisconnected (void)//U盘移除
 {
+    reset_InitState(USBSTATE);
 	LOG_DEBUG("USB设备拔出!\r\n");
 }  
 //复位从机
@@ -171,6 +173,7 @@ int USBH_USR_MSC_Application(void)
   	{
     	case USH_USR_FS_INIT://初始化文件系统 
 			AppState=USH_USR_FS_TEST;
+            add_InitState(USBSTATE);
       		break;
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
 			res=USH_User_App(); //用户主程序
@@ -255,10 +258,7 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 
 u8 USH_User_App(void)
 { 
-//read
-    mf_open("2:/lccdsb.txt",FA_CREATE_NEW|FA_WRITE);
-    mf_write("lccdsb",6);
-    mf_close();
+    //read
 	return 0;
 }
 

@@ -8,6 +8,7 @@
 #define Sign_OUT PFout(3)
 
 #define NOTHING 0
+
 #define SDCARD_OK 1
 #define FATFS_OK 2
 
@@ -15,6 +16,7 @@
 #define DHCP_OK 2
 #define TCP_OK 3
 
+#define USB_OK 1
 
 void TIM_Init(void);
 

@@ -1,11 +1,15 @@
 #include "lcd12864.h"
 #include "delay.h"
 #include "timer.h"
+#include "gpio.h"
 
 static u8 LcdWriteFlag;
 static u8 lcd_data[16];
 static u8 pos;
 static u8 isLCDBusy;
+static u8 show_Ctrl[16];  // 0:I  1:V
+static u8 show_State[16]; // 0:N  1:Y
+static u8 show_Count;
 
 void lcd12864_GPIO_Init(void)
 {
@@ -78,6 +82,8 @@ void Clear_Screen(void)
 
 void LCD_Init(void)
 {
+    int i,j;
+    char string[16];
     Write_Com(0x34);
     delay_ms(5);
     Write_Com(0x30);
@@ -86,14 +92,73 @@ void LCD_Init(void)
     delay_ms(5);
     Write_Com(0x01);
     delay_ms(5);
-    ShowString(0,0,"V   V   V   V");
-    delay_ms(70);
-    ShowString(1,0,"V   V   V   V");
-    delay_ms(70);
-    ShowString(2,0,"V   V   V   V");
-    delay_ms(70);
-    ShowString(3,0,"V   V   V   V");
-    delay_ms(70);
+    show_State[0]=STATE_0;
+    show_State[1]=STATE_1;
+    show_State[2]=STATE_2;
+    show_State[3]=STATE_3;
+    show_State[4]=STATE_4;
+    show_State[5]=STATE_5;
+    show_State[6]=STATE_6;
+    show_State[7]=STATE_7;
+    show_State[8]=STATE_8;
+    show_State[9]=STATE_9;
+    show_State[10]=STATE_10;
+    show_State[11]=STATE_11;
+    show_State[12]=STATE_12;
+    show_State[13]=STATE_13;
+    show_State[14]=STATE_14;
+    show_State[15]=STATE_15;
+    
+    show_Ctrl[0]=CTRL_0;
+    show_Ctrl[1]=CTRL_1;
+    show_Ctrl[2]=CTRL_2;
+    show_Ctrl[3]=CTRL_3;
+    show_Ctrl[4]=CTRL_4;
+    show_Ctrl[5]=CTRL_5;
+    show_Ctrl[6]=CTRL_6;
+    show_Ctrl[7]=CTRL_7;
+    show_Ctrl[8]=CTRL_8;
+    show_Ctrl[9]=CTRL_9;
+    show_Ctrl[10]=CTRL_10;
+    show_Ctrl[11]=CTRL_11;
+    show_Ctrl[12]=CTRL_12;
+    show_Ctrl[13]=CTRL_13;
+    show_Ctrl[14]=CTRL_14;
+    show_Ctrl[15]=CTRL_15;
+    
+    for(i=0;i<4;i++)
+    {
+        memset(string,'\0',16*sizeof(char));
+        for(j=0;j<4;j++)
+        {
+            if(show_Ctrl[4*i+j]==0)
+            {
+                strcat(string,"I");
+            }
+            else
+            {
+                strcat(string,"V");
+            }
+            if(show_State[4*i+j]==0)
+            {
+                strcat(string," ");
+            }
+            else
+            {
+                strcat(string,"\x04");
+            }
+            if(j<3)
+            {
+                strcat(string,"  ");
+            }
+            else if(j==3)
+            {
+                strcat(string," ");
+            }
+        }
+        ShowString(i,0,(u8*)string);
+        delay_ms(80);
+    }
 }
 
 void ShowString(u8 line, u8 pos, u8 *s)
@@ -107,7 +172,6 @@ void ShowString(u8 line, u8 pos, u8 *s)
         case 2:Write_Com(0x88+pos);break;
         case 3:Write_Com(0x98+pos);break;
     }
-    
     strncpy((char *)lcd_data, (char *)s, 16);
     LcdWriteFlag = LCD_DATA;
     TIM7_Enable(ENABLE);
@@ -132,9 +196,9 @@ void LCD_Proc_5ms(void)
 {
     if(LcdWriteFlag == LCD_DATA)
     {
-        Write_Data(lcd_data[pos++]);     
+        Write_Data(lcd_data[pos++]);
         if(pos > strlen((char *)lcd_data) - 1)
-        {            
+        {
             pos = 0;
             isLCDBusy = 0;
             TIM7_Enable(DISABLE);
@@ -144,3 +208,167 @@ void LCD_Proc_5ms(void)
     }
 }
 
+void show_Update(void)
+{
+    char isUpdate=0;
+    switch(show_Count)
+    {
+        case 0:
+            if(show_Ctrl[0]!=CTRL_0||show_State[0]!=STATE_0)
+            {
+                show_Ctrl[0]=CTRL_0;
+                show_State[0]=STATE_0;
+                isUpdate=1;
+            }
+            break;
+        case 1:
+            if(show_Ctrl[1]!=CTRL_1||show_State[1]!=STATE_1)
+            {
+                show_Ctrl[1]=CTRL_1;
+                show_State[1]=STATE_1;
+                isUpdate=1;
+            }
+            break;
+        case 2:
+            if(show_Ctrl[2]!=CTRL_2||show_State[2]!=STATE_2)
+            {
+                show_Ctrl[2]=CTRL_2;
+                show_State[2]=STATE_2;
+                isUpdate=1;
+            }
+            break;
+        case 3:
+            if(show_Ctrl[3]!=CTRL_3||show_State[3]!=STATE_3)
+            {
+                show_Ctrl[3]=CTRL_3;
+                show_State[3]=STATE_3;
+                isUpdate=1;
+            }
+            break;
+        case 4:
+            if(show_Ctrl[4]!=CTRL_4||show_State[4]!=STATE_4)
+            {
+                show_Ctrl[4]=CTRL_4;
+                show_State[4]=STATE_4;
+                isUpdate=1;
+            }
+            break;
+        case 5:
+            if(show_Ctrl[5]!=CTRL_5||show_State[5]!=STATE_5)
+            {
+                show_Ctrl[5]=CTRL_5;
+                show_State[5]=STATE_5;
+                isUpdate=1;
+            }
+            break;
+        case 6:
+            if(show_Ctrl[6]!=CTRL_6||show_State[6]!=STATE_6)
+            {
+                show_Ctrl[6]=CTRL_6;
+                show_State[6]=STATE_6;
+                isUpdate=1;
+            }
+            break;
+        case 7:
+            if(show_Ctrl[7]!=CTRL_7||show_State[7]!=STATE_7)
+            {
+                show_Ctrl[7]=CTRL_7;
+                show_State[7]=STATE_7;
+                isUpdate=1;
+            }
+            break;
+        case 8:
+            if(show_Ctrl[8]!=CTRL_8||show_State[8]!=STATE_8)
+            {
+                show_Ctrl[8]=CTRL_8;
+                show_State[8]=STATE_8;
+                isUpdate=1;
+            }
+            break;
+        case 9:
+            if(show_Ctrl[9]!=CTRL_9||show_State[9]!=STATE_9)
+            {
+                show_Ctrl[9]=CTRL_9;
+                show_State[9]=STATE_9;
+                isUpdate=1;
+            }
+            break;
+        case 10:
+            if(show_Ctrl[10]!=CTRL_10||show_State[10]!=STATE_10)
+            {
+                show_Ctrl[10]=CTRL_10;
+                show_State[10]=STATE_10;
+                isUpdate=1;
+            }
+            break;
+        case 11:
+            if(show_Ctrl[11]!=CTRL_11||show_State[11]!=STATE_11)
+            {
+                show_Ctrl[11]=CTRL_11;
+                show_State[11]=STATE_11;
+                isUpdate=1;
+            }
+            break;
+        case 12:
+            if(show_Ctrl[12]!=CTRL_12||show_State[12]!=STATE_12)
+            {
+                show_Ctrl[12]=CTRL_12;
+                show_State[12]=STATE_12;
+                isUpdate=1;
+            }
+            break;
+        case 13:
+            if(show_Ctrl[13]!=CTRL_13||show_State[13]!=STATE_13)
+            {
+                show_Ctrl[13]=CTRL_13;
+                show_State[13]=STATE_13;
+                isUpdate=1;
+            }
+            break;
+        case 14:
+            if(show_Ctrl[14]!=CTRL_14||show_State[14]!=STATE_14)
+            {
+                show_Ctrl[14]=CTRL_14;
+                show_State[14]=STATE_14;
+                isUpdate=1;
+            }
+            break;
+        case 15:
+            if(show_Ctrl[15]!=CTRL_15||show_State[15]!=STATE_15)
+            {
+                show_Ctrl[15]=CTRL_15;
+                show_State[15]=STATE_15;
+                isUpdate=1;
+            }
+            break;
+        default:
+            break;
+    }
+    if(isUpdate==1)
+    {
+        if(show_Ctrl[show_Count]==0&&show_State[show_Count]==0)
+        {
+            ShowString(show_Count/4,(show_Count%4)*2,"IN  ");
+        }
+        else if(show_Ctrl[show_Count]==0&&show_State[show_Count]==1)
+        {
+            ShowString(show_Count/4,(show_Count%4)*2,"IY  ");
+        }
+        else if(show_Ctrl[show_Count]==1&&show_State[show_Count]==0)
+        {
+            ShowString(show_Count/4,(show_Count%4)*2,"VN  ");
+        }
+        else if(show_Ctrl[show_Count]==1&&show_State[show_Count]==1)
+        {
+            ShowString(show_Count/4,(show_Count%4)*2,"VY  ");
+        }
+    }
+    if(show_Count<15)
+    {
+        show_Count++;
+    }
+    else 
+    {
+        show_Count=0;
+    }
+}

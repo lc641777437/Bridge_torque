@@ -1,8 +1,12 @@
 #include "stmflash.h"
 #include "delay.h"
 #include "usart.h" 
+#include "gpio.h"
+#include "tcp_client_demo.h" 
+#include "timer.h"
 
- 
+static u32 Flash_State[4];//0:DEV_ID   1:CTRL_STATE   2:IP_ADDRESS   3:FREQUENCE
+
 //读取指定地址的半字(16位数据) 
 //faddr:读地址 
 //返回值:对应数据.
@@ -90,23 +94,76 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)
 	}
 }
 
-void Set_DeviceID(u32 DeviceID)
+
+void My_Flash_Read(void)
 {
-    u32 Dev_ID;
-    Dev_ID=DeviceID;
-    STMFLASH_Write(FALSH_SAVE_ADDR,&Dev_ID,1);
+    STMFLASH_Read(FALSH_SAVE_ADDR,Flash_State,4);
+    set_CtrlState(Flash_State[1]);
+    if(Flash_State[3]<500)
+    {
+        set_Frequent(Flash_State[3]);
+    }
+    else 
+    {
+        set_Frequent(200);
+    }
 }
 
-u32 Get_DeviceID(void)
+u32 get_FlashState(int i)
 {
-    u32 Dev_ID;
-    STMFLASH_Read(FALSH_SAVE_ADDR,&Dev_ID,1);
-    return Dev_ID;
+    if(i>=0&&i<=3)
+    {
+        return Flash_State[i];
+    }
+    else 
+    {
+        return 0;
+    }
 }
 
+void Write_DeviceID(u32 DeviceID)
+{
+    Flash_State[0]=DeviceID;
+    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
+}
 
+void Write_CtrlState(u32 CtrlState)
+{
+    Flash_State[1]=CtrlState;
+    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
+}
 
+void Write_IPAddress(u32 IPAddress)
+{
+    Flash_State[2]=IPAddress;
+    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
+}
 
+void Write_Frequent(u32 Frequent)
+{
+    Flash_State[3]=Frequent;
+    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
+}
+
+void set_CtrlState(u32 CtrlState)
+{
+    CTRL_0=(CtrlState>>0)&1;
+    CTRL_1=(CtrlState>>1)&1;
+    CTRL_2=(CtrlState>>2)&1;
+    CTRL_3=(CtrlState>>3)&1;
+    CTRL_4=(CtrlState>>4)&1;
+    CTRL_5=(CtrlState>>5)&1;
+    CTRL_6=(CtrlState>>6)&1;
+    CTRL_7=(CtrlState>>7)&1;
+    CTRL_8=(CtrlState>>8)&1;
+    CTRL_9=(CtrlState>>9)&1;
+    CTRL_10=(CtrlState>>10)&1;
+    CTRL_11=(CtrlState>>11)&1;
+    CTRL_12=(CtrlState>>12)&1;
+    CTRL_13=(CtrlState>>13)&1;
+    CTRL_14=(CtrlState>>14)&1;
+    CTRL_15=(CtrlState>>15)&1;
+}
 
 
 

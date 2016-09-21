@@ -21,7 +21,9 @@ static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
 //static u8 ad_State[16];
 static u8 SendBuf[53];
-int Date_Now;
+int Date_Now_SD;
+int Date_Now_USB;
+int SavePosition;  //1 for SD 2 for USB
 char FileName[30];
 
 void ads1258_Init(void)
@@ -138,7 +140,7 @@ void Send_AD_RawData(u8 i)
 }
 
 
-void Save_AD_RawData(void)
+void Save_AD_RawData_SD(void)
 {
 //    RTC_DateTypeDef RTC_DateStruct;
 //    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
@@ -159,15 +161,52 @@ void Save_AD_RawData(void)
 //    mf_close();
     RTC_TimeTypeDef RTC_TimeStruct;
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
-    if(Date_Now!=RTC_TimeStruct.RTC_Minutes)
+    // 新的时间创建新的文件
+    if(Date_Now_SD!=RTC_TimeStruct.RTC_Minutes)
     {
         mf_close();
-        Date_Now=RTC_TimeStruct.RTC_Minutes;
+        Date_Now_SD=RTC_TimeStruct.RTC_Minutes;
+        SavePosition=1;
         snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
         RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
         mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
+    }
+    //换了存储位置 打开原有文件
+    else if(SavePosition!=1)
+    {
+        SavePosition=1;
+        mf_close();
+        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        mf_open((u8 *)FileName,FA_WRITE);
     }
     mf_write((u8 *)SendBuf,52);//TODO:time
     mf_write("\r\n",2);
 }
 
+void Save_AD_RawData_USB(void)
+{
+    RTC_TimeTypeDef RTC_TimeStruct;
+    RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
+    // 新的时间创建新的文件
+    if(Date_Now_USB!=RTC_TimeStruct.RTC_Minutes)
+    {
+        mf_close();
+        Date_Now_USB=RTC_TimeStruct.RTC_Minutes;
+        SavePosition=2;
+        snprintf(FileName,30,"%s%02d%02d%02d%s","2:/20",\
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
+    }
+    //换了存储位置 打开原有文件
+    else if(SavePosition!=2)
+    {
+        SavePosition=2;
+        mf_close();
+        snprintf(FileName,30,"%s%02d%02d%02d%s","2:/20",\
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        mf_open((u8 *)FileName,FA_WRITE);
+    }
+    mf_write((u8 *)SendBuf,52);//TODO:time
+    mf_write("\r\n",2);
+}

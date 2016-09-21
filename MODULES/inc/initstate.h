@@ -4,6 +4,7 @@
 
 #define SDSTATE 1
 #define ETHSTATE 2
+#define USBSTATE 3
 
 void add_InitState(char mode);
 void reset_InitState(char mode);

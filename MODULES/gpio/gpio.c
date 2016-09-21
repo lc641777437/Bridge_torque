@@ -2,7 +2,6 @@
 #include "sys.h"
 
 
-
 void GPIO_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -58,22 +57,22 @@ void GPIO_init(void)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_Init(GPIOF, &GPIO_InitStructure);
-    
-    CTRL_0=1;
-    CTRL_1=1;
-    CTRL_2=1;
-    CTRL_3=1;
-    CTRL_4=1;
-    CTRL_5=1;
-    CTRL_6=1;
-    CTRL_7=1;
-    CTRL_8=1;
-    CTRL_9=1;
-    CTRL_10=1;
-    CTRL_11=1;
-    CTRL_12=1;
-    CTRL_13=1;
-    CTRL_14=1;
-    CTRL_15=1;
+
+    CTRL_0=0;
+    CTRL_1=0;
+    CTRL_2=0;
+    CTRL_3=0;
+    CTRL_4=0;
+    CTRL_5=0;
+    CTRL_6=0;
+    CTRL_7=0;
+    CTRL_8=0;
+    CTRL_9=0;
+    CTRL_10=0;
+    CTRL_11=0;
+    CTRL_12=0;
+    CTRL_13=0;
+    CTRL_14=0;
+    CTRL_15=0;
 }
 

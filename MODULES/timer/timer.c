@@ -22,9 +22,9 @@ void TIM_Init(void)
     TIM2_Init();
     TIM3_Init();
     TIM4_Init();
-    TIM5_Init();  
-    TIM14_Init(); 
-    TIM7_Init();    
+    TIM5_Init();
+    TIM14_Init();
+    TIM7_Init();
 }
 void TIM3_Init(void)//10ms for identify uart3 end
 {
@@ -169,8 +169,8 @@ void TIM2_Init(void)//10us
     TIM_ITConfig(TIM2,TIM_IT_Update,ENABLE); 
 
     NVIC_InitStructure.NVIC_IRQChannel=TIM2_IRQn; 
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x01; 
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x00; 
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x00; 
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
@@ -232,9 +232,9 @@ void TIM14_Init(void)//1s: for check the state of SD card and eth
     
     TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE); 
 
-    NVIC_InitStructure.NVIC_IRQChannel=TIM8_TRG_COM_TIM14_IRQn; 
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x02; 
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02; 
+    NVIC_InitStructure.NVIC_IRQChannel=TIM8_TRG_COM_TIM14_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0x02;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02;
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
     
@@ -248,7 +248,6 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
         if(time_s<9)
         {
             time_s++;
-//            USBH_Process(&USB_OTG_Core, &USB_Host);
         }
         else
         {

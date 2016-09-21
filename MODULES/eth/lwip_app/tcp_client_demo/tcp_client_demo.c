@@ -3,7 +3,8 @@
 #include "usart.h"
 #include "malloc.h"
 #include "stdio.h"
-#include "string.h"  
+#include "string.h"
+#include "stmflash.h"
  
 //TCP Client接收数据缓冲区
 u8 tcp_client_recvbuf[TCP_CLIENT_RX_BUFSIZE];	
@@ -42,23 +43,14 @@ void tcp_client_set_remoteip(u8 set_IP)
 //TCP Client 测试
 void tcp_client_test(void)
 {
-	tcp_client_set_remoteip(110);//先选择IP
-//      tcp_client_flag|=1<<7;//标记要发送数据
-//		if(tcp_client_flag&1<<6)//是否收到数据?
-//		{		
-//			tcp_client_flag&=~(1<<6);//标记数据已经被处理了.
-//		}
-//		if(tcp_client_flag&1<<5)//是否连接上?
-//		{
-//			if(connflag==0)
-//			{ 
-//				connflag=1;//标记连接了
-//			} 
-//		}else if(connflag)
-//		{
-//			connflag=0;	//标记连接断开了
-//		} 
-//	tcp_client_connection_close(tcppcb,0);//关闭TCP Client连接
+    if(get_FlashState(1)<256)
+    {
+        tcp_client_set_remoteip(get_FlashState(1));//先选择IP
+    }
+    else
+    {
+        tcp_client_set_remoteip(1);//先选择IP
+    }
 }
 //lwIP TCP连接建立后调用回调函数
 err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err)

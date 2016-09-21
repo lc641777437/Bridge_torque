@@ -7,7 +7,7 @@
 
 //FLASH起始地址
 #define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
-#define FALSH_SAVE_ADDR 0x0807FF00
+#define FALSH_SAVE_ADDR 0x08070000
 
 //FLASH 扇区的起始地址
 #define ADDR_FLASH_SECTOR_0     ((u32)0x08000000) 	//扇区0起始地址, 16 Kbytes  
@@ -26,9 +26,13 @@
 u32 STMFLASH_ReadWord(u32 faddr);		  	//读出字  
 void STMFLASH_Write(u32 WriteAddr,u32 *pBuffer,u32 NumToWrite);		//从指定地址开始写入指定长度的数据
 void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead);   		//从指定地址开始读出指定长度的数据
-void Set_DeviceID(u32 DeviceID);
-u32 Get_DeviceID(void);
-
+void My_Flash_Read(void);
+u32 get_FlashState(int i);
+void Write_DeviceID(u32 DeviceID);
+void Write_CtrlState(u32 CtrlState);
+void Write_IPAddress(u32 IPAddress);
+void Write_Frequent(u32 Frequent);
+void set_CtrlState(u32 CtrlState);
 
 #endif
 

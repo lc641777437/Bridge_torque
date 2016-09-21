@@ -5,6 +5,8 @@
 void EXTI_Configuration(void);
 void set_Save_Flag(int i);
 int get_Save_Flag(void);
+void set_Send_Flag(int i);
+int get_Send_Flag(void);
 void EXTI_Sign_Configuration(void);
 
 #endif

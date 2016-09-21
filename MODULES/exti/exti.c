@@ -8,6 +8,7 @@
 int Count=0;
 extern u8 Sign_Flag;
 static int save_Flag = 0;
+static int send_Flag = 0;
 
 void EXTI_Configuration(void)
 {
@@ -54,7 +55,10 @@ void EXTI9_5_IRQHandler(void)
                 START=0;
                 Count=0;
                 convert_AD_RawData();
-                USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+                if(get_Send_Flag())
+                {
+                    USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+                }
                 set_Save_Flag(1);
             }
         }
@@ -64,7 +68,7 @@ void EXTI9_5_IRQHandler(void)
     if(EXTI_GetITStatus(EXTI_Line9)!=RESET)// Signal IN 
     {
         Sign_OUT=1;
-        Sign_Flag=1 ;
+        Sign_Flag=1;
         START=1;
         EXTI_ClearITPendingBit(EXTI_Line9);
     }
@@ -78,6 +82,16 @@ void set_Save_Flag(int i)
 int get_Save_Flag(void)
 {
     return save_Flag;
+}
+
+void set_Send_Flag(int i)
+{
+    send_Flag=i;
+}
+
+int get_Send_Flag(void)
+{
+    return send_Flag;
 }
 
 void EXTI_Sign_Configuration(void)
