@@ -4,7 +4,7 @@
 #include "gpio.h"
 
 static u8 LcdWriteFlag;
-static u8 lcd_data[16];
+static u8 lcd_data[17];
 static u8 pos;
 static u8 isLCDBusy;
 static u8 show_Ctrl[16];  // 0:I  1:V
@@ -83,7 +83,8 @@ void Clear_Screen(void)
 void LCD_Init(void)
 {
     int i,j;
-    char string[16];
+    char string[17];
+    
     Write_Com(0x34);
     delay_ms(5);
     Write_Com(0x30);
@@ -92,6 +93,7 @@ void LCD_Init(void)
     delay_ms(5);
     Write_Com(0x01);
     delay_ms(5);
+    
     show_State[0]=STATE_0;
     show_State[1]=STATE_1;
     show_State[2]=STATE_2;
@@ -128,36 +130,30 @@ void LCD_Init(void)
     
     for(i=0;i<4;i++)
     {
-        memset(string,'\0',16*sizeof(char));
+        memset(string,'\0',17*sizeof(char));
         for(j=0;j<4;j++)
         {
             if(show_Ctrl[4*i+j]==0)
             {
-                strcat(string,"I");
+                string[j * 4 + 0] = 'I';
             }
             else
             {
-                strcat(string,"V");
+                string[j * 4 + 0] = 'V';
             }
             if(show_State[4*i+j]==0)
             {
-                strcat(string," ");
+                string[j * 4 + 1] = ' ';
             }
             else
             {
-                strcat(string,"\x04");
+                string[j * 4 + 1] = '\x04';
             }
-            if(j<3)
-            {
-                strcat(string,"  ");
-            }
-            else if(j==3)
-            {
-                strcat(string," ");
-            }
+            string[j * 4 + 2] = ' ';
+            string[j * 4 + 3] = ' ';
         }
         ShowString(i,0,(u8*)string);
-        delay_ms(80);
+        delay_ms(100);
     }
 }
 
@@ -172,7 +168,7 @@ void ShowString(u8 line, u8 pos, u8 *s)
         case 2:Write_Com(0x88+pos);break;
         case 3:Write_Com(0x98+pos);break;
     }
-    strncpy((char *)lcd_data, (char *)s, 16);
+    strncpy((char *)lcd_data, (char *)s, 17);
     LcdWriteFlag = LCD_DATA;
     TIM7_Enable(ENABLE);
 }
