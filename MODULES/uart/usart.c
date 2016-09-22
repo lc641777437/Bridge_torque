@@ -116,7 +116,7 @@ void USART1_proc()
     }
     if(strstr((char *)USART1_RX_BUF, "SetCtrlState:"))
     {
-        sscanf((const char*)&USART1_RX_BUF,"%13s%d",command,&data);
+        sscanf((const char*)&USART1_RX_BUF,"%13s%x",command,&data);
         Write_CtrlState(data);
         set_CtrlState(data);
         LOG_DEBUG("Set Ctrl State OK\r\n");

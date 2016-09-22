@@ -27,6 +27,8 @@ void TIM4_set(u8 sta);
 void TIM5_Init(void);
 void TIM2_Init(void);
 void TIM14_Init(void);
+void TIM14_ENABLE(void);
+    
 void set_Frequent(int fre);
 
 void TIM7_Init(void);

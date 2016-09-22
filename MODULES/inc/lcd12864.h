@@ -37,6 +37,7 @@ void LCD_Proc_10us(void);
 
 void LCD_Start_5ms(u8 flag);
 void LCD_Proc_5ms(void);
+void show_Update(void);
 
 #define SENSOR_1 0,0
 #define SENSOR_2 0,2

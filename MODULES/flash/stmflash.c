@@ -147,22 +147,22 @@ void Write_Frequent(u32 Frequent)
 
 void set_CtrlState(u32 CtrlState)
 {
-    CTRL_0=(CtrlState>>0)&1;
-    CTRL_1=(CtrlState>>1)&1;
-    CTRL_2=(CtrlState>>2)&1;
-    CTRL_3=(CtrlState>>3)&1;
-    CTRL_4=(CtrlState>>4)&1;
-    CTRL_5=(CtrlState>>5)&1;
-    CTRL_6=(CtrlState>>6)&1;
-    CTRL_7=(CtrlState>>7)&1;
-    CTRL_8=(CtrlState>>8)&1;
-    CTRL_9=(CtrlState>>9)&1;
-    CTRL_10=(CtrlState>>10)&1;
-    CTRL_11=(CtrlState>>11)&1;
-    CTRL_12=(CtrlState>>12)&1;
-    CTRL_13=(CtrlState>>13)&1;
-    CTRL_14=(CtrlState>>14)&1;
-    CTRL_15=(CtrlState>>15)&1;
+    CTRL_0=(CtrlState&(1<<0))?1:0;
+    CTRL_1=(CtrlState&(1<<1))?1:0;
+    CTRL_2=(CtrlState&(1<<2))?1:0;
+    CTRL_3=(CtrlState&(1<<3))?1:0;
+    CTRL_4=(CtrlState&(1<<4))?1:0;
+    CTRL_5=(CtrlState&(1<<5))?1:0;
+    CTRL_6=(CtrlState&(1<<6))?1:0;
+    CTRL_7=(CtrlState&(1<<7))?1:0;
+    CTRL_8=(CtrlState&(1<<8))?1:0;
+    CTRL_9=(CtrlState&(1<<9))?1:0;
+    CTRL_10=(CtrlState&(1<<10))?1:0;
+    CTRL_11=(CtrlState&(1<<11))?1:0;
+    CTRL_12=(CtrlState&(1<<12))?1:0;
+    CTRL_13=(CtrlState&(1<<13))?1:0;
+    CTRL_14=(CtrlState&(1<<14))?1:0;
+    CTRL_15=(CtrlState&(1<<15))?1:0;
 }
 
 

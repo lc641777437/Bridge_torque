@@ -9,7 +9,7 @@ static u8 pos;
 static u8 isLCDBusy;
 static u8 show_Ctrl[16];  // 0:I  1:V
 static u8 show_State[16]; // 0:N  1:Y
-static u8 show_Count;
+static u8 show_Count = 0;
 
 void lcd12864_GPIO_Init(void)
 {
@@ -143,11 +143,11 @@ void LCD_Init(void)
             }
             if(show_State[4*i+j]==0)
             {
-                string[j * 4 + 1] = ' ';
+                string[j * 4 + 1] = '\x04';
             }
             else
             {
-                string[j * 4 + 1] = '\x04';
+                string[j * 4 + 1] = ' ';
             }
             string[j * 4 + 2] = ' ';
             string[j * 4 + 3] = ' ';
@@ -199,7 +199,7 @@ void LCD_Proc_5ms(void)
             isLCDBusy = 0;
             TIM7_Enable(DISABLE);
             LcdWriteFlag = LCD_NULL;
-            memset(lcd_data,'\0',16);
+            memset(lcd_data,'\0',17);
         }
     }
 }
@@ -207,6 +207,8 @@ void LCD_Proc_5ms(void)
 void show_Update(void)
 {
     char isUpdate=0;
+    char string_Show[17];
+    int i;
     switch(show_Count)
     {
         case 0:
@@ -216,24 +218,18 @@ void show_Update(void)
                 show_State[0]=STATE_0;
                 isUpdate=1;
             }
-            break;
-        case 1:
             if(show_Ctrl[1]!=CTRL_1||show_State[1]!=STATE_1)
             {
                 show_Ctrl[1]=CTRL_1;
                 show_State[1]=STATE_1;
                 isUpdate=1;
             }
-            break;
-        case 2:
             if(show_Ctrl[2]!=CTRL_2||show_State[2]!=STATE_2)
             {
                 show_Ctrl[2]=CTRL_2;
                 show_State[2]=STATE_2;
                 isUpdate=1;
             }
-            break;
-        case 3:
             if(show_Ctrl[3]!=CTRL_3||show_State[3]!=STATE_3)
             {
                 show_Ctrl[3]=CTRL_3;
@@ -241,31 +237,25 @@ void show_Update(void)
                 isUpdate=1;
             }
             break;
-        case 4:
+        case 1:
             if(show_Ctrl[4]!=CTRL_4||show_State[4]!=STATE_4)
             {
                 show_Ctrl[4]=CTRL_4;
                 show_State[4]=STATE_4;
                 isUpdate=1;
             }
-            break;
-        case 5:
             if(show_Ctrl[5]!=CTRL_5||show_State[5]!=STATE_5)
             {
                 show_Ctrl[5]=CTRL_5;
                 show_State[5]=STATE_5;
                 isUpdate=1;
             }
-            break;
-        case 6:
             if(show_Ctrl[6]!=CTRL_6||show_State[6]!=STATE_6)
             {
                 show_Ctrl[6]=CTRL_6;
                 show_State[6]=STATE_6;
                 isUpdate=1;
             }
-            break;
-        case 7:
             if(show_Ctrl[7]!=CTRL_7||show_State[7]!=STATE_7)
             {
                 show_Ctrl[7]=CTRL_7;
@@ -273,31 +263,25 @@ void show_Update(void)
                 isUpdate=1;
             }
             break;
-        case 8:
+        case 2:
             if(show_Ctrl[8]!=CTRL_8||show_State[8]!=STATE_8)
             {
                 show_Ctrl[8]=CTRL_8;
                 show_State[8]=STATE_8;
                 isUpdate=1;
             }
-            break;
-        case 9:
             if(show_Ctrl[9]!=CTRL_9||show_State[9]!=STATE_9)
             {
                 show_Ctrl[9]=CTRL_9;
                 show_State[9]=STATE_9;
                 isUpdate=1;
             }
-            break;
-        case 10:
             if(show_Ctrl[10]!=CTRL_10||show_State[10]!=STATE_10)
             {
                 show_Ctrl[10]=CTRL_10;
                 show_State[10]=STATE_10;
                 isUpdate=1;
             }
-            break;
-        case 11:
             if(show_Ctrl[11]!=CTRL_11||show_State[11]!=STATE_11)
             {
                 show_Ctrl[11]=CTRL_11;
@@ -305,31 +289,25 @@ void show_Update(void)
                 isUpdate=1;
             }
             break;
-        case 12:
+        case 3:
             if(show_Ctrl[12]!=CTRL_12||show_State[12]!=STATE_12)
             {
                 show_Ctrl[12]=CTRL_12;
                 show_State[12]=STATE_12;
                 isUpdate=1;
             }
-            break;
-        case 13:
             if(show_Ctrl[13]!=CTRL_13||show_State[13]!=STATE_13)
             {
                 show_Ctrl[13]=CTRL_13;
                 show_State[13]=STATE_13;
                 isUpdate=1;
             }
-            break;
-        case 14:
             if(show_Ctrl[14]!=CTRL_14||show_State[14]!=STATE_14)
             {
                 show_Ctrl[14]=CTRL_14;
                 show_State[14]=STATE_14;
                 isUpdate=1;
             }
-            break;
-        case 15:
             if(show_Ctrl[15]!=CTRL_15||show_State[15]!=STATE_15)
             {
                 show_Ctrl[15]=CTRL_15;
@@ -340,30 +318,35 @@ void show_Update(void)
         default:
             break;
     }
+    
     if(isUpdate==1)
     {
-        if(show_Ctrl[show_Count]==0&&show_State[show_Count]==0)
+        memset(string_Show,'\0',17*sizeof(char));
+        for(i=0;i<4;i++)
         {
-            ShowString(show_Count/4,(show_Count%4)*2,"IN  ");
+            if(show_Ctrl[show_Count*4+i]==0)
+            {
+                string_Show[i * 4 + 0] = 'I';
+            }
+            else
+            {
+                string_Show[i * 4 + 0] = 'V';
+            }
+            if(show_State[show_Count*4+i]==0)
+            {
+                string_Show[i * 4 + 1] = '\x04';
+            }
+            else
+            {
+                string_Show[i * 4 + 1] = ' ';
+            }
+            string_Show[i * 4 + 2] = ' ';
+            string_Show[i * 4 + 3] = ' ';
         }
-        else if(show_Ctrl[show_Count]==0&&show_State[show_Count]==1)
-        {
-            ShowString(show_Count/4,(show_Count%4)*2,"IY  ");
-        }
-        else if(show_Ctrl[show_Count]==1&&show_State[show_Count]==0)
-        {
-            ShowString(show_Count/4,(show_Count%4)*2,"VN  ");
-        }
-        else if(show_Ctrl[show_Count]==1&&show_State[show_Count]==1)
-        {
-            ShowString(show_Count/4,(show_Count%4)*2,"VY  ");
-        }
+        ShowString(show_Count,0,(u8*)string_Show);
     }
-    if(show_Count<15)
-    {
-        show_Count++;
-    }
-    else 
+    
+    if(++show_Count>3)
     {
         show_Count=0;
     }

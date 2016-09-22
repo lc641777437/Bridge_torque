@@ -38,8 +38,8 @@ void SystemConfiguration(void)
     delay_init();
     GPIO_init();
     UART_Init();
-    TIM_Init();
     My_Flash_Read();
+    TIM_Init();
     mymem_init(SRAMIN);
     mymem_init(SRAMCCM);
     exfuns_init();							//为fatfs相关变量申请内存
@@ -56,6 +56,7 @@ void SystemConfiguration(void)
     lcd12864_GPIO_Init();
     LCD_Init();
     USB_Init();
+    TIM14_ENABLE();
 }
 
 

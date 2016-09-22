@@ -23,8 +23,8 @@ void TIM_Init(void)
     TIM3_Init();
     TIM4_Init();
     TIM5_Init();
-    TIM14_Init();
     TIM7_Init();
+    TIM14_Init();
 }
 void TIM3_Init(void)//10ms for identify uart3 end
 {
@@ -182,7 +182,7 @@ void TIM2_IRQHandler(void)//10us
     static u8 LCDEN_TIME;
 	if(TIM_GetITStatus(TIM2,TIM_IT_Update)==SET) //Òç³öÖÐ¶Ï
 	{
-        if(time_10us < sample_time)
+        if(time_10us < sample_time-1)
         {
             time_10us++;
         }
@@ -239,12 +239,19 @@ void TIM14_Init(void)//1s: for check the state of SD card and eth
     NVIC_Init(&NVIC_InitStructure);
     
     TIM_Cmd(TIM14,ENABLE); 
+    TIM_ITConfig(TIM14,TIM_IT_Update,DISABLE); 
+}
+
+void TIM14_ENABLE(void)
+{
+    TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE); 
 }
 
 void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
+        show_Update();
         if(time_s<9)
         {
             time_s++;
