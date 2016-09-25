@@ -106,37 +106,47 @@ void USART1_proc()
         sscanf((const char*)&USART1_RX_BUF,"%11s%d",command,&data);
         Write_Frequent(data);
         set_Frequent(data);
-        LOG_DEBUG("Set sample rate OK\r\n");
+        LOG_INFO("Set sample rate OK\r\n");
     }
     if(strstr((char *)USART1_RX_BUF, "SetDeviceID:"))
     {
         sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
         Write_DeviceID(data);
-        LOG_DEBUG("Set device ID OK\r\n");
+        LOG_INFO("Set device ID OK\r\n");
     }
     if(strstr((char *)USART1_RX_BUF, "SetCtrlState:"))
     {
         sscanf((const char*)&USART1_RX_BUF,"%13s%x",command,&data);
         Write_CtrlState(data);
         set_CtrlState(data);
-        LOG_DEBUG("Set Ctrl State OK\r\n");
+        LOG_INFO("Set Ctrl State OK\r\n");
     }
     if(strstr((char *)USART1_RX_BUF, "SetRemoteIP:"))
     {
         sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
         Write_IPAddress(data);
         reset_InitState(ETHSTATE);
-        LOG_DEBUG("Set remote IP OK\r\n");
+        LOG_INFO("Set remote IP OK\r\n");
     }
     if(strstr((char *)USART1_RX_BUF, "StartToSend"))
     {
         set_Send_Flag(1);
-        LOG_DEBUG("Start to Send\r\n");
+        LOG_INFO("Start to Send\r\n");
     }
     if(strstr((char *)USART1_RX_BUF, "StopToSend"))
     {
         set_Send_Flag(0);
-        LOG_DEBUG("Stop to Send\r\n");
+        LOG_INFO("Stop to Send\r\n");
+    }
+    if(strstr((char *)USART1_RX_BUF, "ResetOption"))
+    {
+        Write_Frequent(100);
+        set_Frequent(100);
+        Write_CtrlState(0xffff);
+        set_CtrlState(0xffff);
+        Write_DeviceID(1001);
+        Write_IPAddress(1);
+        LOG_INFO("Reset the Option\r\n");
     }
     memset(USART1_RX_BUF,'\0',strlen((const char*)USART1_RX_BUF));
     return;
@@ -186,8 +196,6 @@ void USART1_IRQHandler(void)
         }
     }
 }
-
-
 
 
 

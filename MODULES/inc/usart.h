@@ -19,8 +19,8 @@ void UART_Init(void);
 									printf (fmt, ##__VA_ARGS__)
                                     
 //#define LOG_DEBUG(fmt, ...) send_USART2("[%s][%d]"fmt,__FILE__,__LINE__,##__VA_ARGS__)
-#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
-
+#define LOG_DEBUG(fmt, ...)  
+#define LOG_INFO(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
 
                                     
 #endif
