@@ -134,14 +134,15 @@ void convert_AD_RawData(void)
     }
 }
 
-void Send_AD_RawData(u8 i)
+void Send_AD_RawData_1(u8 i)
 {
-    if(get_Send_Flag())
-    {
-        USART_SendData(USART1, (uint8_t)SendBuf[i]);
-    }
+    USART_SendData(USART1, (uint8_t)SendBuf[i]);
 }
 
+void Send_AD_RawData_3(u8 i)
+{
+    USART_SendData(USART3, (uint8_t)SendBuf[i]);
+}
 
 void Save_AD_RawData_SD(void)
 {

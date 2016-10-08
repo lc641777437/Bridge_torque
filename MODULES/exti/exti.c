@@ -55,7 +55,14 @@ void EXTI9_5_IRQHandler(void)
                 START=0;
                 Count=0;
                 convert_AD_RawData();
-                USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+                if(get_Send_Flag()==1)
+                {
+                    USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+                }
+                else if(get_Send_Flag()==2)
+                {
+                    USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+                }
                 set_Save_Flag(1);
             }
         }
