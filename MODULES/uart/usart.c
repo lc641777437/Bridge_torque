@@ -5,17 +5,19 @@
 #include "stmflash.h"
 #include "initstate.h"
 #include "exti.h"
+#include "rtc.h"
 
 
 #define USART_MAX_RECV_LEN 256
 
 static u8 printf_state;
 static u8 data_Count_1;
+static u8 data_Count_2;
 static u8 data_Count_3;
 
-static u16 USART3_RX_STA = 0;//接收状态标记    
 static u16 USART1_RX_STA = 0;//接收状态标记    
 static u16 USART2_RX_STA = 0;//接收状态标记
+static u16 USART3_RX_STA = 0;//接收状态标记    
 
 static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];    
 static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
@@ -104,10 +106,25 @@ void USART1_proc()
 	
     if(strstr((char *)USART1_RX_BUF, "SampleRate:"))
     {
-        sendBackMessage_1(0x10);
         sscanf((const char*)&USART1_RX_BUF,"%11s%d",command,&data);
-        Write_Frequent(data);
-        set_Frequent(data);
+        switch(data)
+        {
+            case 200:
+            case 100: 
+            case 50:
+            case 20:
+            case 10:
+            case 5:
+            case 2:
+            case 1:
+                Write_Frequent(data);
+                set_Frequent(data);
+                sendBackMessage_1(0x10);
+                break;
+            default:
+                sendBackMessage_1(0x20);
+                break;
+        }
     }
     if(strstr((char *)USART1_RX_BUF, "SetDeviceID:"))
     {
@@ -124,10 +141,17 @@ void USART1_proc()
     }
     if(strstr((char *)USART1_RX_BUF, "SetRemoteIP:"))
     {
-        sendBackMessage_1(0x13);
         sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
-        Write_IPAddress(data);
-        reset_InitState(ETHSTATE);
+        if(data >= 0&&data <=255)
+        {
+            Write_IPAddress(data);
+            reset_InitState(ETHSTATE);
+            sendBackMessage_1(0x13);
+        }
+        else
+        {
+            sendBackMessage_1(0x23);
+        }
     }
     if(strstr((char *)USART1_RX_BUF, "StartToSend"))
     {
@@ -256,7 +280,13 @@ void USART2_Configuration(void)
 }
 void USART2_proc()    
 {
-    send_USART2("%s",USART2_RX_BUF);
+    u8 year,month,date,hour,minute,second;
+    if(USART2_RX_BUF[0] == '2'&&USART2_RX_BUF[1] == '0')
+    {
+        sscanf((const char*)&USART2_RX_BUF,"%*2d%2d%2d%2d%2d%2d%2d",&year,&month,&date,&hour,&minute,&second);
+        RTC_Set_Time(hour,minute,second,RTC_H12_AM);	//设置时间
+        RTC_Set_Date(year,month,date,1);		//设置日期 
+    }
     USART2_RX_STA = 0;
     memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
 }
@@ -298,6 +328,19 @@ void USART2_IRQHandler(void)
                     USART2_RX_STA = 0;  //接收数据错误,重新开始接收	  
             }		 
         }	  		 
+    }
+    if( USART_GetITStatus(USART2, USART_IT_TXE) == SET  )
+    {
+        if( data_Count_2>147 )
+        {
+            data_Count_2=0;
+            USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
+        }
+        else
+        {
+            Send_AD_RawData_2(data_Count_2);
+            data_Count_2++;
+        }
     }
 }
 
@@ -351,10 +394,25 @@ void USART3_proc(void)
 	
     if(strstr((char *)USART3_RX_BUF, "SampleRate:"))
     {
-        sendBackMessage_3(0x10);
         sscanf((const char*)&USART3_RX_BUF,"%11s%d",command,&data);
-        Write_Frequent(data);
-        set_Frequent(data);
+        switch(data)
+        {
+            case 200:
+            case 100:
+            case 50:
+            case 20:
+            case 10:
+            case 5:
+            case 2:
+            case 1:
+                Write_Frequent(data);
+                set_Frequent(data);
+                sendBackMessage_3(0x10);
+                break;
+            default:
+                break;
+        }
+
     }
     if(strstr((char *)USART3_RX_BUF, "SetDeviceID:"))
     {
@@ -371,10 +429,13 @@ void USART3_proc(void)
     }
     if(strstr((char *)USART3_RX_BUF, "SetRemoteIP:"))
     {
-        sendBackMessage_3(0x13);
         sscanf((const char*)&USART3_RX_BUF,"%12s%d",command,&data);
-        Write_IPAddress(data);
-        reset_InitState(ETHSTATE);
+        if(data>=0&&data<=255)
+        {
+            Write_IPAddress(data);
+            reset_InitState(ETHSTATE);
+            sendBackMessage_3(0x13);
+        }
     }
     if(strstr((char *)USART3_RX_BUF, "StartToSend"))
     {

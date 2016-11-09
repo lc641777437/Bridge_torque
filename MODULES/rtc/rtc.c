@@ -71,8 +71,8 @@ u8 My_RTC_Init(void)
         RTC_InitStructure.RTC_HourFormat   = RTC_HourFormat_24;//RTC设置为,24小时格式
         RTC_Init(&RTC_InitStructure);
 
-        RTC_Set_Time(21,15,56,RTC_H12_AM);	//设置时间
-        RTC_Set_Date(16,7,27,3);		//设置日期
+        RTC_Set_Time(0,0,0,RTC_H12_AM);	//设置时间
+        RTC_Set_Date(0,1,1,1);		//设置日期
 
         RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//标记已经初始化过了
     } 
@@ -181,10 +181,14 @@ void RTC_WKUP_IRQHandler(void)
 	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WAKE_UP中断
 	{ 
 		RTC_ClearFlag(RTC_FLAG_WUTF);	//清除中断标志
-        if(get_InitState(ETHSTATE)==TCP_OK)
+//use eth to transfer data to server
+/*      if(get_InitState(ETHSTATE)==TCP_OK)
         {
-            ad_Data_Proc();
+            ad_Data_Proc_Eth();
         }
+*/
+//use gprs to transfer data to server
+        ad_Data_Proc_Gprs();
 	}   
 	EXTI_ClearITPendingBit(EXTI_Line22);//清除中断线22的中断标志 								
 }

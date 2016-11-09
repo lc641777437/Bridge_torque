@@ -21,6 +21,7 @@ static long long int ad_Data_Sum[16];
 static long int ad_Data_Num[16];
 //static u8 ad_State[16];
 static u8 SendBuf[53];
+static u8 SendBuf_avr[149];
 int Date_Now_SD;
 int Date_Now_USB;
 int SavePosition;  //1 for SD 2 for USB
@@ -36,8 +37,6 @@ void ads1258_Init(void)
     GPIO_Init(GPIOB, &GPIO_InitStructure);
     PBout(12)=0;
     
-    EXTI_Configuration();
-    EXTI_Sign_Configuration();
     SPI2_Init();
     SPI2_ReadWriteByte(0xC0);
 }
@@ -64,7 +63,7 @@ void ad_DataConvert(u8 result[4])
     ad_Data[result[0]-8]|=result[3];
     if(ad_Data[result[0]-8]>ad_Data_Max[result[0]-8])
         ad_Data_Max[result[0]-8]=ad_Data[result[0]-8];
-    if(ad_Data[result[0]-8]<ad_Data_Min[result[0]-8])
+    if((ad_Data[result[0]-8]<ad_Data_Min[result[0]-8])||(ad_Data_Min[result[0]-8]==0))
         ad_Data_Min[result[0]-8]=ad_Data[result[0]-8];
     ad_Data_Sum[result[0]-8]+=ad_Data[result[0]-8];
     ad_Data_Num[result[0]-8]++;
@@ -75,7 +74,7 @@ void ads1258_ReadData(void)
     SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,ENABLE);
 }
 
-void ad_Data_Proc(void)
+void ad_Data_Proc_Eth(void)
 {
     int n;
     int avr;
@@ -86,16 +85,52 @@ void ad_Data_Proc(void)
         avr=ad_Data_Sum[n]/ad_Data_Num[n];
         snprintf((char*)send_Data_Buf,100,"%s%d%s%d%s%d%s%d\r\n","ID:",n,"MAX:",ad_Data_Max[n],"MIN:",ad_Data_Min[n],"AVR:",avr);
         strcat((char*)tcp_client_sendbuf,send_Data_Buf);
-//        LOG_DEBUG("CHANNEL ID: %d\r\n",n);
-//        LOG_DEBUG("MAX: %d\r\n",ad_Data_Max[n]);
-//        LOG_DEBUG("MIN: %d\r\n",ad_Data_Min[n]);
-//        LOG_DEBUG("AVR: %d\r\n",avr);
+//      LOG_DEBUG("CHANNEL ID: %d\r\n",n);
+//      LOG_DEBUG("MAX: %d\r\n",ad_Data_Max[n]);
+//      LOG_DEBUG("MIN: %d\r\n",ad_Data_Min[n]);
+//      LOG_DEBUG("AVR: %d\r\n",avr);
         ad_Data_Sum[n]=0;
         ad_Data_Max[n]=0;
-        ad_Data_Min[n]=0x7FFFFF;
+        ad_Data_Min[n]=0;
         ad_Data_Num[n]=0;
     }
     tcp_client_flag|=1<<7;
+}
+
+void ad_Data_Proc_Gprs(void)
+{
+    convert_AD_RawData_avr();
+    USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+}
+
+void convert_AD_RawData_avr(void)   
+{
+    int i;
+    int data_Buf;
+    SendBuf_avr[0] = 'C';
+    SendBuf_avr[1] = 'T';
+    SendBuf_avr[2] = SendBuf[2];
+    SendBuf_avr[3] = SendBuf[3];
+    for(i=0;i<16;i++)
+    {
+        data_Buf = ad_Data_Max[i];
+        SendBuf_avr[4 + 9 * i + 0] = data_Buf>>16;
+        SendBuf_avr[4 + 9 * i + 1] = (data_Buf&0xff00)>>8;
+        SendBuf_avr[4 + 9 * i + 2] = data_Buf&0xff;
+        data_Buf = ad_Data_Min[i];
+        SendBuf_avr[4 + 9 * i + 3] = data_Buf>>16;
+        SendBuf_avr[4 + 9 * i + 4] = (data_Buf&0xff00)>>8;
+        SendBuf_avr[4 + 9 * i + 5] = data_Buf&0xff;
+        data_Buf = ad_Data_Sum[i]/ad_Data_Num[i];
+        SendBuf_avr[4 + 9 * i + 6] = data_Buf>>16;
+        SendBuf_avr[4 + 9 * i + 7] = (data_Buf&0xff00)>>8;
+        SendBuf_avr[4 + 9 * i + 8] = data_Buf&0xff;
+        ad_Data_Sum[i]=0;
+        ad_Data_Max[i]=0;
+        ad_Data_Min[i]=0;
+        ad_Data_Num[i]=0;
+    }
+    SendBuf_avr[148] = '\0';
 }
 
 void convert_AD_RawData(void)
@@ -134,12 +169,17 @@ void convert_AD_RawData(void)
     }
 }
 
-void Send_AD_RawData_1(u8 i)
+void Send_AD_RawData_1(u8 i)// wired 232
 {
     USART_SendData(USART1, (uint8_t)SendBuf[i]);
 }
 
-void Send_AD_RawData_3(u8 i)
+void Send_AD_RawData_2(u8 i)// simcom
+{
+    USART_SendData(USART2, (uint8_t)SendBuf_avr[i]);
+}
+
+void Send_AD_RawData_3(u8 i)// wireless 433
 {
     USART_SendData(USART3, (uint8_t)SendBuf[i]);
 }

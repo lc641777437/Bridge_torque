@@ -20,19 +20,22 @@
 
 void TIM_Init(void);
 
+void TIM2_Init(void);
 void TIM3_Init(void);
 void TIM3_set(u8 sta);
 void TIM4_Init(void);
 void TIM4_set(u8 sta);
 void TIM5_Init(void);
-void TIM2_Init(void);
+void TIM7_Init(void);
+void TIM7_Enable(u8 state);
+void TIM13_Init(void);
+void TIM13_Enable(u8 state);
 void TIM14_Init(void);
-void TIM14_ENABLE(void);
+void TIM14_IT_ENABLE(void);
     
 void set_Frequent(int fre);
 
-void TIM7_Init(void);
-void TIM7_Enable(u8 state);
+
 		 
 #endif
 
