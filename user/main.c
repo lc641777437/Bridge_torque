@@ -52,7 +52,7 @@ void SystemConfiguration(void)
     LWIP_Init();
     ads1258_Init();
     My_RTC_Init();		 		//≥ı ºªØRTC
-    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,9);      
+    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,59);      
     RTC_Set_AlarmA(1,0,0,0);
     lcd12864_GPIO_Init();
     LCD_Init();

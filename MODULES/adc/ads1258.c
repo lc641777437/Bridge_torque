@@ -204,15 +204,17 @@ void Save_AD_RawData_SD(void)
 //    mf_write("\r\n",2);
 //    mf_close();
     RTC_TimeTypeDef RTC_TimeStruct;
+    RTC_DateTypeDef RTC_DateStruct;
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
+    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
     // 新的时间创建新的文件
     if(Date_Now_SD!=RTC_TimeStruct.RTC_Minutes)
     {
         mf_close();
         Date_Now_SD=RTC_TimeStruct.RTC_Minutes;
         SavePosition=1;
-        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","0:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
         mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
     }
     //换了存储位置 打开原有文件
@@ -220,8 +222,8 @@ void Save_AD_RawData_SD(void)
     {
         SavePosition=1;
         mf_close();
-        snprintf(FileName,30,"%s%02d%02d%02d%s","0:/20",\
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","0:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
         mf_open((u8 *)FileName,FA_WRITE);
     }
     mf_write((u8 *)SendBuf,52);//TODO:time
@@ -231,15 +233,17 @@ void Save_AD_RawData_SD(void)
 void Save_AD_RawData_USB(void)
 {
     RTC_TimeTypeDef RTC_TimeStruct;
+    RTC_DateTypeDef RTC_DateStruct;
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
+    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
     // 新的时间创建新的文件
     if(Date_Now_USB!=RTC_TimeStruct.RTC_Minutes)
     {
         mf_close();
         Date_Now_USB=RTC_TimeStruct.RTC_Minutes;
         SavePosition=2;
-        snprintf(FileName,30,"%s%02d%02d%02d%s","2:/20",\
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","2:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
         mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
     }
     //换了存储位置 打开原有文件
@@ -247,8 +251,8 @@ void Save_AD_RawData_USB(void)
     {
         SavePosition=2;
         mf_close();
-        snprintf(FileName,30,"%s%02d%02d%02d%s","2:/20",\
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
+        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","2:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
         mf_open((u8 *)FileName,FA_WRITE);
     }
     mf_write((u8 *)SendBuf,52);//TODO:time

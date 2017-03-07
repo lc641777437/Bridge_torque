@@ -81,7 +81,7 @@ void USART1_Configuration(void)
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOB,&gpio);
 
-    usart1.USART_BaudRate = 256000;
+    usart1.USART_BaudRate = 115200;
     usart1.USART_WordLength = USART_WordLength_8b;
     usart1.USART_StopBits = USART_StopBits_1;
     usart1.USART_Parity = USART_Parity_No;
