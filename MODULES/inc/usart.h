@@ -11,17 +11,15 @@ void USART3_RECV_Timeout(void);
 void Send_Data(u8 *SendBuf);
 void UART_Init(void);
 
-void USART1_Send_Cmd(u8 cmd);
-void USART1_Send_Byte(u8 data);
-void USART1_Send_Bytes(u8 *data,int length);
+void USART1_Send_Bytes(u8 *data, int length);
+void USART1_Send_Bytes_Directly(u8 cmd, u8 *data, int length);
 
 void USART2_Send_Cmd(u8 cmd);
 void USART2_Send_Byte(u8 data);
 void USART2_Send_Bytes(u8 *data,int length);
 
-void USART3_Send_Cmd(u8 cmd);
-void USART3_Send_Byte(u8 data);
 void USART3_Send_Bytes(u8 *data,int length);
+void USART3_Send_Bytes_Directly(u8 cmd, u8 *data, int length);
 
 
 #define send_USART1(fmt, ...) select_USART(1);\
