@@ -3,51 +3,57 @@
 #include "stmflash.h"
 #include "ads1258.h"
 #include "stmflash.h"
-#include "initstate.h"
+#include "device_state.h"
 #include "exti.h"
 #include "rtc.h"
 
 
 #define USART_MAX_RECV_LEN 256
 
-static u8 printf_state;
+static u8 printf_channel;
 static u8 data_Count_1;
 static u8 data_Count_2;
 static u8 data_Count_3;
 
-static u16 USART1_RX_STA = 0;//接收状态标记    
+static u16 USART1_RX_STA = 0;//接收状态标记
 static u16 USART2_RX_STA = 0;//接收状态标记
-static u16 USART3_RX_STA = 0;//接收状态标记    
+static u16 USART3_RX_STA = 0;//接收状态标记
 
-static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];    
+static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];
+static u8 USART1_TX_BUF[USART_MAX_RECV_LEN];
+static u8  USART1_TX_flag = 0;
+static u32 USART1_TX_ptr_in  = 0;
+static u32 USART1_TX_ptr_out = 0;
+static u32 USART1_TX_length  = 0;
+
 static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
-static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];    
+static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];
 
 
-#pragma import(__use_no_semihosting)             
-               
-struct __FILE 
-{ 
-	int handle; 
-}; 
+#pragma import(__use_no_semihosting)
 
-FILE __stdout;       
+struct __FILE
+{
+	int handle;
+};
+
+FILE __stdout;
 
 //重定义fputc函数
 int fputc(int ch, FILE *f)
 {
-    switch(printf_state)
+    switch(printf_channel)
     {
         case 1:
             while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
             USART_SendData(USART1, (uint8_t)ch);
             break;
-        
-        case 2:  		
+
+        case 2:
             while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
             USART_SendData(USART2, (uint8_t)ch);
             break;
-        
+
         case 3:
             while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
             USART_SendData(USART3, (uint8_t)ch);
@@ -59,7 +65,7 @@ int fputc(int ch, FILE *f)
 
 void select_USART(u8 channel)
 {
-	printf_state = channel;
+	printf_channel = channel;
 }
 
 void USART1_Configuration(void)
@@ -71,8 +77,8 @@ void USART1_Configuration(void)
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);
 
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource6,GPIO_AF_USART1);
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource7,GPIO_AF_USART1); 
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_USART1);
+    GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);
 
     gpio.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7;
     gpio.GPIO_Mode = GPIO_Mode_AF;
@@ -81,11 +87,11 @@ void USART1_Configuration(void)
     gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOB,&gpio);
 
-    usart1.USART_BaudRate = 115200;
+    usart1.USART_BaudRate = 256000;
     usart1.USART_WordLength = USART_WordLength_8b;
     usart1.USART_StopBits = USART_StopBits_1;
     usart1.USART_Parity = USART_Parity_No;
-    usart1.USART_Mode = USART_Mode_Tx|USART_Mode_Rx;
+    usart1.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
     usart1.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_Init(USART1,&usart1);
 
@@ -103,14 +109,14 @@ void USART1_proc()
 {
     char command[20];
     int data;
-	
+
     if(strstr((char *)USART1_RX_BUF, "SampleRate:"))
     {
         sscanf((const char*)&USART1_RX_BUF,"%11s%d",command,&data);
         switch(data)
         {
             case 200:
-            case 100: 
+            case 100:
             case 50:
             case 20:
             case 10:
@@ -145,7 +151,7 @@ void USART1_proc()
         if(data >= 0&&data <=255)
         {
             Write_IPAddress(data);
-            reset_InitState(ETHSTATE);
+            set_DeviceState(DEVICE_ETH);
             sendBackMessage_1(0x13);
         }
         else
@@ -203,7 +209,7 @@ void USART1_IRQHandler(void)
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART1);//(USART1->DR);	//读取接收到的数据
-		
+
         if(USART1_RX_STA & 0x4000)      //之前接收到了0x0d
         {
             USART1_RX_STA = 0;
@@ -220,25 +226,64 @@ void USART1_IRQHandler(void)
             {
                 USART1_RX_BUF[USART1_RX_STA++ & 0X3FFF] = res;
                 if(USART1_RX_STA > (USART_MAX_RECV_LEN - 1))
-                    USART1_RX_STA = 0;  //接收数据错误,重新开始接收	  
-            }		 
-        }	  		 
+                    USART1_RX_STA = 0;  //接收数据错误,重新开始接收
+            }
+        }
     }
-    if( USART_GetITStatus(USART1, USART_IT_TXE) == SET  )
+
+    if( USART_GetITStatus(USART1, USART_IT_TXE) == SET )
     {
-        if( data_Count_1>51 )
+
+        if(USART1_TX_length > 0)
         {
-            data_Count_1=0;
-            USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+            USART_SendData(USART1, USART1_TX_BUF[USART1_TX_ptr_out]);
+            USART1_TX_ptr_out++;
+            USART1_TX_length--;
+
+            if(USART1_TX_length == 0)
+            {
+                USART_ITConfig(USART1, USART_IT_TXE, DISABLE);//close the Tx interrupt
+            }
+
+            if(USART1_TX_ptr_out == USART_MAX_RECV_LEN)// To avoid buffer overflow
+            {
+                USART1_TX_ptr_out = 0;
+            }
         }
         else
         {
-            Send_AD_RawData_1(data_Count_1);
-            data_Count_1++;
+            USART_ITConfig(USART1, USART_IT_TXE, DISABLE);//close the Tx interrupt
         }
     }
 }
 
+static void USART1_Send_Byte(u8 data)
+{
+	while(USART1_TX_length >= USART_MAX_RECV_LEN - 2)//avoid overflow
+	{
+		USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+	}
+
+	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+	USART1_TX_BUF[USART1_TX_ptr_in] = data;
+	USART1_TX_ptr_in++;
+	USART1_TX_length++;
+
+	if(USART1_TX_ptr_in == USART_MAX_RECV_LEN)// avoid overflow
+	{
+		USART1_TX_ptr_in = 0;
+	}
+
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);//open the Tx interrupt
+}
+
+void USART1_Send_Bytes(u8 *data,int length)
+{
+	for(int i = 0; i < length; i++)
+	{
+        USART1_Send_Byte(*(data + i));
+	}
+}
 
 
 
@@ -252,7 +297,7 @@ void USART2_Configuration(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2,ENABLE);
 
     GPIO_PinAFConfig(GPIOD,GPIO_PinSource5,GPIO_AF_USART2);
-    GPIO_PinAFConfig(GPIOD,GPIO_PinSource6,GPIO_AF_USART2); 
+    GPIO_PinAFConfig(GPIOD,GPIO_PinSource6,GPIO_AF_USART2);
 
     gpio.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6;
     gpio.GPIO_Mode = GPIO_Mode_AF;
@@ -278,14 +323,14 @@ void USART2_Configuration(void)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
-void USART2_proc()    
+void USART2_proc()
 {
     u8 year,month,date,hour,minute,second;
     if(USART2_RX_BUF[0] == '2'&&USART2_RX_BUF[1] == '0')
     {
         sscanf((const char*)&USART2_RX_BUF,"%*2d%2d%2d%2d%2d%2d%2d",&year,&month,&date,&hour,&minute,&second);
         RTC_Set_Time(hour,minute,second,RTC_H12_AM);	//设置时间
-        RTC_Set_Date(year,month,date,1);		//设置日期 
+        RTC_Set_Date(year,month,date,1);		//设置日期
     }
     USART2_RX_STA = 0;
     memset(USART2_RX_BUF,'\0',strlen((const char*)USART2_RX_BUF));
@@ -299,13 +344,13 @@ void USART2_RECV_Timeout(void)
 void USART2_IRQHandler(void)
 {
     u8 res;
- 
+
     if(USART_GetITStatus(USART2, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
         USART_ClearITPendingBit(USART2,USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART2);//(USART2->DR);	//读取接收到的数据
-		
+
 
         if(USART2_RX_STA & 0x4000)      //之前接收到了0x0d
         {
@@ -317,7 +362,7 @@ void USART2_IRQHandler(void)
             }
         }
         else                            //之前还没收到0X0d
-        {	
+        {
             if(res == 0x0d)
                 USART2_RX_STA |= 0x4000;
             else
@@ -325,9 +370,9 @@ void USART2_IRQHandler(void)
 				TIM4_set(1);
                 USART2_RX_BUF[USART2_RX_STA++ & 0X3FFF] = res;
                 if(USART2_RX_STA > (USART_MAX_RECV_LEN - 1))
-                    USART2_RX_STA = 0;  //接收数据错误,重新开始接收	  
-            }		 
-        }	  		 
+                    USART2_RX_STA = 0;  //接收数据错误,重新开始接收
+            }
+        }
     }
     if( USART_GetITStatus(USART2, USART_IT_TXE) == SET  )
     {
@@ -360,7 +405,7 @@ void USART3_Configuration(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3,ENABLE);
 
     GPIO_PinAFConfig(GPIOB,GPIO_PinSource10,GPIO_AF_USART3);
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource11,GPIO_AF_USART3); 
+    GPIO_PinAFConfig(GPIOB,GPIO_PinSource11,GPIO_AF_USART3);
 
     gpio.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
     gpio.GPIO_Mode = GPIO_Mode_AF;
@@ -391,7 +436,7 @@ void USART3_proc(void)
 {
     char command[20];
     int data;
-	
+
     if(strstr((char *)USART3_RX_BUF, "SampleRate:"))
     {
         sscanf((const char*)&USART3_RX_BUF,"%11s%d",command,&data);
@@ -428,7 +473,7 @@ void USART3_proc(void)
         set_CtrlState(data);
     }
     if(strstr((char *)USART3_RX_BUF, "SetRemoteIP:"))
-    {
+    {/*
         sscanf((const char*)&USART3_RX_BUF,"%12s%d",command,&data);
         if(data>=0&&data<=255)
         {
@@ -436,6 +481,7 @@ void USART3_proc(void)
             reset_InitState(ETHSTATE);
             sendBackMessage_3(0x13);
         }
+     */
     }
     if(strstr((char *)USART3_RX_BUF, "StartToSend"))
     {
@@ -506,13 +552,13 @@ void USART3_RECV_Timeout(void)
 void USART3_IRQHandler(void)
 {
     u8 res;
- 
+
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
         USART_ClearITPendingBit(USART3,USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART3);//(USART3->DR);	//读取接收到的数据
-		
+
         if(USART3_RX_STA & 0x4000)      //之前接收到了0x0d
         {
             USART3_RX_STA = 0;
@@ -523,7 +569,7 @@ void USART3_IRQHandler(void)
             }
         }
         else                            //之前还没收到0X0d
-        {	
+        {
             if(res == 0x0d)
                 USART3_RX_STA |= 0x4000;
             else
@@ -531,9 +577,9 @@ void USART3_IRQHandler(void)
                 TIM3_set(1);
                 USART3_RX_BUF[USART3_RX_STA++ & 0X3FFF] = res;
                 if(USART3_RX_STA > (USART_MAX_RECV_LEN - 1))
-                    USART3_RX_STA = 0;  //接收数据错误,重新开始接收	  
-            }		 
-        }	  		 
+                    USART3_RX_STA = 0;  //接收数据错误,重新开始接收
+            }
+        }
     }
     if( USART_GetITStatus(USART3, USART_IT_TXE) == SET  )
     {

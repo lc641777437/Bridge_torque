@@ -17,14 +17,13 @@
 #include "malloc.h"
 #include "exfuns.h"
 #include "timer.h"
-#include "lwip_comm.h" 
 #include "exti.h"
 #include "rtc.h"
 #include "gpio.h"
 #include "stmflash.h"
-#include "initstate.h"
+#include "device_state.h"
 #include "lcd12864.h"
-#include "usbh_usr.h" 
+#include "usbh_usr.h"
 #include "fatfs_api.h"
 
 void SystemConfiguration(void);

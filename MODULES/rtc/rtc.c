@@ -2,7 +2,7 @@
 #include "delay.h"
 #include "usart.h"
 #include "ads1258.h"
-#include "initstate.h"
+#include "device_state.h"
 #include "timer.h"
 
  
