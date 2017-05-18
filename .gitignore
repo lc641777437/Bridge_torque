@@ -1,0 +1,25 @@
+# output files
+project/Objects/*.d
+project/Objects/*.o
+project/Objects/*.crf
+project/Objects/*.hex
+project/Objects/*.htm
+project/Objects/*.lnp
+project/Objects/*.dep
+project/Objects/*.axf
+project/Objects/*.iex
+project/Objects/*.lst
+project/Objects/*.map
+project/Listings/*.map
+project/Listings/*.lst
+#sourse insight
+*.IAB
+*.IAD
+*.IMB
+*.IMD
+*.PFI
+*.PO
+*.PR
+*.PRI
+*.PS
+*.WK3
