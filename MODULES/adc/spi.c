@@ -1,12 +1,9 @@
 #include "spi.h"
 #include "ads1258.h"
-
-static u8 spi_Count_S;
-static u8 iData[4];
-extern int Count;
+#include "exti.h"
 
 void SPI1_Init(void)
-{	 
+{
     GPIO_InitTypeDef GPIO_InitStructure;
     SPI_InitTypeDef  SPI_InitStructure;
 
@@ -20,8 +17,8 @@ void SPI1_Init(void)
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource3,GPIO_AF_SPI1); 
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource4,GPIO_AF_SPI1); 
+    GPIO_PinAFConfig(GPIOB,GPIO_PinSource3,GPIO_AF_SPI1);
+    GPIO_PinAFConfig(GPIOB,GPIO_PinSource4,GPIO_AF_SPI1);
     GPIO_PinAFConfig(GPIOB,GPIO_PinSource5,GPIO_AF_SPI1);
 
 
@@ -41,11 +38,11 @@ void SPI1_Init(void)
 
     SPI_Cmd(SPI1, ENABLE); //使能SPI外设
     SPI1_ReadWriteByte(0xff);//启动传输
-}   
+}
 
 //SPI1速度设置函数
 //SPI速度=fAPB2/分频系数
-//@ref SPI_BaudRate_Prescaler:SPI_BaudRatePrescaler_2~SPI_BaudRatePrescaler_256  
+//@ref SPI_BaudRate_Prescaler:SPI_BaudRatePrescaler_2~SPI_BaudRatePrescaler_256
 //fAPB2一般为84Mhz:
 void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
 {
@@ -53,13 +50,13 @@ void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
     SPI1->CR1&=0XFFC7;//位3-5清零
     SPI1->CR1|=SPI_BaudRatePrescaler;	//设置SPI1速度
     SPI_Cmd(SPI1,ENABLE); //使能SPI1
-} 
+}
 
 //SPI1读写一个字节
 //TxData:要写入的字节
 //返回值:读取到的字节
 u8 SPI1_ReadWriteByte(u8 TxData)
-{		 			 
+{
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空
     SPI_I2S_SendData(SPI1, TxData); //发送数据
     while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收一个byte
@@ -67,7 +64,7 @@ u8 SPI1_ReadWriteByte(u8 TxData)
 }
 
 void SPI2_Init(void)
-{	 
+{
     GPIO_InitTypeDef GPIO_InitStructure;
     SPI_InitTypeDef  SPI_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
@@ -81,10 +78,10 @@ void SPI2_Init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
-    
 
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource13,GPIO_AF_SPI2); 
-    GPIO_PinAFConfig(GPIOB,GPIO_PinSource14,GPIO_AF_SPI2); 
+
+    GPIO_PinAFConfig(GPIOB,GPIO_PinSource13,GPIO_AF_SPI2);
+    GPIO_PinAFConfig(GPIOB,GPIO_PinSource14,GPIO_AF_SPI2);
     GPIO_PinAFConfig(GPIOB,GPIO_PinSource15,GPIO_AF_SPI2);
 
 
@@ -101,22 +98,19 @@ void SPI2_Init(void)
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;	//数据传输从MSB位开始
     SPI_InitStructure.SPI_CRCPolynomial = 7;	//CRC值的计算多项式
     SPI_Init(SPI2, &SPI_InitStructure);  //初始化SPI寄存器
-    
+
     NVIC_InitStructure.NVIC_IRQChannel = SPI2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE; 
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
-    
-//    SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_RXNE,ENABLE);
-//    SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,ENABLE);
 
     SPI_Cmd(SPI2, ENABLE); //使能SPI外设
-}   
+}
 
 //SPI1速度设置函数
 //SPI速度=fAPB2/分频系数
-//@ref SPI_BaudRate_Prescaler:SPI_BaudRatePrescaler_2~SPI_BaudRatePrescaler_256  
+//@ref SPI_BaudRate_Prescaler:SPI_BaudRatePrescaler_2~SPI_BaudRatePrescaler_256
 //fAPB2一般为84Mhz:
 void SPI2_SetSpeed(u8 SPI_BaudRatePrescaler)
 {
@@ -124,14 +118,13 @@ void SPI2_SetSpeed(u8 SPI_BaudRatePrescaler)
     SPI2->CR1&=0XFFC7;//位3-5清零
     SPI2->CR1|=SPI_BaudRatePrescaler;	//设置SPI1速度
     SPI_Cmd(SPI2,ENABLE); //使能SPI1
-} 
-
+}
 
 //SPI1读写一个字节
 //TxData:要写入的字节
 //返回值:读取到的字节
 u8 SPI2_ReadWriteByte(u8 TxData)
-{		 			 
+{
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空
     SPI_I2S_SendData(SPI2, TxData); //发送数据
     while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收一个byte
@@ -139,28 +132,30 @@ u8 SPI2_ReadWriteByte(u8 TxData)
 }
 
 void SPI2_IRQHandler(void)
-{    
+{
+    static u8 iData[4];
+    static u8 spi_Count_S;
     if(SPI_I2S_GetFlagStatus(SPI2,SPI_I2S_FLAG_TXE)==SET)
     {
-        if(spi_Count_S==0)
+        if(spi_Count_S == 0)
         {
             SPI_I2S_SendData(SPI2,0xA0);
             spi_Count_S++;
         }
-        else if(spi_Count_S<4)
+        else if(spi_Count_S < 4)
         {
-            iData[spi_Count_S-1]=SPI_I2S_ReceiveData(SPI2);
-            SPI_I2S_SendData(SPI2,0xA0);
+            iData[spi_Count_S - 1]=SPI_I2S_ReceiveData(SPI2);
+            SPI_I2S_SendData(SPI2, 0xA0);
             spi_Count_S++;
         }
         else
         {
-            iData[spi_Count_S-1]=SPI_I2S_ReceiveData(SPI2);
-            spi_Count_S=0;
-            iData[0]&=0x1f;
-            Count++;
-            ad_DataConvert(iData);
-            SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,DISABLE);
+            iData[spi_Count_S - 1] = SPI_I2S_ReceiveData(SPI2);
+            spi_Count_S = 0;
+            iData[0] &= 0x1f;
+            sample_count++;
+            ad_DataConvert(iData);// one channel value into ad adta
+            SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, DISABLE);
         }
     }
 }

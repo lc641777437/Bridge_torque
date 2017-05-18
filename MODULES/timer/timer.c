@@ -8,6 +8,7 @@
 #include "fatfs_api.h"
 #include "lcd12864.h"
 #include "stmflash.h"
+#include "gpio.h"
 
 int time_10us = 0;
 int time_s = 0;
@@ -297,7 +298,7 @@ void TIM8_UP_TIM13_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM13,TIM_IT_Update)==SET)
     {
-        if(PDin(9)==0)
+        if(PIN_RESET == 0)
         {
             Write_Frequent(200);
             set_Frequent(200);

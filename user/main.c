@@ -54,7 +54,7 @@ int main(void)
         USBH_Process(&USB_OTG_Core, &USB_Host);
         if(get_DeviceState(DEVICE_USB) == ON)
         {
-            if(get_Save_Flag()==1)
+            if(get_Save_Flag())
             {
                 set_Save_Flag(0);
                 Save_AD_RawData_USB();
@@ -62,7 +62,7 @@ int main(void)
         }
         else if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON)
         {
-            if(get_Save_Flag()==1)
+            if(get_Save_Flag())
             {
                 set_Save_Flag(0);
                 Save_AD_RawData_SD();

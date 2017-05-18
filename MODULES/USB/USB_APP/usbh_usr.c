@@ -96,6 +96,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 	}
 	else
 	{
+        reset_DeviceState(DEVICE_USB);
 		LOG_DEBUG("设备错误!\r\n");
 	}
 }
@@ -103,8 +104,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 //DeviceDesc:设备描述符指针
 void USBH_USR_Device_DescAvailable(void *DeviceDesc)
 {
-	USBH_DevDesc_TypeDef *hs;
-	hs=DeviceDesc;
+	USBH_DevDesc_TypeDef *hs = (USBH_DevDesc_TypeDef *)DeviceDesc;
 	LOG_DEBUG("VID: %04Xh\r\n" , (uint32_t)(*hs).idVendor);
 	LOG_DEBUG("PID: %04Xh\r\n" , (uint32_t)(*hs).idProduct);
 }
@@ -151,6 +151,7 @@ void USBH_USR_EnumerationDone(void)
 //无法识别的USB设备
 void USBH_USR_DeviceNotSupported(void)
 {
+    reset_DeviceState(DEVICE_USB);
 	LOG_DEBUG("无法识别的USB设备!\r\n\r\n");
 }
 //等待用户输入按键,执行下一步操作
@@ -161,6 +162,7 @@ USBH_USR_Status USBH_USR_UserInput(void)
 //USB接口电流过载
 void USBH_USR_OverCurrentDetected (void)
 {
+    reset_DeviceState(DEVICE_USB);
 	LOG_DEBUG("端口电流过大!!!\r\n");
 }
 
@@ -172,13 +174,15 @@ int USBH_USR_MSC_Application(void)
   	switch(AppState)
   	{
     	case USH_USR_FS_INIT://初始化文件系统
-			AppState=USH_USR_FS_TEST;
+			AppState = USH_USR_FS_TEST;
             set_DeviceState(DEVICE_USB);
       		break;
+
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
-			res=USH_User_App(); //用户主程序
-     		res=0;
-			if(res)AppState=USH_USR_FS_INIT;
+			if(0 == USH_User_App())
+            {
+                AppState = USH_USR_FS_INIT;
+			}
       		break;
     	default:break;
   	}
@@ -187,7 +191,7 @@ int USBH_USR_MSC_Application(void)
 //用户要求重新初始化设备
 void USBH_USR_DeInit(void)
 {
-  	AppState=USH_USR_FS_INIT;
+  	AppState = USH_USR_FS_INIT;
 }
 //无法恢复的错误!!
 void USBH_USR_UnrecoveredError (void)
@@ -258,7 +262,6 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 
 u8 USH_User_App(void)
 {
-    //read
 	return 0;
 }
 
