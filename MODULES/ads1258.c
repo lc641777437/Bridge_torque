@@ -1,14 +1,19 @@
-#include "ads1258.h"
+/*
+ * ads1258.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
 #include "spi.h"
-#include "delay.h"
-#include "exti.h"
-#include "usart.h"
 #include "sys.h"
+#include "exti.h"
 #include "gpio.h"
-#include "stmflash.h"
-#include "fatfs_api.h"
+#include "usart.h"
 #include "string.h"
 #include "exfuns.h"
+#include "ads1258.h"
+#include "stmflash.h"
+#include "fatfs_api.h"
 
 #define DeviceID *(vu32*)FALSH_SAVE_ADDR
 

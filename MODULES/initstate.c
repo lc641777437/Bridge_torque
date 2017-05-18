@@ -1,3 +1,9 @@
+/*
+ * initstate.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
 #include "initstate.h"
 
 DEVICE_STATE sd_card = OFF;

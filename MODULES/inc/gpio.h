@@ -1,5 +1,11 @@
-#ifndef __GPIO_H
-#define __GPIO_H
+/*
+ * gpio.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
+#ifndef __GPIO_H__
+#define __GPIO_H__
 #include "stm32f4xx.h"
 
 #define STATE_15 PFin(2)
@@ -41,4 +47,4 @@
 
 void GPIO_init(void);
 
-#endif
+#endif/*__GPIO_H__*/

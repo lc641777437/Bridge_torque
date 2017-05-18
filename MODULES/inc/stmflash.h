@@ -2,9 +2,6 @@
 #define __STMFLASH_H__
 #include "sys.h"   
 
-
-
-
 //FLASH起始地址
 #define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
 #define FALSH_SAVE_ADDR 0x08070000

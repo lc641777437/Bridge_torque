@@ -1,22 +1,17 @@
-#ifndef __TIMER_H
-#define __TIMER_H
+/*
+ * timer.h
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
+#ifndef __TIMER_H__
+#define __TIMER_H__
 
 #include <string.h>
 #include "stm32f4xx.h"
 
 #define Sign_IN PFin(2)
 #define Sign_OUT PFout(3)
-
-#define NOTHING 0
-
-#define SDCARD_OK 1
-#define FATFS_OK 2
-
-#define LWIP_OK 1
-#define DHCP_OK 2
-#define TCP_OK 3
-
-#define USB_OK 1
 
 void TIM_Init(void);
 
@@ -32,11 +27,8 @@ void TIM13_Init(void);
 void TIM13_Enable(u8 state);
 void TIM14_Init(void);
 void TIM14_IT_ENABLE(void);
-    
+
 void set_Frequent(int fre);
 
 
-		 
-#endif
-
-
+#endif/*__TIMER_H__*/

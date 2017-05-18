@@ -1,21 +1,27 @@
-#include "sdio_sdcard.h"
+/*
+ * timer.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
+#include "sys.h"
+#include "gpio.h"
 #include "timer.h"
 #include "usart.h"
-#include "sys.h"
 #include "ads1258.h"
-#include "initstate.h"
 #include "usbh_usr.h"
-#include "fatfs_api.h"
 #include "lcd12864.h"
 #include "stmflash.h"
-#include "gpio.h"
-
-int time_10us = 0;
-int time_s = 0;
-int sample_time = 5 * 100;
-u8 Sign_Flag=0;//0:master  1:slave
+#include "initstate.h"
+#include "fatfs_api.h"
+#include "sdio_sdcard.h"
 extern USBH_HOST  USB_Host;
 extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
+
+int time_s = 0;
+int time_10us = 0;
+int sample_time = 5 * 100;
+u8 Sign_Flag=0;//0:master  1:slave
 
 void TIM_Init(void)
 {

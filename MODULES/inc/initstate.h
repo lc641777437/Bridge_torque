@@ -1,6 +1,17 @@
-#ifndef __INITSTATE_H
-#define __INITSTATE_H
+/*
+ * initstate.h
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
+#ifndef __INITSTATE_H__
+#define __INITSTATE_H__
 #include "stm32f4xx.h"
+
+typedef enum{
+    OFF = 0,
+    ON  = 1,
+} DEVICE_STATE;
 
 typedef enum{
     DEVICE_NULL = 0,
@@ -10,15 +21,8 @@ typedef enum{
     DEVICE_FATFS= 4,
 } DEVICE;
 
-typedef enum{
-    OFF = 0,
-    ON  = 1,
-} DEVICE_STATE;
-
 void set_DeviceState(DEVICE device);
 void reset_DeviceState(DEVICE device);
 DEVICE_STATE get_DeviceState(DEVICE device);
 
-#endif
-
-
+#endif/*__INITSTATE_H__*/

@@ -1,25 +1,30 @@
+/*
+ * main.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
 #include <stdio.h>
 #include <string.h>
 
-
 #include "stm32f4xx.h"
-#include "delay.h"
+
 #include "sys.h"
-#include "spi.h"
-#include "ads1258.h"
+#include "rtc.h"
+#include "exti.h"
+#include "gpio.h"
+#include "delay.h"
 #include "usart.h"
-#include "sdio_sdcard.h"
+#include "timer.h"
 #include "malloc.h"
 #include "exfuns.h"
-#include "timer.h"
-#include "exti.h"
-#include "rtc.h"
-#include "gpio.h"
-#include "stmflash.h"
-#include "initstate.h"
+#include "ads1258.h"
 #include "lcd12864.h"
 #include "usbh_usr.h"
+#include "stmflash.h"
+#include "initstate.h"
 #include "fatfs_api.h"
+#include "sdio_sdcard.h"
 
 USBH_HOST  USB_Host;
 USB_OTG_CORE_HANDLE  USB_OTG_Core;

@@ -1,11 +1,17 @@
+/*
+ * usart.c
+ *
+ *  Created on: 2017/05/18
+ *      Author: lc
+ */
+#include "rtc.h"
+#include "exti.h"
 #include "usart.h"
 #include "timer.h"
-#include "stmflash.h"
 #include "ads1258.h"
 #include "stmflash.h"
+#include "stmflash.h"
 #include "initstate.h"
-#include "exti.h"
-#include "rtc.h"
 /*
     USART1 232
     USART2 SIM808
