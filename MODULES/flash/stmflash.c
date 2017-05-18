@@ -2,7 +2,6 @@
 #include "delay.h"
 #include "usart.h" 
 #include "gpio.h"
-#include "tcp_client_demo.h" 
 #include "timer.h"
 
 static u32 Flash_State[4];//0:DEV_ID   1:CTRL_STATE   2:IP_ADDRESS   3:FREQUENCE

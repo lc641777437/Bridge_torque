@@ -1,19 +1,19 @@
-#include "fatfs_api.h"	 
+#include "fatfs_api.h"
 #include "sdio_sdcard.h"
 #include "usart.h"
 #include "exfuns.h"
-#include "malloc.h"		  
+#include "malloc.h"
 #include "ff.h"
 #include "delay.h"
 #include "initstate.h"
-    
-//为磁盘注册工作区	 
+
+//为磁盘注册工作区
 //path:磁盘路径，比如"0:"、"1:"
 //mt:0，不立即注册（稍后注册）；1，立即注册
 //返回值:执行结果
 u8 mf_mount(u8* path,u8 mt)
-{		   
-	return f_mount(fs[2],(const TCHAR*)path,mt); 
+{
+	return f_mount(fs[2],(const TCHAR*)path,mt);
 }
 
 //打开路径下的文件
@@ -22,10 +22,10 @@ u8 mf_mount(u8* path,u8 mt)
 //返回值:执行结果
 u8 mf_open(u8*path,u8 mode)
 {
-	u8 res;	 
+	u8 res;
 	res=f_open(file,(const TCHAR*)path,mode);//打开文件夹
 	return res;
-} 
+}
 
 //关闭文件
 //返回值:执行结果
@@ -56,7 +56,7 @@ u8 mf_read(u16 len)
 			tlen+=br;
 			for(t=0;t<br;t++)
             {
-                LOG_DEBUG("%c",fatbuf[t]); 
+                LOG_DEBUG("%c",fatbuf[t]);
             }
 		}
 	}
@@ -65,18 +65,18 @@ u8 mf_read(u16 len)
 		res=f_read(file,fatbuf,len%512,&br);
 		if(res)	//读数据出错了
 		{
-			LOG_DEBUG("\r\nRead Error:%d\r\n",res);   
+			LOG_DEBUG("\r\nRead Error:%d\r\n",res);
 		}else
 		{
 			tlen+=br;
 			for(t=0;t<br;t++)
             {
-                LOG_DEBUG("%c",fatbuf[t]); 
+                LOG_DEBUG("%c",fatbuf[t]);
             }
-		}	 
+		}
 	}
 	if(tlen)LOG_DEBUG("\r\nReaded data len:%d\r\n",tlen);//读到的数据长度
-	LOG_DEBUG("Read data over\r\n");	 
+	LOG_DEBUG("Read data over\r\n");
 	return res;
 }
 
@@ -85,7 +85,7 @@ u8 mf_read(u16 len)
 //len:写入长度
 //返回值:执行结果
 u8 mf_write(u8*dat,u16 len)
-{			    
+{
 	return f_write(file,dat,len,&bw);
 }
 
@@ -94,14 +94,14 @@ u8 mf_write(u8*dat,u16 len)
 //返回值:执行结果
 u8 mf_opendir(u8* path)
 {
-	return f_opendir(&dir,(const TCHAR*)path);	
+	return f_opendir(&dir,(const TCHAR*)path);
 }
 
-//关闭目录 
+//关闭目录
 //返回值:执行结果
 u8 mf_closedir(void)
 {
-	return f_closedir(&dir);	
+	return f_closedir(&dir);
 }
 
 //打读取文件夹
@@ -109,11 +109,11 @@ u8 mf_closedir(void)
 u8 mf_readdir(void)
 {
 	u8 res;
-	char *fn;			 
+	char *fn;
 #if _USE_LFN
  	fileinfo.lfsize = _MAX_LFN * 2 + 1;
 	fileinfo.lfname = mymalloc(SRAMIN,fileinfo.lfsize);
-#endif		  
+#endif
 	res=f_readdir(&dir,&fileinfo);//读取一个文件的信息
 	if(res!=FR_OK || fileinfo.fname[0]==0)
 	{
@@ -124,14 +124,14 @@ u8 mf_readdir(void)
 	fn=*fileinfo.lfname ? fileinfo.lfname : fileinfo.fname;
 #else
 	fn=fileinfo.fname;;
-#endif	
+#endif
 	LOG_DEBUG("\r\n DIR info:\r\n");
 
 	LOG_DEBUG("dir.id:%d\r\n",dir.id);
 	LOG_DEBUG("dir.index:%d\r\n",dir.index);
 	LOG_DEBUG("dir.sclust:%d\r\n",dir.sclust);
 	LOG_DEBUG("dir.clust:%d\r\n",dir.clust);
-	LOG_DEBUG("dir.sect:%d\r\n",dir.sect);	  
+	LOG_DEBUG("dir.sect:%d\r\n",dir.sect);
 
 	LOG_DEBUG("\r\n");
 	LOG_DEBUG("File Name is:%s\r\n",fn);
@@ -142,24 +142,24 @@ u8 mf_readdir(void)
 	LOG_DEBUG("\r\n");
 	myfree(SRAMIN,fileinfo.lfname);
 	return 0;
-}			 
+}
 
  //遍历文件
  //path:路径
  //返回值:执行结果
 u8 mf_scan_files(u8 * path)
 {
-	FRESULT res;	  
+	FRESULT res;
     char *fn;   /* This function is assuming non-Unicode cfg. */
 #if _USE_LFN
  	fileinfo.lfsize = _MAX_LFN * 2 + 1;
 	fileinfo.lfname = mymalloc(SRAMIN,fileinfo.lfsize);
-#endif		  
+#endif
 
     res = f_opendir(&dir,(const TCHAR*)path); //打开一个目录
-    if (res == FR_OK) 
-	{	
-		LOG_DEBUG("\r\n"); 
+    if (res == FR_OK)
+	{
+		LOG_DEBUG("\r\n");
 		while(1)
 		{
 	        res = f_readdir(&dir, &fileinfo);                   //读取目录下的一个文件
@@ -167,15 +167,15 @@ u8 mf_scan_files(u8 * path)
 	        //if (fileinfo.fname[0] == '.') continue;             //忽略上级目录
 #if _USE_LFN
         	fn = *fileinfo.lfname ? fileinfo.lfname : fileinfo.fname;
-#else							   
+#else
         	fn = fileinfo.fname;
 #endif	                                              /* It is a file. */
-			LOG_DEBUG("%s/", path);//打印路径	
-			LOG_DEBUG("%s\r\n",  fn);//打印文件名	  
-		} 
-    }	  
+			LOG_DEBUG("%s/", path);//打印路径
+			LOG_DEBUG("%s\r\n",  fn);//打印文件名
+		}
+    }
 	myfree(SRAMIN,fileinfo.lfname);
-    return res;	  
+    return res;
 }
 
 //显示剩余容量
@@ -189,13 +189,13 @@ u32 mf_showfree(u8 *drv)
     //得到磁盘信息及空闲簇数量
     res = f_getfree((const TCHAR*)drv,(DWORD*)&fre_clust, &fs1);
     if(res==0)
-	{											   
+	{
 	    tot_sect = (fs1->n_fatent - 2) * fs1->csize;//得到总扇区数
-	    fre_sect = fre_clust * fs1->csize;			//得到空闲扇区数	   
+	    fre_sect = fre_clust * fs1->csize;			//得到空闲扇区数
 #if _MAX_SS!=512
 		tot_sect*=fs1->ssize/512;
 		fre_sect*=fs1->ssize/512;
-#endif	  
+#endif
 		if(tot_sect<20480)//总容量小于10M
 		{
 		    /* Print free space in unit of KB (assuming 512 bytes/sector) */
@@ -211,7 +211,7 @@ u32 mf_showfree(u8 *drv)
 		}
 	}
 	return fre_sect;
-}		   
+}
 
 //文件读写指针偏移
 //offset:相对首地址的偏移量
@@ -233,7 +233,7 @@ u32 mf_tell(void)
 u32 mf_size(void)
 {
 	return f_size(file);
-} 
+}
 
 //创建目录
 //pname:目录路径+名字
@@ -251,7 +251,7 @@ u8 mf_mkdir(u8*pname)
 u8 mf_fmkfs(u8* path,u8 mode,u16 au)
 {
 	return f_mkfs((const TCHAR*)path,mode,au);//格式化,drv:盘符;mode:模式;au:簇大小
-} 
+}
 
 //删除文件/目录
 //pname:文件/目录路径+名字
@@ -271,7 +271,7 @@ u8 mf_rename(u8 *oldname,u8* newname)
 }
 
 //获取盘符（磁盘名字）
-//path:磁盘路径，比如"0:"、"1:"  
+//path:磁盘路径，比如"0:"、"1:"
 void mf_getlabel(u8 *path)
 {
 	u8 buf[20];
@@ -281,12 +281,12 @@ void mf_getlabel(u8 *path)
 	if(res==FR_OK)
 	{
 		LOG_DEBUG("\r\n磁盘%s 的盘符为:%s\r\n",path,buf);
-		LOG_DEBUG("磁盘%s 的序列号:%X\r\n\r\n",path,sn); 
+		LOG_DEBUG("磁盘%s 的序列号:%X\r\n\r\n",path,sn);
 	}else LOG_DEBUG("\r\n获取失败，错误码:%X\r\n",res);
 }
 
 //设置盘符（磁盘名字），最长11个字符！！，支持数字和大写字母组合以及汉字等
-//path:磁盘号+名字，比如"0:ALIENTEK"、"1:OPENEDV"  
+//path:磁盘号+名字，比如"0:ALIENTEK"、"1:OPENEDV"
 void mf_setlabel(u8 *path)
 {
 	u8 res;
@@ -295,7 +295,7 @@ void mf_setlabel(u8 *path)
 	{
 		LOG_DEBUG("\r\n磁盘盘符设置成功:%s\r\n",path);
 	}else LOG_DEBUG("\r\n磁盘盘符设置失败，错误码:%X\r\n",res);
-} 
+}
 
 //从文件里面读取一段字符串
 //size:要读取的长度
@@ -306,8 +306,8 @@ void mf_gets(u16 size)
 	if(*rbuf==0)return  ;//没有数据读到
 	else
 	{
-		LOG_DEBUG("\r\nThe String Readed Is:%s\r\n",rbuf);  	  
-	}			    	
+		LOG_DEBUG("\r\nThe String Readed Is:%s\r\n",rbuf);
+	}
 }
 
 //需要_USE_STRFUNC>=1
@@ -331,31 +331,19 @@ void fatfs_init(void)
 {
     u8 res = 0;
     u32 total,free;
-				 
-  	res = f_mount(fs[0],"0:",1); 					//挂载SD卡 
-    LOG_DEBUG("RESULT : %d\r\n",res);												    
+
+  	res = f_mount(fs[0],"0:",1); 					//挂载SD卡
+    LOG_DEBUG("RESULT : %d\r\n",res);
 	while(exf_getfree("0",&total,&free))	//得到SD卡的总容量和剩余容量
 	{
 		LOG_DEBUG("SD Card Fatfs Error!");
 		delay_ms(200);
-	}													  			    
+	}
 	LOG_DEBUG("FATFS OK!\r\n");
-    delay_ms(10);    
+    delay_ms(10);
 	LOG_DEBUG("SD Total Size:%d MB",total>>10);
-    delay_ms(10);    
-	LOG_DEBUG("SD  Free Size:%d MB",free>>10); 	    
-    add_InitState(SDSTATE);
+    delay_ms(10);
+	LOG_DEBUG("SD  Free Size:%d MB",free>>10);
+    set_DeviceState(DEVICE_SD);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 

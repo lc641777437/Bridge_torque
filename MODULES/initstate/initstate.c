@@ -1,54 +1,59 @@
 #include "initstate.h"
 
-char sd_Init_State;
-char eth_Init_State;
-char usb_Init_State;
-//1£ºsd¿¨   2£ºÍø¿Ú  3:USB
-void add_InitState(char mode)
+DEVICE_STATE sd_card = OFF;
+DEVICE_STATE eth_host = OFF;
+DEVICE_STATE usb_face = OFF;
+DEVICE_STATE sd_fatfs = OFF;
+
+void set_DeviceState(DEVICE device)
 {
-    if(mode==1)
+    if(device == DEVICE_SD)
     {
-        sd_Init_State++;
+        sd_card = ON;
     }
-    else if(mode==2)
+    else if(device == DEVICE_USB)
     {
-        eth_Init_State++;
+        usb_face = ON;
     }
-    else if (mode==3)
+    else if(device == DEVICE_FATFS)
     {
-        usb_Init_State++;
+        usb_face = ON;
     }
 }
 
-void reset_InitState(char mode)
+void reset_DeviceState(DEVICE device)
 {
-    if(mode==1)
+    if(device == DEVICE_SD)
     {
-        sd_Init_State=0;
+        sd_card = OFF;
     }
-    else if(mode==2)
+    else if(device == DEVICE_USB)
     {
-        eth_Init_State=0;
+        usb_face = OFF;
     }
-    else if (mode==3)
+    else if(device == DEVICE_FATFS)
     {
-        usb_Init_State=0;
+        usb_face = OFF;
     }
 }
 
-char get_InitState(char mode)
+DEVICE_STATE get_DeviceState(DEVICE device)
 {
-    if(mode==1)
+    DEVICE_STATE state = OFF;
+
+    if(device == DEVICE_SD)
     {
-        return sd_Init_State;
+        state = sd_card;
     }
-    else if(mode==2)
+    else if(device == DEVICE_USB)
     {
-        return eth_Init_State;
+        state = usb_face;
     }
-    else if (mode==3)
+    else if(device == DEVICE_FATFS)
     {
-        return usb_Init_State;
+        state = sd_fatfs;
     }
-    return 0;
+
+    return state;
 }
+

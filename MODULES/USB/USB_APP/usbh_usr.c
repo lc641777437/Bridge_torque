@@ -1,24 +1,24 @@
-#include "usbh_usr.h" 
-#include "ff.h" 
-#include "usart.h" 
+#include "usbh_usr.h"
+#include "ff.h"
+#include "usart.h"
 #include "fatfs_api.h"
 #include "exfuns.h"
 #include "initstate.h"
-//////////////////////////////////////////////////////////////////////////////////	 
+//////////////////////////////////////////////////////////////////////////////////
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
-//USBH-USR 代码	   
+//USBH-USR 代码
 //正点原子@ALIENTEK
 //技术论坛:www.openedv.com
 //创建日期:2014/7/22
 //版本：V1.0
 //版权所有，盗版必究。
 //Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
+//All rights reserved
 //*******************************************************************************
 //修改信息
 //无
-////////////////////////////////////////////////////////////////////////////////// 	   
+//////////////////////////////////////////////////////////////////////////////////
 
 static u8 AppState;
 extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
@@ -28,7 +28,7 @@ extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
 void OTG_FS_IRQHandler(void)
 {
   	USBH_OTG_ISR_Handler(&USB_OTG_Core);
-} 
+}
 //USB HOST 用户回调函数.
 USBH_Usr_cb_TypeDef USR_Callbacks=
 {
@@ -54,13 +54,13 @@ USBH_Usr_cb_TypeDef USR_Callbacks=
 /////////////////////////////////////////////////////////////////////////////////
 //以下为各回调函数实现.
 
-//USB HOST 初始化 
+//USB HOST 初始化
 void USBH_USR_Init(void)
 {
 	LOG_DEBUG("USB OTG HS MSC Host\r\n");
 	LOG_DEBUG("USB Host library started.\r\n");
 	LOG_DEBUG("USB Host Library v2.1.0\r\n\r\n");
-	
+
 }
 //检测到U盘插入
 void USBH_USR_DeviceAttached(void)//U盘插入
@@ -70,9 +70,9 @@ void USBH_USR_DeviceAttached(void)//U盘插入
 //检测到U盘拔出
 void USBH_USR_DeviceDisconnected (void)//U盘移除
 {
-    reset_InitState(USBSTATE);
+    reset_DeviceState(DEVICE_USB);
 	LOG_DEBUG("USB设备拔出!\r\n");
-}  
+}
 //复位从机
 void USBH_USR_ResetDevice(void)
 {
@@ -85,84 +85,84 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 	if(DeviceSpeed==HPRT0_PRTSPD_HIGH_SPEED)
 	{
 		LOG_DEBUG("高速(HS)USB设备!\r\n");
- 	}  
+ 	}
 	else if(DeviceSpeed==HPRT0_PRTSPD_FULL_SPEED)
 	{
-		LOG_DEBUG("全速(FS)USB设备!\r\n"); 
+		LOG_DEBUG("全速(FS)USB设备!\r\n");
 	}
 	else if(DeviceSpeed==HPRT0_PRTSPD_LOW_SPEED)
 	{
-		LOG_DEBUG("低速(LS)USB设备!\r\n");  
+		LOG_DEBUG("低速(LS)USB设备!\r\n");
 	}
 	else
 	{
-		LOG_DEBUG("设备错误!\r\n");  
+		LOG_DEBUG("设备错误!\r\n");
 	}
 }
 //检测到从机的描述符
 //DeviceDesc:设备描述符指针
 void USBH_USR_Device_DescAvailable(void *DeviceDesc)
-{ 
+{
 	USBH_DevDesc_TypeDef *hs;
-	hs=DeviceDesc;   
-	LOG_DEBUG("VID: %04Xh\r\n" , (uint32_t)(*hs).idVendor); 
-	LOG_DEBUG("PID: %04Xh\r\n" , (uint32_t)(*hs).idProduct); 
+	hs=DeviceDesc;
+	LOG_DEBUG("VID: %04Xh\r\n" , (uint32_t)(*hs).idVendor);
+	LOG_DEBUG("PID: %04Xh\r\n" , (uint32_t)(*hs).idProduct);
 }
 //从机地址分配成功
 void USBH_USR_DeviceAddressAssigned(void)
 {
-	LOG_DEBUG("从机地址分配成功!\r\n");   
+	LOG_DEBUG("从机地址分配成功!\r\n");
 }
 //配置描述符获有效
 void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
                                           USBH_InterfaceDesc_TypeDef *itfDesc,
                                           USBH_EpDesc_TypeDef *epDesc)
 {
-	USBH_InterfaceDesc_TypeDef *id; 
-	id = itfDesc;   
+	USBH_InterfaceDesc_TypeDef *id;
+	id = itfDesc;
 	if((*id).bInterfaceClass==0x08)
 	{
-		LOG_DEBUG("可移动存储器设备!\r\n"); 
+		LOG_DEBUG("可移动存储器设备!\r\n");
 	}else if((*id).bInterfaceClass==0x03)
 	{
-		LOG_DEBUG("HID 设备!\r\n"); 
-	}    
+		LOG_DEBUG("HID 设备!\r\n");
+	}
 }
 //获取到设备Manufacturer String
 void USBH_USR_Manufacturer_String(void *ManufacturerString)
 {
 	LOG_DEBUG("Manufacturer: %s\r\n",(char *)ManufacturerString);
 }
-//获取到设备Product String 
+//获取到设备Product String
 void USBH_USR_Product_String(void *ProductString)
 {
-	LOG_DEBUG("Product: %s\r\n",(char *)ProductString);  
+	LOG_DEBUG("Product: %s\r\n",(char *)ProductString);
 }
-//获取到设备SerialNum String 
+//获取到设备SerialNum String
 void USBH_USR_SerialNum_String(void *SerialNumString)
 {
-	LOG_DEBUG("Serial Number: %s\r\n",(char *)SerialNumString);    
-} 
+	LOG_DEBUG("Serial Number: %s\r\n",(char *)SerialNumString);
+}
 //设备USB枚举完成
 void USBH_USR_EnumerationDone(void)
-{ 
-	LOG_DEBUG("设备枚举完成!\r\n");    
-} 
+{
+	LOG_DEBUG("设备枚举完成!\r\n");
+}
 //无法识别的USB设备
 void USBH_USR_DeviceNotSupported(void)
 {
-	LOG_DEBUG("无法识别的USB设备!\r\n\r\n");    
-}  
+	LOG_DEBUG("无法识别的USB设备!\r\n\r\n");
+}
 //等待用户输入按键,执行下一步操作
 USBH_USR_Status USBH_USR_UserInput(void)
-{ 
+{
 	return USBH_USR_RESP_OK;
-} 
+}
 //USB接口电流过载
 void USBH_USR_OverCurrentDetected (void)
 {
 	LOG_DEBUG("端口电流过大!!!\r\n");
-} 
+}
 
 extern u8 USH_User_App(void);		//用户测试主程序
 //USB HOST MSC类用户应用程序
@@ -171,9 +171,9 @@ int USBH_USR_MSC_Application(void)
 	u8 res=0;
   	switch(AppState)
   	{
-    	case USH_USR_FS_INIT://初始化文件系统 
+    	case USH_USR_FS_INIT://初始化文件系统
 			AppState=USH_USR_FS_TEST;
-            add_InitState(USBSTATE);
+            set_DeviceState(DEVICE_USB);
       		break;
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
 			res=USH_User_App(); //用户主程序
@@ -181,7 +181,7 @@ int USBH_USR_MSC_Application(void)
 			if(res)AppState=USH_USR_FS_INIT;
       		break;
     	default:break;
-  	} 
+  	}
 	return res;
 }
 //用户要求重新初始化设备
@@ -189,13 +189,13 @@ void USBH_USR_DeInit(void)
 {
   	AppState=USH_USR_FS_INIT;
 }
-//无法恢复的错误!!  
+//无法恢复的错误!!
 void USBH_USR_UnrecoveredError (void)
 {
-	LOG_DEBUG("无法恢复的错误!!!\r\n\r\n");	
+	LOG_DEBUG("无法恢复的错误!!!\r\n\r\n");
 }
 ////////////////////////////////////////////////////////////////////////////////////////
-//用户定义函数,实现fatfs diskio的接口函数 
+//用户定义函数,实现fatfs diskio的接口函数
 extern USBH_HOST              USB_Host;
 
 //获取U盘状态
@@ -209,55 +209,55 @@ u8 USBH_UDISK_Status(void)
 //读U盘
 //buf:读数据缓存区
 //sector:扇区地址
-//cnt:扇区个数	
-//返回值:错误状态;0,正常;其他,错误代码;		 
+//cnt:扇区个数
+//返回值:错误状态;0,正常;其他,错误代码;
 u8 USBH_UDISK_Read(u8* buf,u32 sector,u32 cnt)
 {
 	u8 res=1;
 	if(HCD_IsDeviceConnected(&USB_OTG_Core)&&AppState==USH_USR_FS_TEST)//连接还存在,且是APP测试状态
-	{  		    
+	{
 		do
 		{
 			res=USBH_MSC_Read10(&USB_OTG_Core,buf,sector,512*cnt);
-			USBH_MSC_HandleBOTXfer(&USB_OTG_Core ,&USB_Host);		      
+			USBH_MSC_HandleBOTXfer(&USB_OTG_Core ,&USB_Host);
 			if(!HCD_IsDeviceConnected(&USB_OTG_Core))
 			{
 				res=1;//读写错误
 				break;
-			};   
+			};
 		}while(res==USBH_MSC_BUSY);
-	}else res=1;		  
-	if(res==USBH_MSC_OK)res=0;	
+	}else res=1;
+	if(res==USBH_MSC_OK)res=0;
 	return res;
 }
 
 //写U盘
 //buf:写数据缓存区
 //sector:扇区地址
-//cnt:扇区个数	
-//返回值:错误状态;0,正常;其他,错误代码;		 
+//cnt:扇区个数
+//返回值:错误状态;0,正常;其他,错误代码;
 u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 {
 	u8 res=1;
 	if(HCD_IsDeviceConnected(&USB_OTG_Core)&&AppState==USH_USR_FS_TEST)//连接还存在,且是APP测试状态
-	{  		    
+	{
 		do
 		{
-			res=USBH_MSC_Write10(&USB_OTG_Core,buf,sector,512*cnt); 
-			USBH_MSC_HandleBOTXfer(&USB_OTG_Core ,&USB_Host);		      
+			res=USBH_MSC_Write10(&USB_OTG_Core,buf,sector,512*cnt);
+			USBH_MSC_HandleBOTXfer(&USB_OTG_Core ,&USB_Host);
 			if(!HCD_IsDeviceConnected(&USB_OTG_Core))
 			{
 				res=1;//读写错误
 				break;
-			};   
+			};
 		}while(res==USBH_MSC_BUSY);
-	}else res=1;		  
-	if(res==USBH_MSC_OK)res=0;	
+	}else res=1;
+	if(res==USBH_MSC_OK)res=0;
 	return res;
 }
 
 u8 USH_User_App(void)
-{ 
+{
     //read
 	return 0;
 }
@@ -265,45 +265,6 @@ u8 USH_User_App(void)
 void USB_Init(void)
 {
     f_mount(fs[2],"2:",1); 	//挂载U盘
-    USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks); 
+    USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

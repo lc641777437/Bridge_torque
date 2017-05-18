@@ -10,9 +10,6 @@
 #include "string.h"
 #include "exfuns.h"
 
-extern u8 tcp_client_sendbuf[800];
-extern u8 tcp_client_flag;	
-
 #define DeviceID *(vu32*)FALSH_SAVE_ADDR
 int ad_Data[16];
 static int ad_Data_Max[16];
@@ -24,7 +21,7 @@ static u8 SendBuf[53];
 static u8 SendBuf_avr[149];
 int Date_Now_SD;
 int Date_Now_USB;
-int SavePosition;  //1 for SD 2 for USB
+int SavePosition;  // 1 for SD 2 for USB
 char FileName[30];
 
 void ads1258_Init(void)
@@ -36,7 +33,7 @@ void ads1258_Init(void)
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
     PBout(12)=0;
-    
+
     SPI2_Init();
     SPI2_ReadWriteByte(0xC0);
 }
@@ -75,7 +72,7 @@ void ads1258_ReadData(void)
 }
 
 void ad_Data_Proc_Eth(void)
-{
+{/*
     int n;
     int avr;
     char send_Data_Buf[100];
@@ -94,7 +91,7 @@ void ad_Data_Proc_Eth(void)
         ad_Data_Min[n]=0;
         ad_Data_Num[n]=0;
     }
-    tcp_client_flag|=1<<7;
+    tcp_client_flag|=1<<7;*/
 }
 
 void ad_Data_Proc_Gprs(void)
@@ -103,7 +100,7 @@ void ad_Data_Proc_Gprs(void)
     USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 }
 
-void convert_AD_RawData_avr(void)   
+void convert_AD_RawData_avr(void)
 {
     int i;
     int data_Buf;
