@@ -441,72 +441,72 @@
             <File>
               <FileName>ads1258.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\adc\ads1258.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\adc\spi.c</FilePath>
+              <FilePath>..\MODULES\ads1258.c</FilePath>
             </File>
             <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\delay\delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\sys\sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\uart\usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>malloc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\malloc\malloc.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\sd\sdio_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\timer\timer.c</FilePath>
+              <FilePath>..\MODULES\delay.c</FilePath>
             </File>
             <File>
               <FileName>exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\exti\exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\rtc\rtc.c</FilePath>
+              <FilePath>..\MODULES\exti.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\gpio\gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stmflash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\flash\stmflash.c</FilePath>
+              <FilePath>..\MODULES\gpio.c</FilePath>
             </File>
             <File>
               <FileName>initstate.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\initstate\initstate.c</FilePath>
+              <FilePath>..\MODULES\initstate.c</FilePath>
             </File>
             <File>
               <FileName>lcd12864.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\MODULES\lcd12864\lcd12864.c</FilePath>
+              <FilePath>..\MODULES\lcd12864.c</FilePath>
+            </File>
+            <File>
+              <FileName>malloc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\malloc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_sdcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\sdio_sdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\stmflash.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\usart.c</FilePath>
             </File>
           </Files>
         </Group>

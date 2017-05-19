@@ -15,7 +15,14 @@
 #include "stmflash.h"
 #include "fatfs_api.h"
 
+#define FILE_NAME_LEN (32)
 #define DeviceID *(vu32*)FALSH_SAVE_ADDR
+
+typedef enum{
+    SAVE_NULL   = 0,
+    SAVE_SD     = 1,
+    SAVE_USB    = 2
+} SAVE_POSITION;
 
 static int ad_Data[ADS1258_CHANNEL_NUM];
 static int ad_Data_Min[ADS1258_CHANNEL_NUM];
@@ -26,8 +33,7 @@ static long long int ad_Data_Sum[ADS1258_CHANNEL_NUM];
 static u8 SendBuf[DATA_2_PC_LEN]; // 52 Bytes to send 232
 static u8 SendBuf_avr[DATA_2_SIMCOM_LEN]; // 148 Bytes to send to sim808
 
-int SavePosition;  // 1 for SD 2 for USB
-char FileName[32];
+static SAVE_POSITION SavePosition = SAVE_NULL;  // 1 for SD 2 for USB
 
 void ads1258_Init(void)
 {
@@ -173,60 +179,66 @@ void USART3_Send_AD_RawData(void)// wireless 433
 
 void Save_AD_RawData_SD(void)
 {
-    int Date_Now_SD = 0;
-
+    static int Date_Now_SD = 0;
+    char FileName[FILE_NAME_LEN];
     RTC_TimeTypeDef RTC_TimeStruct;
     RTC_DateTypeDef RTC_DateStruct;
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
     RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
 
-    if(Date_Now_SD!=RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
+    if(Date_Now_SD != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
     {
         mf_close();
-        Date_Now_SD=RTC_TimeStruct.RTC_Minutes;
-        SavePosition=1;
-        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","0:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
-        mf_open((u8 *)FileName,FA_CREATE_NEW | FA_WRITE);
+        Date_Now_SD = RTC_TimeStruct.RTC_Minutes;
+        SavePosition = SAVE_SD;
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "0:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
-    else if(SavePosition!=1)//换了存储位置 打开原有文件
+    else if(SavePosition != SAVE_SD)//换了存储位置 打开原有文件
     {
-        SavePosition=1;
+        SavePosition = SAVE_SD;
         mf_close();
-        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","0:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
-        mf_open((u8 *)FileName,FA_WRITE);
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "0:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        mf_open((u8 *)FileName, FA_WRITE);
     }
-    mf_write((u8 *)SendBuf, 52);//TODO:time
-    mf_write("\r\n",2);
+
+    mf_write((u8 *)SendBuf, DATA_2_PC_LEN);
+    mf_write("\r\n", 2);
 }
 
 void Save_AD_RawData_USB(void)
 {
     static int Date_Now_USB = 0;
+    char FileName[FILE_NAME_LEN];
     RTC_TimeTypeDef RTC_TimeStruct;
     RTC_DateTypeDef RTC_DateStruct;
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
     RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
-    // 新的时间创建新的文件
-    if(Date_Now_USB!=RTC_TimeStruct.RTC_Minutes)
+
+    if(Date_Now_USB != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
     {
         mf_close();
-        Date_Now_USB=RTC_TimeStruct.RTC_Minutes;
-        SavePosition=2;
-        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","2:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
-        mf_open((u8 *)FileName,FA_CREATE_NEW|FA_WRITE);
+        Date_Now_USB = RTC_TimeStruct.RTC_Minutes;
+        SavePosition = SAVE_USB;
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "2:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
-    //换了存储位置 打开原有文件
-    else if(SavePosition!=2)
+    else if(SavePosition != SAVE_USB)//换了存储位置 打开原有文件
     {
-        SavePosition=2;
+        SavePosition = SAVE_USB;
         mf_close();
-        snprintf(FileName,30,"%s%02d%02d%02d%02d%02d%02d%s","2:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month,RTC_DateStruct.RTC_Date,RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes,RTC_TimeStruct.RTC_Seconds,".txt");
-        mf_open((u8 *)FileName,FA_WRITE);
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "2:/20",\
+        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        mf_open((u8 *)FileName, FA_WRITE);
     }
-    mf_write((u8 *)SendBuf,52);//TODO:time
-    mf_write("\r\n",2);
+
+    mf_write((u8 *)SendBuf, DATA_2_PC_LEN);
+    mf_write("\r\n", 2);
 }

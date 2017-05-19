@@ -10,15 +10,13 @@
 #include "timer.h"
 #include "ads1258.h"
 #include "stmflash.h"
-#include "stmflash.h"
 #include "initstate.h"
+#include "PC_message_proc.h"
 /*
     USART1 232
     USART2 SIM808
     USART3 433
 */
-#define USART_MAX_RECV_LEN 512
-
 static u8 printf_channel;
 
 /*receive state flag*/
@@ -75,7 +73,6 @@ int fputc(int ch, FILE *f)
         case 3:
             while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
             USART_SendData(USART3, (uint8_t)ch);
-
             break;
     }
 	return ch;
@@ -123,99 +120,6 @@ void USART1_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-void USART1_proc()
-{
-    int data;
-    char command[32];
-
-    if(strstr((char *)USART1_RX_BUF, "SampleRate:"))
-    {
-        sscanf((const char*)&USART1_RX_BUF,"%11s%d",command,&data);
-        switch(data)
-        {
-            case 200:
-            case 100:
-            case 50:
-            case 20:
-            case 10:
-            case 5:
-            case 2:
-            case 1:
-                Write_Frequent(data);
-                set_Frequent(data);
-                USART1_Send_Bytes_Directly(0x10, NULL, 0);
-                break;
-            default:
-                USART1_Send_Bytes_Directly(0x20, NULL, 0);
-                break;
-        }
-    }
-    if(strstr((char *)USART1_RX_BUF, "SetDeviceID:"))
-    {
-        USART1_Send_Bytes_Directly(0x11, NULL, 0);
-        sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
-        Write_DeviceID(data);
-    }
-    if(strstr((char *)USART1_RX_BUF, "SetCtrlState:"))
-    {
-        USART1_Send_Bytes_Directly(0x12, NULL, 0);
-        sscanf((const char*)&USART1_RX_BUF,"%13s%x",command,&data);
-        Write_CtrlState(data);
-        set_CtrlState(data);
-    }
-    if(strstr((char *)USART1_RX_BUF, "SetRemoteIP:"))
-    {
-        sscanf((const char*)&USART1_RX_BUF,"%12s%d",command,&data);
-        if(data >= 0&&data <=255)
-        {
-            Write_IPAddress(data);
-            reset_DeviceState(DEVICE_ETH);
-            USART1_Send_Bytes_Directly(0x13, NULL, 0);
-        }
-        else
-        {
-            USART1_Send_Bytes_Directly(0X23, NULL, 0);
-        }
-    }
-    if(strstr((char *)USART1_RX_BUF, "StartToSend"))
-    {
-        set_Send_Flag(SEND_BY_UART1);
-    }
-    if(strstr((char *)USART1_RX_BUF, "StopToSend"))
-    {
-        set_Send_Flag(SEND_BY_NULL);
-        USART1_Send_Bytes_Directly(0X15, NULL, 0);
-    }
-    if(strstr((char *)USART1_RX_BUF, "ResetOption"))
-    {
-        USART1_Send_Bytes_Directly(0x16, NULL, 0);
-        Write_Frequent(100);
-        set_Frequent(100);
-        Write_CtrlState(0xffff);
-        set_CtrlState(0xffff);
-        Write_DeviceID(1001);
-        Write_IPAddress(1);
-    }
-    if(strstr((char *)USART1_RX_BUF, "GetSampleRate"))
-    {
-        u8 rate = 0;
-        u32 flash = get_FlashState(3);
-        rate = flash;
-        USART1_Send_Bytes_Directly(0X17, &rate, 1);
-    }
-    if(strstr((char *)USART1_RX_BUF, "GetCtrlState"))
-    {
-        u8 state[2] = {0};
-        u32 flash = get_FlashState(1);
-        state[0] = (u8)(flash>>8);
-        state[1] = (u8)flash;
-        USART1_Send_Bytes_Directly(0x18, state, 2);
-    }
-    memset(USART1_RX_BUF, 0, USART_MAX_RECV_LEN);
-    return;
-}
-
-
 void USART1_IRQHandler(void)
 {
     u8 res;
@@ -230,7 +134,7 @@ void USART1_IRQHandler(void)
             USART1_RX_STA = 0;
             if(res == 0x0a)             //接收完成了
             {
-                USART1_proc();
+                pc_message_proc(USART1, USART1_RX_BUF);
             }
         }
         else                            //之前还没收到0X0d
@@ -272,21 +176,6 @@ void USART1_IRQHandler(void)
         {
             USART_ITConfig(USART1, USART_IT_TXE, DISABLE);//close the Tx interrupt
         }
-    }
-}
-
-void USART1_Send_Bytes_Directly(u8 cmd, u8 *data, int length)
-{
-    while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-    USART_SendData(USART1, 0XA6);
-    while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-    USART_SendData(USART1, 0XA6);
-    while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-    USART_SendData(USART1, (cmd));
-    for(int i = 0; i < length; i++)
-    {
-        while(USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
-        USART_SendData(USART1, *(data + i));
     }
 }
 
@@ -356,112 +245,6 @@ void USART3_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-void USART3_proc(void)
-{
-    char command[20];
-    int data;
-
-    if(strstr((char *)USART3_RX_BUF, "SampleRate:"))
-    {
-        sscanf((const char*)&USART3_RX_BUF, "%11s%d", command, &data);
-        switch(data)
-        {
-            case 200:
-            case 100:
-            case 50:
-            case 20:
-            case 10:
-            case 5:
-            case 2:
-            case 1:
-                Write_Frequent(data);
-                set_Frequent(data);
-                USART3_Send_Bytes_Directly(0x10, NULL, 0);
-                break;
-            default:
-                USART3_Send_Bytes_Directly(0x20, NULL, 0);
-                break;
-        }
-    }
-    if(strstr((char *)USART3_RX_BUF, "SetDeviceID:"))
-    {
-        USART3_Send_Bytes_Directly(0x11, NULL, 0);
-        sscanf((const char*)&USART3_RX_BUF,"%12s%d", command,&data);
-        Write_DeviceID(data);
-    }
-    if(strstr((char *)USART3_RX_BUF, "SetCtrlState:"))
-    {
-        USART3_Send_Bytes_Directly(0x12, NULL, 0);
-        sscanf((const char*)&USART3_RX_BUF,"%13s%x", command,&data);
-        Write_CtrlState(data);
-        set_CtrlState(data);
-    }
-    if(strstr((char *)USART3_RX_BUF, "SetRemoteIP:"))
-    {
-        sscanf((const char*)&USART3_RX_BUF,"%12s%d", command,&data);
-        if(data >= 0&&data <=255)
-        {
-            Write_IPAddress(data);
-            reset_DeviceState(DEVICE_ETH);
-            USART3_Send_Bytes_Directly(0x13, NULL, 0);
-        }
-        else
-        {
-            USART3_Send_Bytes_Directly(0x23, NULL, 0);
-        }
-    }
-    if(strstr((char *)USART3_RX_BUF, "StartToSend"))
-    {
-        set_Send_Flag(SEND_BY_UART3);
-    }
-    if(strstr((char *)USART3_RX_BUF, "StopToSend"))
-    {
-        USART3_Send_Bytes_Directly(0x15, NULL, 0);
-        set_Send_Flag(SEND_BY_NULL);
-    }
-    if(strstr((char *)USART3_RX_BUF, "ResetOption"))
-    {
-        USART3_Send_Bytes_Directly(0x16, NULL, 0);
-        Write_Frequent(100);
-        set_Frequent(100);
-        Write_CtrlState(0xffff);
-        set_CtrlState(0xffff);
-        Write_DeviceID(1001);
-        Write_IPAddress(1);
-    }
-    if(strstr((char *)USART3_RX_BUF, "GetSampleRate"))
-    {
-        u32 flash = get_FlashState(3);
-        u8 rate = flash;
-        USART3_Send_Bytes_Directly(0x17, &rate, 1);
-    }
-    if(strstr((char *)USART3_RX_BUF, "GetCtrlState"))
-    {
-        u8 state[2] = {0};
-        u32 flash = get_FlashState(1);
-        state[0] = (u8)(flash>>8);
-        state[1] = (u8)flash;
-        USART3_Send_Bytes_Directly(0x18, state, 2);
-    }
-    memset(USART3_RX_BUF, 0, USART_MAX_RECV_LEN);
-    return;
-}
-
-void USART3_Send_Bytes_Directly(u8 cmd, u8 *data, int length)
-{
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    USART_SendData(USART3, 0XA6);
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    USART_SendData(USART3, 0XA6);
-    while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-    USART_SendData(USART3, cmd);
-    for(int i = 0; i < length; i++)
-    {
-        while(USART_GetFlagStatus(USART3, USART_FLAG_TC) == RESET);
-        USART_SendData(USART3, *(data + i));
-    }
-}
-
 static void USART3_Send_Byte(u8 data)
 {
 	while(USART3_TX_length > USART_MAX_RECV_LEN - 2)//avoid overflow
@@ -492,29 +275,30 @@ void USART3_Send_Bytes(u8 *data,int length)
 
 void USART3_RECV_Timeout(void)// uart3 timeout
 {
-    USART3_proc();
+    pc_message_proc(USART3, USART3_RX_BUF);
+
 }
 
 void USART3_IRQHandler(void)
 {
-    u8 res;
-
-    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
+    if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)//接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
+        u8 res;
+
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART3);//(USART3->DR);	//读取接收到的数据
 
-        if(USART3_RX_STA & 0x4000)      //之前接收到了0x0d
+        if(USART3_RX_STA & 0x4000)//之前接收到了0x0d
         {
             USART3_RX_STA = 0;
-            if(res == 0x0a)             //接收完成了
+            if(res == 0x0a)//接收完成了
             {
                 TIM3_set(0);
-                USART3_proc();
+                pc_message_proc(USART3, USART3_RX_BUF);
             }
         }
-        else                            //之前还没收到0X0d
+        else//之前还没收到0X0d
         {
             if(res == 0x0d)
             {
@@ -531,7 +315,8 @@ void USART3_IRQHandler(void)
             }
         }
     }
-    else if( USART_GetITStatus(USART3, USART_IT_TXE) == SET )
+
+    if( USART_GetITStatus(USART3, USART_IT_TXE) == SET )
     {
         if(USART3_TX_length > 0)
         {
@@ -555,6 +340,7 @@ void USART3_IRQHandler(void)
         }
     }
 }
+
 
 
 void USART2_Configuration(void)
@@ -593,6 +379,7 @@ void USART2_Configuration(void)
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
+
 void USART2_proc()
 {
     int year,month,date,hour,minute,second;
@@ -607,13 +394,6 @@ void USART2_proc()
     memset(USART2_RX_BUF, 0, USART_MAX_RECV_LEN);
 }
 
-void USART2_Send_Cmd(u8 cmd)
-{
-    USART2_Send_Byte(0xA6);
-    USART2_Send_Byte(0xA6);
-    USART2_Send_Byte(cmd);
-}
-
 void USART2_Send_Byte(u8 data)
 {
 	while(USART2_TX_length >= USART_MAX_RECV_LEN - 2)//avoid overflow
@@ -621,7 +401,7 @@ void USART2_Send_Byte(u8 data)
 		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 	}
 
-	//USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
+	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
 	USART2_TX_BUF[USART2_TX_ptr_in] = data;
 	USART2_TX_ptr_in++;
 	USART2_TX_length++;
@@ -707,6 +487,20 @@ void USART2_IRQHandler(void)
     }
 }
 
+void USART_Send_Bytes_Directly(USART_TypeDef *uart, u8 cmd, u8 *data, int length)
+{
+    while(USART_GetFlagStatus(uart, USART_FLAG_TC) == RESET);
+    USART_SendData(uart, 0XA6);
+    while(USART_GetFlagStatus(uart, USART_FLAG_TC) == RESET);
+    USART_SendData(uart, 0XA6);
+    while(USART_GetFlagStatus(uart, USART_FLAG_TC) == RESET);
+    USART_SendData(uart, (cmd));
+    for(int i = 0; i < length; i++)
+    {
+        while(USART_GetFlagStatus(uart, USART_FLAG_TC) == RESET);
+        USART_SendData(uart, *(data + i));
+    }
+}
 
 void UART_Init(void)
 {

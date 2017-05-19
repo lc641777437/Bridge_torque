@@ -108,7 +108,7 @@ void EXTI9_5_IRQHandler(void)
 {
     if(EXTI_GetITStatus(EXTI_Line8) != RESET)// // nDRDY for AD sample OK
     {
-        if(START==1)
+        if(START == 1)
         {
             if(sample_count < ADS1258_CHANNEL_NUM)
             {
