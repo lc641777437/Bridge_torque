@@ -7,8 +7,6 @@
 #include "delay.h"
 #include "gpio.h"
 
-extern u8 Sign_Flag;
-
 u8 sample_count = 0;
 
 static int save_Flag = SAVE_BY_NULL;

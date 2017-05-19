@@ -28,4 +28,6 @@ void Save_AD_RawData_SD(void);
 void Save_AD_RawData_USB(void);
 void ad_DataConvert(u8 result[4]);
 
+void ads1258_SampleProc(void);
+
 #endif/*__ADS1258_H__*/

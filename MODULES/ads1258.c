@@ -12,6 +12,7 @@
 #include "string.h"
 #include "exfuns.h"
 #include "ads1258.h"
+#include "setting.h"
 #include "stmflash.h"
 #include "fatfs_api.h"
 
@@ -94,6 +95,20 @@ void ad_Data_Proc_Gprs(void)
 {
     convert_AD_RawData_avr();
     USART2_Send_Data();
+}
+
+void ads1258_SampleProc(void)
+{
+    static int time_10us = 0;
+    if(time_10us < get_sampleTime()- 1)
+    {
+        time_10us++;
+    }
+    else
+    {
+        START = 1;
+        time_10us=0;
+    }
 }
 
 void convert_AD_RawData_avr(void)

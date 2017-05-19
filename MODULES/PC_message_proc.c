@@ -10,6 +10,7 @@
 #include "usart.h"
 #include "timer.h"
 #include "ads1258.h"
+#include "setting.h"
 #include "stmflash.h"
 #include "initstate.h"
 #include "PC_message_proc.h"

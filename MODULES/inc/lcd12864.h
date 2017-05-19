@@ -34,6 +34,7 @@ u8 isLCDBUSY(void);
 u8 isLCDEN(void);
 void LCD_Start_10us(u8 flag);
 void LCD_Proc_10us(void);
+void lcd12864_10us_proc(void);
 
 void LCD_Start_5ms(u8 flag);
 void LCD_Proc_5ms(void);

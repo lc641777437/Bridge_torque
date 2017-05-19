@@ -1741,13 +1741,6 @@ void check_SD_Card(void)
     {
         LOG_DEBUG("%s","SD Card Error!Please Check!\r\n");
     }
-//  while(SD_Init())
-//	{
-//        LOG_DEBUG("%s","SD Card Error!");
-//		delay_ms(10);
-//        LOG_DEBUG("%s","Please Check!\r\n");
-//        delay_ms(10);
-//	}
 }
 
 void SD_Card_Init(void)
@@ -1756,8 +1749,34 @@ void SD_Card_Init(void)
     {
         check_SD_Card();
     }
+
     if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == OFF)
     {
         fatfs_init();
+    }
+}
+
+void SD_1s_CheckProc(void)
+{
+    static u8 time_s = 0;
+    if(time_s < 19)
+    {
+        time_s++;
+    }
+    else
+    {
+        time_s=0;
+        if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON )
+        {
+            if(SD_GetState() == SD_CARD_ERROR)
+            {
+                reset_DeviceState(DEVICE_SD);
+                LOG_DEBUG("SD LOST\r\n");
+            }
+        }
+        else
+        {
+            SD_Card_Init();
+        }
     }
 }

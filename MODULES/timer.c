@@ -20,8 +20,6 @@ extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
 
 int time_s = 0;
 int time_10us = 0;
-int sample_time = 5 * 100;
-u8 Sign_Flag=0;//0:master  1:slave
 
 void TIM_Init(void)
 {
@@ -60,35 +58,11 @@ void TIM2_Init(void)//10us
 
 void TIM2_IRQHandler(void)//10us
 {
-    static u8 LCDEN_TIME;
 	if(TIM_GetITStatus(TIM2,TIM_IT_Update)==SET) //溢出中断
 	{
-        if(time_10us < sample_time-1)
-        {
-            time_10us++;
-        }
-        else
-        {
-            time_10us=0;
-            if(Sign_Flag==0)
-            {
-                Sign_OUT=1;
-                START=1;
-            }
-            else
-            {
-                Sign_Flag--;
-            }
-        }
+        ads1258_SampleProc();
+        lcd12864_10us_proc();
 
-        if(isLCDEN())//let LCD_EN high at least 10us
-        {
-            if(++LCDEN_TIME > 2)
-            {
-                LCDEN_TIME = 0;
-                LCD_Proc_10us();
-            }
-        }
 	}
 	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);  //清除中断标志位
 }
@@ -134,8 +108,8 @@ void TIM3_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM3,TIM_IT_Update)==SET)
     {
-        USART3_RECV_Timeout();
         TIM3_set(0);
+        USART3_RECV_Timeout();
     }
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
 }
@@ -181,8 +155,8 @@ void TIM4_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM4,TIM_IT_Update)==SET)
     {
-        USART2_RECV_Timeout();
         TIM4_set(0);
+        USART2_RECV_Timeout();
     }
     TIM_ClearITPendingBit(TIM4,TIM_IT_Update);
 }
@@ -353,31 +327,8 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
         show_Update();
-        if(time_s<19)
-        {
-            time_s++;
-        }
-        else
-        {
-            time_s=0;
-            if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON )
-            {
-                if(SD_GetState() == SD_CARD_ERROR)
-                {
-                    reset_DeviceState(DEVICE_SD);
-                    LOG_DEBUG("SD LOST\r\n");
-                }
-            }
-            else
-            {
-                SD_Card_Init();
-            }
-        }
+        SD_1s_CheckProc();
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update);
 }
 
-void set_Frequent(int fre)
-{
-    sample_time = 100000/fre;
-}

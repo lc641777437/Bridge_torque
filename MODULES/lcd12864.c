@@ -42,7 +42,7 @@ void lcd12864_GPIO_Init(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
     GPIO_Init(GPIOF, &GPIO_InitStructure);
-    
+
 }
 
 void DataPort_Write(u8 data)
@@ -84,7 +84,7 @@ void LCD_Init(void)
 {
     int i,j;
     char string[17];
-    
+
     Write_Com(0x34);
     delay_ms(5);
     Write_Com(0x30);
@@ -93,7 +93,7 @@ void LCD_Init(void)
     delay_ms(5);
     Write_Com(0x01);
     delay_ms(5);
-    
+
     show_State[0]=STATE_0;
     show_State[1]=STATE_1;
     show_State[2]=STATE_2;
@@ -110,7 +110,7 @@ void LCD_Init(void)
     show_State[13]=STATE_13;
     show_State[14]=STATE_14;
     show_State[15]=STATE_15;
-    
+
     show_Ctrl[0]=CTRL_0;
     show_Ctrl[1]=CTRL_1;
     show_Ctrl[2]=CTRL_2;
@@ -127,7 +127,7 @@ void LCD_Init(void)
     show_Ctrl[13]=CTRL_13;
     show_Ctrl[14]=CTRL_14;
     show_Ctrl[15]=CTRL_15;
-    
+
     for(i=0;i<4;i++)
     {
         memset(string,'\0',17*sizeof(char));
@@ -160,9 +160,9 @@ void LCD_Init(void)
 void ShowString(u8 line, u8 pos, u8 *s)
 {
     if(isLCDBusy)return;
-    
+
     switch(line)
-    {   
+    {
         case 0:Write_Com(0x80+pos);break;
         case 1:Write_Com(0x90+pos);break;
         case 2:Write_Com(0x88+pos);break;
@@ -318,7 +318,7 @@ void show_Update(void)
         default:
             break;
     }
-    
+
     if(isUpdate==1)
     {
         memset(string_Show,'\0',17*sizeof(char));
@@ -345,9 +345,22 @@ void show_Update(void)
         }
         ShowString(show_Count,0,(u8*)string_Show);
     }
-    
+
     if(++show_Count>3)
     {
         show_Count=0;
+    }
+}
+
+void lcd12864_10us_proc(void)
+{
+    static u8 LCDEN_TIME = 0;
+    if(isLCDEN())//let LCD_EN high at least 10us
+    {
+        if(++LCDEN_TIME > 2)
+        {
+            LCDEN_TIME = 0;
+            LCD_Proc_10us();
+        }
     }
 }
