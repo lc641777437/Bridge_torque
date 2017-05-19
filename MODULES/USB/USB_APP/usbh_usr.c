@@ -267,7 +267,7 @@ u8 USH_User_App(void)
 
 void USB_Init(void)
 {
-    f_mount(fs[2],"2:",1); 	//╧ртьUел
-    USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks);
+    f_mount(fs[2], "2:", 1); 	//╧ртьUел
+    USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID, &USB_Host, &USBH_MSC_cb, &USR_Callbacks);
 }
 

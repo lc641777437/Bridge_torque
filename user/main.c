@@ -33,21 +33,32 @@ static void SystemConfiguration(void)
 {
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     delay_init();
+
     GPIO_init();
-    UART_Init();
-    My_Flash_Read();
+
     TIM_Init();
+
+    UART_Init();
+
     EXTI_Configuration();
-    mymem_init(SRAMIN);
-    exfuns_init();//为fatfs相关变量申请内存
-    SD_Card_Init();
+
+    My_Flash_Read();
+
     ads1258_Init();
-    My_RTC_Init();//初始化RTC
+
+    mymem_init(SRAMIN);
+    while(exfuns_init() != 0);//为fatfs相关变量申请内存
+    SD_Card_Init();
+
+    USB_Init();
+
+
+    while(My_RTC_Init() != 0);//初始化RTC
     RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,59);
     RTC_Set_AlarmA(1,0,0,0);
+
     lcd12864_GPIO_Init();
     LCD_Init();
-    USB_Init();
     TIM14_IT_ENABLE();
 }
 
@@ -62,7 +73,7 @@ int main(void)
             if(get_Save_Flag())
             {
                 set_Save_Flag(0);
-                Save_AD_RawData_USB();
+                ads1258_SaveDataByUSB();
             }
         }
         else if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON)
@@ -70,7 +81,7 @@ int main(void)
             if(get_Save_Flag())
             {
                 set_Save_Flag(0);
-                Save_AD_RawData_SD();
+                ads1258_SaveDataBySD();
             }
         }
 	}

@@ -119,11 +119,11 @@ void EXTI9_5_IRQHandler(void)
                 convert_AD_RawData();
                 if(get_Send_Flag() == SEND_BY_UART1)
                 {
-                    USART1_Send_AD_RawData();
+                    ads1258_SendDataBy232();
                 }
                 else if(get_Send_Flag() == SEND_BY_UART3)
                 {
-                    USART3_Send_AD_RawData();
+                    ads1258_SendDataBy433();
                 }
                 set_Save_Flag(1);
             }

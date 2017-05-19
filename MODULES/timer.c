@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "usart.h"
 #include "ads1258.h"
+#include "setting.h"
 #include "usbh_usr.h"
 #include "lcd12864.h"
 #include "stmflash.h"

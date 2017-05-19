@@ -116,6 +116,7 @@ SD_Error SD_Init(void)
     }
     return errorstatus;
 }
+
 //SDIO时钟初始化设置
 //clkdiv:时钟分频系数
 //CK时钟=SDIOCLK/[clkdiv+2];(SDIOCLK时钟固定为48Mhz)
@@ -126,7 +127,6 @@ void SDIO_Clock_Set(u8 clkdiv)
  	tmpreg |= clkdiv;
 	SDIO->CLKCR = tmpreg;
 }
-
 
 //卡上电
 //查询所有SDIO接口上的卡设备,并查询其电压和配置时钟
@@ -1728,14 +1728,10 @@ void check_SD_Card(void)
             case SDIO_HIGH_CAPACITY_SD_CARD:LOG_DEBUG("Card Type:SDHC V2.0\r\n");break;
             case SDIO_MULTIMEDIA_CARD:LOG_DEBUG("Card Type:MMC Card\r\n");break;
         }
-        delay_ms(10);
-        LOG_DEBUG("Card ManufacturerID:%d\r\n",SDCardInfo.SD_cid.ManufacturerID);
-        delay_ms(10);
-        LOG_DEBUG("Card RCA:%d\r\n",SDCardInfo.RCA);
-        delay_ms(10);
-        LOG_DEBUG("Card Capacity:%d MB\r\n",(u32)(SDCardInfo.CardCapacity>>20));
-        delay_ms(10);
-        LOG_DEBUG("Card BlockSize:%d\r\n\r\n",SDCardInfo.CardBlockSize);
+        LOG_DEBUG("Card ManufacturerID:%d\r\n", SDCardInfo.SD_cid.ManufacturerID);
+        LOG_DEBUG("Card RCA:%d\r\n", SDCardInfo.RCA);
+        LOG_DEBUG("Card Capacity:%d MB\r\n", (u32)(SDCardInfo.CardCapacity>>20));
+        LOG_DEBUG("Card BlockSize:%d\r\n\r\n", SDCardInfo.CardBlockSize);
     }
     else
     {
@@ -1752,7 +1748,7 @@ void SD_Card_Init(void)
 
     if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == OFF)
     {
-        fatfs_init();
+        fatfs_init_SD();
     }
 }
 

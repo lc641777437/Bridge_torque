@@ -107,7 +107,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     if(pBuf)
     {
         u8 rate = 0;
-        u32 flash = get_FlashState(3);
+        u32 flash = get_FlashValue(FLASH_FREQ);
         rate = flash;
         USART_Send_Bytes_Directly(usart, 0X17, &rate, 1);
     }
@@ -116,7 +116,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     if(pBuf)
     {
         u8 state[2] = {0};
-        u32 flash = get_FlashState(1);
+        u32 flash = get_FlashValue(FLASH_CTRL);
         state[0] = (u8)(flash>>8);
         state[1] = (u8)flash;
         USART_Send_Bytes_Directly(usart, 0x18, state, 2);

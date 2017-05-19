@@ -94,7 +94,7 @@ void ads1258_ReadData(void)
 void ad_Data_Proc_Gprs(void)
 {
     convert_AD_RawData_avr();
-    USART2_Send_Data();
+    ads1258_SendDataBy808();
 }
 
 void ads1258_SampleProc(void)
@@ -177,30 +177,30 @@ void convert_AD_RawData(void)
     }
 }
 
-void USART1_Send_AD_RawData(void)// wired 232
+void ads1258_SendDataBy232(void)// wired 232
 {
     USART1_Send_Bytes(SendBuf, DATA_2_PC_LEN);
 }
 
-void USART2_Send_Data(void)// simcom
+void ads1258_SendDataBy808(void)// simcom
 {
     USART2_Send_Bytes(SendBuf_avr, DATA_2_SIMCOM_LEN);
 }
 
-void USART3_Send_AD_RawData(void)// wireless 433
+void ads1258_SendDataBy433(void)// wireless 433
 {
     USART3_Send_Bytes(SendBuf, DATA_2_PC_LEN);
 }
 
-void Save_AD_RawData_SD(void)
+void ads1258_SaveDataBySD(void)
 {
     static int Date_Now_SD = 0;
     char FileName[FILE_NAME_LEN];
     RTC_TimeTypeDef RTC_TimeStruct;
     RTC_DateTypeDef RTC_DateStruct;
+
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
     RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
-
     if(Date_Now_SD != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
     {
         mf_close();
@@ -225,15 +225,15 @@ void Save_AD_RawData_SD(void)
     mf_write("\r\n", 2);
 }
 
-void Save_AD_RawData_USB(void)
+void ads1258_SaveDataByUSB(void)
 {
     static int Date_Now_USB = 0;
     char FileName[FILE_NAME_LEN];
     RTC_TimeTypeDef RTC_TimeStruct;
     RTC_DateTypeDef RTC_DateStruct;
+
     RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
     RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
-
     if(Date_Now_USB != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
     {
         mf_close();

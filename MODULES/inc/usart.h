@@ -11,6 +11,8 @@
 
 #include "stm32f4xx.h"
 
+#include "delay.h"
+
 void UART_Init(void);
 void USART2_RECV_Timeout(void);
 void USART3_RECV_Timeout(void);
@@ -32,8 +34,8 @@ void select_USART(u8 channel);
 
 #define USART_MAX_RECV_LEN (512)
 
-#if 0
-//#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
+#if 1
+#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__);delay_ms(10)
 #else
 #define LOG_DEBUG(fmt, ...)
 #endif
