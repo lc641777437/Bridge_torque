@@ -183,11 +183,6 @@ void USART3_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-void USART3_RECV_Timeout(void)// uart3 timeout
-{
-    pc_message_proc(USART3, USART3_RX_BUF);
-}
-
 void USART3_IRQHandler(void)
 {
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)//接收中断(接收到的数据必须是0x0d 0x0a结尾)
@@ -202,7 +197,6 @@ void USART3_IRQHandler(void)
             USART3_RX_STA = 0;
             if(res == 0x0a)//接收完成了
             {
-                TIM3_set(0);
                 pc_message_proc(USART3, USART3_RX_BUF);
             }
         }
@@ -214,7 +208,6 @@ void USART3_IRQHandler(void)
             }
             else
             {
-                TIM3_set(1);
                 USART3_RX_BUF[USART3_RX_STA++ & 0X3FFF] = res;
                 if(USART3_RX_STA > (USART_MAX_RECV_LEN - 1))
                 {

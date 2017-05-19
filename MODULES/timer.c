@@ -8,6 +8,7 @@
 #include "gpio.h"
 #include "timer.h"
 #include "usart.h"
+#include "setting.h"
 #include "ads1258.h"
 #include "usbh_usr.h"
 #include "lcd12864.h"
@@ -103,7 +104,6 @@ void TIM3_IRQHandler(void)
     if(TIM_GetITStatus(TIM3,TIM_IT_Update)==SET)
     {
         TIM3_set(0);
-        USART3_RECV_Timeout();
     }
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
 }

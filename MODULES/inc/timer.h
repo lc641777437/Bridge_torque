@@ -10,9 +10,6 @@
 #include <string.h>
 #include "stm32f4xx.h"
 
-#define Sign_IN PFin(2)
-#define Sign_OUT PFout(3)
-
 void TIM_Init(void);
 
 void TIM2_Init(void);
@@ -27,6 +24,5 @@ void TIM13_Init(void);
 void TIM13_Enable(u8 state);
 void TIM14_Init(void);
 void TIM14_IT_ENABLE(void);
-
 
 #endif/*__TIMER_H__*/
