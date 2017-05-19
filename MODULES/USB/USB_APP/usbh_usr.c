@@ -175,7 +175,6 @@ int USBH_USR_MSC_Application(void)
   	{
     	case USH_USR_FS_INIT://初始化文件系统
 			AppState = USH_USR_FS_TEST;
-            set_DeviceState(DEVICE_USB);
       		break;
 
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
@@ -262,12 +261,24 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 
 u8 USH_User_App(void)
 {
+    u8 res;
+    u32 total,free;
+    f_mount(fs[2], "2:", 1);//挂载U盘
+    res=exf_getfree("2:", &total, &free);
+   if(res==0)
+   {
+        LOG_DEBUG"FATFS OK!");
+        LOG_DEBUG("U Disk Total Size: %d MB", total>>10);
+        LOG_DEBUG("U Disk Free Size: %d MB", free>>10);
+   }
+
+    set_DeviceState(DEVICE_USB);
+    set_DeviceState(DEVICE_USB);
 	return 0;
 }
 
 void USB_Init(void)
 {
-    f_mount(fs[2],"2:",1); 	//挂载U盘
     USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks);
 }
 

@@ -40,7 +40,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
                 USART_Send_Bytes_Directly(usart, CMD_SET_SEQUENCE, NULL, 0);
                 break;
             default:
-                USART_Send_Bytes_Directly(usart, 0x20, NULL, 0);
+                USART_Send_Bytes_Directly(usart, CMD_SET_ERROR, NULL, 0);
                 break;
         }
     }
@@ -74,7 +74,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
         }
         else
         {
-            USART_Send_Bytes_Directly(usart, 0X23, NULL, 0);
+            USART_Send_Bytes_Directly(usart, CMD_SET_ERROR, NULL, 0);
         }
     }
 

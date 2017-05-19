@@ -18,6 +18,7 @@ typedef enum{
     CMD_GET_SEQUENCE = 0X17,
     CMD_GET_CTRL     = 0X18,
 
+    CMD_SET_ERROR    = 0X99
 } CMD_TYPE;
 void pc_message_proc(USART_TypeDef *usart, u8 *buf);
 
