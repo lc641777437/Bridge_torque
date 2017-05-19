@@ -81,7 +81,14 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     pBuf = strstr((char *)buf, "StartToSend");
     if(pBuf)
     {
-        set_Send_Flag(SEND_BY_UART1);
+        if(usart == USART1)
+        {
+            set_Send_Flag(SEND_BY_UART1);
+        }
+        else
+        {
+            set_Send_Flag(SEND_BY_UART3);
+        }
     }
 
     pBuf = strstr((char *)buf, "StopToSend");
