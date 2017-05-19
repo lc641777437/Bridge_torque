@@ -97,7 +97,7 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)
 
 void My_Flash_Read(void)
 {
-    STMFLASH_Read(FALSH_SAVE_ADDR,Flash_State,4);
+    STMFLASH_Read(FALSH_SAVE_ADDR, Flash_State,4);
     set_CtrlState(Flash_State[1]);
     if(Flash_State[3]<500)
     {

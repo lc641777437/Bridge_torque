@@ -28,7 +28,5 @@ void TIM13_Enable(u8 state);
 void TIM14_Init(void);
 void TIM14_IT_ENABLE(void);
 
-void set_Frequent(int fre);
-
 
 #endif/*__TIMER_H__*/

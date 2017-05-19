@@ -29,26 +29,6 @@ static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];
 
-/*send buffer*/
-static u8 USART1_TX_BUF[USART_MAX_RECV_LEN];
-static u8 USART2_TX_BUF[USART_MAX_RECV_LEN];
-static u8 USART3_TX_BUF[USART_MAX_RECV_LEN];
-
-/*input send position*/
-static u32 USART1_TX_ptr_in  = 0;
-static u32 USART2_TX_ptr_in  = 0;
-static u32 USART3_TX_ptr_in  = 0;
-
-/*output send position*/
-static u32 USART1_TX_ptr_out = 0;
-static u32 USART2_TX_ptr_out = 0;
-static u32 USART3_TX_ptr_out = 0;
-
-/*remain buffer length*/
-static u32 USART1_TX_length  = 0;
-static u32 USART2_TX_length  = 0;
-static u32 USART3_TX_length  = 0;
-
 #pragma import(__use_no_semihosting)
 struct __FILE
 {
@@ -122,9 +102,9 @@ void USART1_Configuration(void)
 
 void USART1_IRQHandler(void)
 {
-    u8 res;
     if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
+        u8 res;
         USART_ClearITPendingBit(USART1,USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART1);//(USART1->DR);	//读取接收到的数据
@@ -156,55 +136,13 @@ void USART1_IRQHandler(void)
 
     if( USART_GetITStatus(USART1, USART_IT_TXE) == SET )
     {
-        if(USART1_TX_length > 0)
-        {
-            USART_SendData(USART1, USART1_TX_BUF[USART1_TX_ptr_out]);
-            USART1_TX_ptr_out++;
-            USART1_TX_length--;
-
-            if(USART1_TX_length == 0)
-            {
-                USART_ITConfig(USART1, USART_IT_TXE, DISABLE);//close the Tx interrupt
-            }
-
-            if(USART1_TX_ptr_out == USART_MAX_RECV_LEN)// To avoid buffer overflow
-            {
-                USART1_TX_ptr_out = 0;
-            }
-        }
-        else
+        u8 *data = ads1258_getSendData();
+        USART_SendData(USART1, *(data + DataSendPosition2PC));
+        if(++DataSendPosition2PC >= DATA_2_PC_LEN)
         {
             USART_ITConfig(USART1, USART_IT_TXE, DISABLE);//close the Tx interrupt
         }
     }
-}
-
-static void USART1_Send_Byte(u8 data)
-{
-	while(USART1_TX_length > USART_MAX_RECV_LEN - 2)//avoid overflow
-	{
-		USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-	}
-
-	USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-	USART1_TX_BUF[USART1_TX_ptr_in] = data;
-	USART1_TX_ptr_in++;
-	USART1_TX_length++;
-
-	if(USART1_TX_ptr_in == USART_MAX_RECV_LEN)// avoid overflow
-	{
-		USART1_TX_ptr_in = 0;
-	}
-
-	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);//open the Tx interrupt
-}
-
-void USART1_Send_Bytes(u8 *data,int length)
-{
-	for(int i = 0; i < length; i++)
-	{
-        USART1_Send_Byte(*(data + i));
-	}
 }
 
 
@@ -245,38 +183,9 @@ void USART3_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-static void USART3_Send_Byte(u8 data)
-{
-	while(USART3_TX_length > USART_MAX_RECV_LEN - 2)//avoid overflow
-	{
-		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
-	}
-
-	USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
-	USART3_TX_BUF[USART3_TX_ptr_in] = data;
-	USART3_TX_ptr_in++;
-	USART3_TX_length++;
-
-	if(USART3_TX_ptr_in == USART_MAX_RECV_LEN)// avoid overflow
-	{
-		USART3_TX_ptr_in = 0;
-	}
-
-	USART_ITConfig(USART3, USART_IT_TXE, ENABLE);//open the Tx interrupt
-}
-
-void USART3_Send_Bytes(u8 *data,int length)
-{
-	for(int i = 0; i < length; i++)
-	{
-        USART3_Send_Byte(*(data + i));
-	}
-}
-
 void USART3_RECV_Timeout(void)// uart3 timeout
 {
     pc_message_proc(USART3, USART3_RX_BUF);
-
 }
 
 void USART3_IRQHandler(void)
@@ -284,7 +193,6 @@ void USART3_IRQHandler(void)
     if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)//接收中断(接收到的数据必须是0x0d 0x0a结尾)
 	{
         u8 res;
-
         USART_ClearITPendingBit(USART3, USART_IT_RXNE);
 
 		res = USART_ReceiveData(USART3);//(USART3->DR);	//读取接收到的数据
@@ -318,30 +226,17 @@ void USART3_IRQHandler(void)
 
     if( USART_GetITStatus(USART3, USART_IT_TXE) == SET )
     {
-        if(USART3_TX_length > 0)
+        if( USART_GetITStatus(USART3, USART_IT_TXE) == SET )
         {
-            USART_SendData(USART3, USART3_TX_BUF[USART3_TX_ptr_out]);
-            USART3_TX_ptr_out++;
-            USART3_TX_length--;
-
-            if(USART3_TX_length == 0)
+            u8 *data = ads1258_getSendData();
+            USART_SendData(USART3, *(data + DataSendPosition2PC));
+            if(++DataSendPosition2PC >= DATA_2_PC_LEN)
             {
                 USART_ITConfig(USART3, USART_IT_TXE, DISABLE);//close the Tx interrupt
             }
-
-            if(USART3_TX_ptr_out == USART_MAX_RECV_LEN)// To avoid buffer overflow
-            {
-                USART3_TX_ptr_out = 0;
-            }
-        }
-        else
-        {
-            USART_ITConfig(USART3, USART_IT_TXE, DISABLE);//close the Tx interrupt
         }
     }
 }
-
-
 
 void USART2_Configuration(void)
 {
@@ -394,33 +289,6 @@ void USART2_proc()
     memset(USART2_RX_BUF, 0, USART_MAX_RECV_LEN);
 }
 
-void USART2_Send_Byte(u8 data)
-{
-	while(USART2_TX_length >= USART_MAX_RECV_LEN - 2)//avoid overflow
-	{
-		USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
-	}
-
-	USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
-	USART2_TX_BUF[USART2_TX_ptr_in] = data;
-	USART2_TX_ptr_in++;
-	USART2_TX_length++;
-
-	if(USART2_TX_ptr_in == USART_MAX_RECV_LEN)// avoid overflow
-	{
-		USART2_TX_ptr_in = 0;
-	}
-
-	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);//open the Tx interrupt
-}
-
-void USART2_Send_Bytes(u8 *data,int length)
-{
-	for(int i = 0; i < length; i++)
-	{
-        USART2_Send_Byte(*(data + i));
-	}
-}
 
 void USART2_RECV_Timeout(void)// uart2 timeout
 {
@@ -464,25 +332,14 @@ void USART2_IRQHandler(void)
 
     if( USART_GetITStatus(USART2, USART_IT_TXE) == SET )
     {
-        if(USART2_TX_length > 0)
+        if( USART_GetITStatus(USART2, USART_IT_TXE) == SET )
         {
-            USART_SendData(USART2, USART2_TX_BUF[USART2_TX_ptr_out]);
-            USART2_TX_ptr_out++;
-            USART2_TX_length--;
-
-            if(USART2_TX_length == 0)
+            u8 *data = ads1258_getSendDataAvr();
+            USART_SendData(USART2, *(data + DataSendPosition2Server));
+            if(++DataSendPosition2Server >= DATA_2_SIMCOM_LEN)
             {
                 USART_ITConfig(USART2, USART_IT_TXE, DISABLE);//close the Tx interrupt
             }
-
-            if(USART2_TX_ptr_out == USART_MAX_RECV_LEN)// To avoid buffer overflow
-            {
-                USART2_TX_ptr_out = 0;
-            }
-        }
-        else
-        {
-            USART_ITConfig(USART2, USART_IT_TXE, DISABLE);//close the Tx interrupt
         }
     }
 }

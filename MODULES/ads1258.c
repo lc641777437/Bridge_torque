@@ -25,6 +25,9 @@ typedef enum{
     SAVE_USB    = 2
 } SAVE_POSITION;
 
+u8 DataSendPosition2PC = 0;
+u8 DataSendPosition2Server = 0;
+
 static int ad_Data[ADS1258_CHANNEL_NUM];
 static int ad_Data_Min[ADS1258_CHANNEL_NUM];
 static int ad_Data_Max[ADS1258_CHANNEL_NUM];
@@ -94,12 +97,13 @@ void ads1258_ReadData(void)
 void ad_Data_Proc_Gprs(void)
 {
     convert_AD_RawData_avr();
-    USART2_Send_Data();
+    ads1258_SendDataBy808();
 }
 
 void ads1258_SampleProc(void)
 {
     static int time_10us = 0;
+
     if(time_10us < get_sampleTime()- 1)
     {
         time_10us++;
@@ -107,7 +111,7 @@ void ads1258_SampleProc(void)
     else
     {
         START = 1;
-        time_10us=0;
+        time_10us = 0;
     }
 }
 
@@ -115,6 +119,7 @@ void convert_AD_RawData_avr(void)
 {
     int i;
     int data_Buf;
+
     SendBuf_avr[0] = 'C';
     SendBuf_avr[1] = 'T';
     SendBuf_avr[2] = SendBuf[2];
@@ -130,7 +135,7 @@ void convert_AD_RawData_avr(void)
         SendBuf_avr[4 + 9 * i + 3] = data_Buf>>16;
         SendBuf_avr[4 + 9 * i + 4] = (data_Buf&0xff00)>>8;
         SendBuf_avr[4 + 9 * i + 5] = data_Buf&0xff;
-        data_Buf = ad_Data_Sum[i]/ad_Data_Num[i];
+        data_Buf = ad_Data_Sum[i] / ad_Data_Num[i];
         SendBuf_avr[4 + 9 * i + 6] = data_Buf>>16;
         SendBuf_avr[4 + 9 * i + 7] = (data_Buf&0xff00)>>8;
         SendBuf_avr[4 + 9 * i + 8] = data_Buf&0xff;
@@ -177,19 +182,32 @@ void convert_AD_RawData(void)
     }
 }
 
-void USART1_Send_AD_RawData(void)// wired 232
+u8 *ads1258_getSendData(void)
 {
-    USART1_Send_Bytes(SendBuf, DATA_2_PC_LEN);
+    return SendBuf;
 }
 
-void USART2_Send_Data(void)// simcom
+u8 *ads1258_getSendDataAvr(void)
 {
-    USART2_Send_Bytes(SendBuf_avr, DATA_2_SIMCOM_LEN);
+    return SendBuf_avr;
 }
 
-void USART3_Send_AD_RawData(void)// wireless 433
+void ads1258_SendDataBy232(void)// wired 232
 {
-    USART3_Send_Bytes(SendBuf, DATA_2_PC_LEN);
+    DataSendPosition2PC= 0;
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);//open the Tx interrupt
+}
+
+void ads1258_SendDataBy808(void)// simcom
+{
+    DataSendPosition2Server = 0;
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);//open the Tx interrupt
+}
+
+void ads1258_SendDataBy433(void)// wireless 433
+{
+    DataSendPosition2PC = 0;
+	USART_ITConfig(USART3, USART_IT_TXE, ENABLE);//open the Tx interrupt
 }
 
 void Save_AD_RawData_SD(void)

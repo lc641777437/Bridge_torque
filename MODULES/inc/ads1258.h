@@ -20,14 +20,20 @@ void ad_Data_Proc_Gprs(void);
 void convert_AD_RawData(void);
 void convert_AD_RawData_avr(void);
 
-void USART1_Send_AD_RawData(void);// wired 232
-void USART2_Send_Data(void);// simcom
-void USART3_Send_AD_RawData(void);// wired 433
+u8 *ads1258_getSendData(void);
+u8 *ads1258_getSendDataAvr(void);
+
+void ads1258_SendDataBy232(void);// wired 232
+void ads1258_SendDataBy808(void);// simcom
+void ads1258_SendDataBy433(void);// wired 433
 
 void Save_AD_RawData_SD(void);
 void Save_AD_RawData_USB(void);
 void ad_DataConvert(u8 result[4]);
 
 void ads1258_SampleProc(void);
+
+extern u8 DataSendPosition2PC;
+extern u8 DataSendPosition2Server;
 
 #endif/*__ADS1258_H__*/

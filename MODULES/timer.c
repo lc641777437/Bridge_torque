@@ -15,11 +15,6 @@
 #include "initstate.h"
 #include "fatfs_api.h"
 #include "sdio_sdcard.h"
-extern USBH_HOST  USB_Host;
-extern USB_OTG_CORE_HANDLE  USB_OTG_Core;
-
-int time_s = 0;
-int time_10us = 0;
 
 void TIM_Init(void)
 {
@@ -58,13 +53,12 @@ void TIM2_Init(void)//10us
 
 void TIM2_IRQHandler(void)//10us
 {
-	if(TIM_GetITStatus(TIM2,TIM_IT_Update)==SET) //溢出中断
+	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) //溢出中断
 	{
         ads1258_SampleProc();
         lcd12864_10us_proc();
-
 	}
-	TIM_ClearITPendingBit(TIM2,TIM_IT_Update);  //清除中断标志位
+	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //清除中断标志位
 }
 
 void TIM3_Init(void)//10ms for identify uart3 end
@@ -313,7 +307,7 @@ void TIM14_Init(void)//1s: for check the state of SD card and eth
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    TIM_Cmd(TIM14,ENABLE);
+    TIM_Cmd(TIM14, ENABLE);
     TIM_ITConfig(TIM14,TIM_IT_Update,DISABLE);
 }
 
