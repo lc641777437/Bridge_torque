@@ -23,7 +23,7 @@ void select_USART(u8 channel);
 #define USART_MAX_RECV_LEN (512)
 
 #if 0
-//#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
+#define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)
 #else
 #define LOG_DEBUG(fmt, ...)
 #endif

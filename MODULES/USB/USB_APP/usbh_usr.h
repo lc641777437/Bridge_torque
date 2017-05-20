@@ -16,14 +16,14 @@
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USH_USR_H__
@@ -48,12 +48,12 @@
 /** @defgroup USBH_USR
   * @brief This file is the Header file for usbh_usr.c
   * @{
-  */ 
+  */
 
 
 /** @defgroup USBH_USR_Exported_Types
   * @{
-  */ 
+  */
 
 
 extern  USBH_Usr_cb_TypeDef USR_Callbacks;
@@ -62,40 +62,40 @@ extern  USBH_Usr_cb_TypeDef USR_Callbacks;
 
 /**
   * @}
-  */ 
+  */
 
 
 
 /** @defgroup USBH_USR_Exported_Defines
   * @{
-  */ 
+  */
 /* State Machine for the USBH_USR_ApplicationState */
 #define USH_USR_FS_INIT       	0
-#define USH_USR_FS_TEST   		1  
+#define USH_USR_FS_TEST   		1
 
- 
+
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_USR_Exported_Macros
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_USR_Exported_Variables
   * @{
-  */ 
+  */
 extern  uint8_t USBH_USR_ApplicationState ;
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_USR_Exported_FunctionsPrototype
   * @{
-  */ 
+  */
 void USBH_USR_ApplicationSelected(void);
 void USBH_USR_Init(void);
 void USBH_USR_DeInit(void);
@@ -103,7 +103,7 @@ void USBH_USR_DeviceAttached(void);
 void USBH_USR_ResetDevice(void);
 void USBH_USR_DeviceDisconnected (void);
 void USBH_USR_OverCurrentDetected (void);
-void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed); 
+void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed);
 void USBH_USR_Device_DescAvailable(void *);
 void USBH_USR_DeviceAddressAssigned(void);
 void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
@@ -125,24 +125,26 @@ u8 USBH_UDISK_Read(u8* buf,u32 sector,u32 cnt);
 u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt);
 
 void USB_Init(void);
+u8 USB_Connected(void);
+u8 USB_Disconnected(void);
 
 /**
   * @}
-  */ 
+  */
 
 #endif /*__USH_USR_H__*/
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

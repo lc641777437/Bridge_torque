@@ -70,7 +70,7 @@ void USBH_USR_DeviceAttached(void)//U盘插入
 //检测到U盘拔出
 void USBH_USR_DeviceDisconnected (void)//U盘移除
 {
-    reset_DeviceState(DEVICE_USB);
+    USB_Disconnected();
 	LOG_DEBUG("USB设备拔出!\r\n");
 }
 //复位从机
@@ -96,7 +96,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 	}
 	else
 	{
-        reset_DeviceState(DEVICE_USB);
+        USB_Disconnected();
 		LOG_DEBUG("设备错误!\r\n");
 	}
 }
@@ -151,7 +151,7 @@ void USBH_USR_EnumerationDone(void)
 //无法识别的USB设备
 void USBH_USR_DeviceNotSupported(void)
 {
-    reset_DeviceState(DEVICE_USB);
+    USB_Disconnected();
 	LOG_DEBUG("无法识别的USB设备!\r\n\r\n");
 }
 //等待用户输入按键,执行下一步操作
@@ -162,7 +162,7 @@ USBH_USR_Status USBH_USR_UserInput(void)
 //USB接口电流过载
 void USBH_USR_OverCurrentDetected (void)
 {
-    reset_DeviceState(DEVICE_USB);
+    USB_Disconnected();
 	LOG_DEBUG("端口电流过大!!!\r\n");
 }
 
@@ -178,7 +178,7 @@ int USBH_USR_MSC_Application(void)
       		break;
 
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
-			if(0 == USH_User_App())
+			if(0 == USB_Connected())
             {
                 AppState = USH_USR_FS_INIT;
 			}
@@ -259,23 +259,30 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 	return res;
 }
 
-u8 USH_User_App(void)
+u8 USB_Connected(void)
 {
     u8 res;
     u32 total,free;
+
     f_mount(fs[2], "2:", 1);//挂载U盘
-    res=exf_getfree("2:", &total, &free);
-   if(res==0)
-   {
-        LOG_DEBUG"FATFS OK!");
+    res = exf_getfree("2:", &total, &free);
+    if(res == 0)
+    {
+        LOG_DEBUG("FATFS OK!");
         LOG_DEBUG("U Disk Total Size: %d MB", total>>10);
         LOG_DEBUG("U Disk Free Size: %d MB", free>>10);
-   }
+        set_DeviceState(DEVICE_USB);
+    }
+	return res;
+}
 
-    set_DeviceState(DEVICE_USB);
-    set_DeviceState(DEVICE_USB);
+u8 USB_Disconnected(void)
+{
+    f_mount(0,"2:",1);
+    reset_DeviceState(DEVICE_USB);
 	return 0;
 }
+
 
 void USB_Init(void)
 {

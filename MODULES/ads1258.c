@@ -257,8 +257,8 @@ void Save_AD_RawData_USB(void)
         mf_close();
         Date_Now_USB = RTC_TimeStruct.RTC_Minutes;
         SavePosition = SAVE_USB;
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "2:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s",
+        "2:/20", RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
         RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
@@ -266,8 +266,8 @@ void Save_AD_RawData_USB(void)
     {
         SavePosition = SAVE_USB;
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "2:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
+        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s",
+        "2:/20", RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
         RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
         mf_open((u8 *)FileName, FA_WRITE);
     }

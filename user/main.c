@@ -43,8 +43,8 @@ static void SystemConfiguration(void)
     SD_Card_Init();
     ads1258_Init();
     My_RTC_Init();//≥ı ºªØRTC
-    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits,59);
-    RTC_Set_AlarmA(1,0,0,0);
+    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits, 59);
+    //RTC_Set_AlarmA(1,0,0,0);
     lcd12864_GPIO_Init();
     LCD_Init();
     USB_Init();
@@ -57,7 +57,7 @@ int main(void)
 	while(1)
 	{
         USBH_Process(&USB_OTG_Core, &USB_Host);
-        if(get_DeviceState(DEVICE_USB) == ON)
+        if(get_DeviceState(DEVICE_USB) == ON && get_DeviceState(DEVICE_FATFS) == ON)
         {
             if(get_Save_Flag())
             {
