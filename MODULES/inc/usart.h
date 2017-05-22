@@ -20,7 +20,7 @@ void select_USART(u8 channel);
 #define send_USART2(fmt, ...) select_USART(2);printf (fmt, ##__VA_ARGS__)
 #define send_USART3(fmt, ...) select_USART(3);printf (fmt, ##__VA_ARGS__)
 
-#define USART_MAX_RECV_LEN (512)
+#define USART_MAX_RECV_LEN (128)
 
 #if 0
 #define LOG_DEBUG(fmt, ...) send_USART1(fmt, ##__VA_ARGS__)

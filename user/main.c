@@ -43,7 +43,6 @@ static void SystemConfiguration(void)
     SD_Card_Init();
     ads1258_Init();
     My_RTC_Init();//≥ı ºªØRTC
-    RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits, 59);
     //lcd12864_GPIO_Init();
     //LCD_Init();
     USB_Init();

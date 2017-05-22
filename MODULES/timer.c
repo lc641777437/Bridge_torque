@@ -275,10 +275,10 @@ void TIM8_UP_TIM13_IRQHandler(void)
         if(PIN_RESET == 0)
         {
             set_Frequent(200);
-            set_CtrlState(0xffff);
+            set_CtrlState(0xFFFF);
             flash_setValue(FLASH_ADDR, 1);
             flash_setValue(FLASH_DEVID, 1001);
-            flash_setValue(FLASH_CTRL, 0xffff);
+            flash_setValue(FLASH_CTRL, 0xFFFF);
             flash_setValue(FLASH_FREQUENCE, 200);
         }
     }

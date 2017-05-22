@@ -12,6 +12,7 @@
 #include "stmflash.h"
 #include "initstate.h"
 #include "PC_message_proc.h"
+#include "Sim808_message_proc.h"
 /*
     USART1 232
     USART2 SIM808
@@ -268,25 +269,9 @@ void USART2_Configuration(void)
     NVIC_Init(&nvic);
 }
 
-void USART2_proc()
-{
-    sim808_message_proc(USART2, USART2_RX_BUF);
-    int year,month,date,hour,minute,second;
-    if(USART2_RX_BUF[0] == '2'&&USART2_RX_BUF[1] == '0')
-    {
-        sscanf((const char*)&USART2_RX_BUF,"%*2d%2d%2d%2d%2d%2d%2d",
-                     &year, &month, &date, &hour, &minute, &second);
-        RTC_Set_Time((u8)hour, (u8)minute, (u8)second,RTC_H12_AM);//设置时间
-        RTC_Set_Date((u8)year, (u8)month, (u8)date,1);//设置日期
-    }
-    USART2_RX_STA = 0;
-    memset(USART2_RX_BUF, 0, USART_MAX_RECV_LEN);
-}
-
-
 void USART2_RECV_Timeout(void)// uart2 timeout
 {
-     USART2_proc();
+    sim808_message_proc(USART2, USART2_RX_BUF);
 }
 
 void USART2_IRQHandler(void)
@@ -305,7 +290,7 @@ void USART2_IRQHandler(void)
             if(res == 0x0a)//接收完成了
             {
 				TIM4_set(0);
-                USART2_proc();
+                sim808_message_proc(USART2, USART2_RX_BUF);
             }
         }
         else//之前还没收到0X0d
