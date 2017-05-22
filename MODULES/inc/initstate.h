@@ -18,7 +18,8 @@ typedef enum{
     DEVICE_SD   = 1,
     DEVICE_ETH  = 2,
     DEVICE_USB  = 3,
-    DEVICE_FATFS= 4,
+    DEVICE_FATFS_SD = 4,
+    DEVICE_FATFS_USB = 5,
 } DEVICE;
 
 void set_DeviceState(DEVICE device);

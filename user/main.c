@@ -57,7 +57,7 @@ int main(void)
 	while(1)
 	{
         USBH_Process(&USB_OTG_Core, &USB_Host);
-        if(get_DeviceState(DEVICE_USB) == ON && get_DeviceState(DEVICE_FATFS) == ON)
+        if(get_DeviceState(DEVICE_USB) == ON && get_DeviceState(DEVICE_FATFS_USB) == ON)
         {
             if(get_Save_Flag())
             {
@@ -65,7 +65,7 @@ int main(void)
                 Save_AD_RawData_USB();
             }
         }
-        else if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON)
+        else if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS_SD) == ON)
         {
             if(get_Save_Flag())
             {

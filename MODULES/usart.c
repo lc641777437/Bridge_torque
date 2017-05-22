@@ -178,7 +178,7 @@ void USART3_Configuration(void)
 
     nvic.NVIC_IRQChannel = USART3_IRQn;
     nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 2;
+    nvic.NVIC_IRQChannelSubPriority = 3;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
@@ -262,8 +262,8 @@ void USART2_Configuration(void)
     USART_Cmd(USART2,ENABLE);
 
     nvic.NVIC_IRQChannel = USART2_IRQn;
-    nvic.NVIC_IRQChannelPreemptionPriority = 1;
-    nvic.NVIC_IRQChannelSubPriority = 3;
+    nvic.NVIC_IRQChannelPreemptionPriority = 0;
+    nvic.NVIC_IRQChannelSubPriority = 2;
     nvic.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&nvic);
 }
@@ -328,8 +328,8 @@ void USART2_IRQHandler(void)
         if( USART_GetITStatus(USART2, USART_IT_TXE) == SET )
         {
             u8 *data = ads1258_getSendDataAvr();
-            USART_SendData(USART2, *(data + DataSendPosition2Server));
-            if(++DataSendPosition2Server >= DATA_2_SIMCOM_LEN)
+            USART_SendData(USART2, *(data + DataSendPosition2Simcom));
+            if(++DataSendPosition2Simcom >= DATA_2_SIMCOM_LEN)
             {
                 USART_ITConfig(USART2, USART_IT_TXE, DISABLE);//close the Tx interrupt
             }

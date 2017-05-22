@@ -116,7 +116,7 @@ void EXTI9_5_IRQHandler(void)
             {
                 START = 0;
                 sample_count = 0;
-                convert_AD_RawData();
+                upgrateBufferSended2Pc();
                 if(get_Send_Flag() == SEND_BY_UART1)
                 {
                     ads1258_SendDataBy232();

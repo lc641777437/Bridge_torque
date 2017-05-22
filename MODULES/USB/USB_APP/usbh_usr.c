@@ -174,14 +174,13 @@ int USBH_USR_MSC_Application(void)
   	switch(AppState)
   	{
     	case USH_USR_FS_INIT://初始化文件系统
-			AppState = USH_USR_FS_TEST;
+    	    fatfs_init_USB();
+            AppState = USH_USR_FS_TEST;
       		break;
 
     	case USH_USR_FS_TEST:	//执行USB OTG 测试主程序
-			if(0 == USB_Connected())
-            {
-                AppState = USH_USR_FS_INIT;
-			}
+                res = USB_Connected();
+                if(res)AppState = USH_USR_FS_INIT;
       		break;
     	default:break;
   	}
@@ -261,24 +260,14 @@ u8 USBH_UDISK_Write(u8* buf,u32 sector,u32 cnt)
 
 u8 USB_Connected(void)
 {
-    u8 res;
-    u32 total,free;
-
-    f_mount(fs[2], "2:", 1);//挂载U盘
-    res = exf_getfree("2:", &total, &free);
-    if(res == 0)
-    {
-        LOG_DEBUG("FATFS OK!");
-        LOG_DEBUG("U Disk Total Size: %d MB", total>>10);
-        LOG_DEBUG("U Disk Free Size: %d MB", free>>10);
-        set_DeviceState(DEVICE_USB);
-    }
-	return res;
+    set_DeviceState(DEVICE_USB);
+	return 0;
 }
 
 u8 USB_Disconnected(void)
 {
-    f_mount(0,"2:",1);
+    u8 res;
+    res = f_mount(0, "2:", 1);
     reset_DeviceState(DEVICE_USB);
 	return 0;
 }
@@ -286,6 +275,7 @@ u8 USB_Disconnected(void)
 
 void USB_Init(void)
 {
+    u8 res;
     USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks);
 }
 

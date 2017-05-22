@@ -1750,9 +1750,9 @@ void SD_Card_Init(void)
         check_SD_Card();
     }
 
-    if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == OFF)
+    if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS_SD) == OFF)
     {
-        fatfs_init();
+        fatfs_init_SD();
     }
 }
 
@@ -1766,7 +1766,7 @@ void SD_1s_CheckProc(void)
     else
     {
         time_s=0;
-        if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS) == ON )
+        if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS_SD) == ON )
         {
             if(SD_GetState() == SD_CARD_ERROR)
             {

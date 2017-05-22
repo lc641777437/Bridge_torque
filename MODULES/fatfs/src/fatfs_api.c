@@ -327,23 +327,33 @@ u8 mf_puts(u8*c)
 	return f_puts((TCHAR*)c,file);
 }
 
-void fatfs_init(void)
+void fatfs_init_SD(void)
 {
-    u8 res = 0;
     u32 total,free;
 
-  	res = f_mount(fs[0],"0:",1); 					//挂载SD卡
-    LOG_DEBUG("RESULT : %d\r\n",res);
-	while(exf_getfree("0",&total,&free))	//得到SD卡的总容量和剩余容量
+  	u8 res = f_mount(fs[0], "0:", 1);//挂载SD卡
+	res = exf_getfree("0", &total, &free);//得到SD卡的总容量和剩余容量
+	if(res == 0)
 	{
-		LOG_DEBUG("SD Card Fatfs Error!");
-		delay_ms(200);
+        LOG_DEBUG("FATFS OK!\r\n");
+        LOG_DEBUG("SD Total Size:%d MB", total >> 10);
+        LOG_DEBUG("SD Free Size:%d MB", free >> 10);
 	}
-	LOG_DEBUG("FATFS OK!\r\n");
-    delay_ms(10);
-	LOG_DEBUG("SD Total Size:%d MB",total>>10);
-    delay_ms(10);
-	LOG_DEBUG("SD  Free Size:%d MB",free>>10);
-    set_DeviceState(DEVICE_SD);
+    set_DeviceState(DEVICE_FATFS_SD);
+}
+
+void fatfs_init_USB(void)
+{
+    u32 total,free;
+
+  	u8 res = f_mount(fs[2], "2:", 1);//挂载USB卡
+	res = exf_getfree("0", &total, &free);//得到USB卡的总容量和剩余容量
+	if(res == 0)
+	{
+        LOG_DEBUG("FATFS OK!\r\n");
+        LOG_DEBUG("SD Total Size:%d MB", total >> 10);
+        LOG_DEBUG("SD Free Size:%d MB", free >> 10);
+	}
+    set_DeviceState(DEVICE_FATFS_USB);
 }
 

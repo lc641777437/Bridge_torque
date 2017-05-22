@@ -179,8 +179,10 @@ void RTC_WKUP_IRQHandler(void)//1min
 {
 	if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WAKE_UP中断
 	{
+        upgrateBufferSended2Sim808();
+        ads1258_SendDataBy808();
+
 		RTC_ClearFlag(RTC_FLAG_WUTF);	//清除中断标志
-        ad_Data_Proc_Gprs();
 	}
 	EXTI_ClearITPendingBit(EXTI_Line22);//清除中断线22的中断标志
 }
