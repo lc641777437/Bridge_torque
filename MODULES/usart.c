@@ -270,6 +270,7 @@ void USART2_Configuration(void)
 
 void USART2_proc()
 {
+    sim808_message_proc(USART2, USART2_RX_BUF);
     int year,month,date,hour,minute,second;
     if(USART2_RX_BUF[0] == '2'&&USART2_RX_BUF[1] == '0')
     {

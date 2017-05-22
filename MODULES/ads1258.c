@@ -32,13 +32,15 @@ static int ad_Data[ADS1258_CHANNEL_NUM];
 static int ad_Data_Min[ADS1258_CHANNEL_NUM];
 static int ad_Data_Max[ADS1258_CHANNEL_NUM];
 static int ad_Data_Num[ADS1258_CHANNEL_NUM];
-static long int ad_Data_Sum[ADS1258_CHANNEL_NUM];
+static long ad_Data_Sum[ADS1258_CHANNEL_NUM];
 
-static u8 Buf_Sended2PC[DATA_2_PC_LEN]; // 52 Bytes to send 232
-static u8 BufwithCT_Sended2Sim808[DATA_2_SIMCOM_LEN]; // "CT" + 146 Bytes to send to sim808
-static u8 BufwithDT_Sended2Sim808[DATA_2_SIMCOM_DYNAMIC_LEN]; // "DT" + 52 Bytes to send sim808
+static u8 Buf_Sended2PC[DATA_2_PC_LEN];// 52 Bytes to send 232
+static u8 BufwithCT_Sended2Sim808[DATA_2_SIMCOM_LEN];// "CT" + 146 Bytes to send to sim808
+static u8 BufwithDT_Sended2Sim808[DATA_2_SIMCOM_DYNAMIC_LEN];// "DT" + 52 Bytes to send sim808
 
-static SAVE_POSITION SavePosition = SAVE_NULL;  // 1 for SD 2 for USB
+static long long timestampPre = 0;
+static char FileName[FILE_NAME_LEN];
+static SAVE_POSITION SavePosition = SAVE_NULL;
 
 void ads1258_Init(void)
 {
@@ -210,30 +212,23 @@ void ads1258_SendDataBy433(void)// wireless 433
 
 void Save_AD_RawData_SD(void)
 {
-    static int Date_Now_SD = 0;
-    char FileName[FILE_NAME_LEN];
-    RTC_TimeTypeDef RTC_TimeStruct;
-    RTC_DateTypeDef RTC_DateStruct;
-    RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
-    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
+    long long timestampNow = get_timestamp();
 
-    if(Date_Now_SD != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
+    if(timestampNow - timestampPre >= TIME_FOR_SAVE)// 新的时间创建新的文件
     {
-        mf_close();
-        Date_Now_SD = RTC_TimeStruct.RTC_Minutes;
         SavePosition = SAVE_SD;
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "0:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        timestampPre = timestampNow;
+
+        mf_close();
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".txt");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_SD)//换了存储位置 打开原有文件
     {
         SavePosition = SAVE_SD;
+
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s", "0:/20",\
-        RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".txt");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
@@ -244,30 +239,23 @@ void Save_AD_RawData_SD(void)
 
 void Save_AD_RawData_USB(void)
 {
-    static int Date_Now_USB = 0;
-    char FileName[FILE_NAME_LEN];
-    RTC_TimeTypeDef RTC_TimeStruct;
-    RTC_DateTypeDef RTC_DateStruct;
-    RTC_GetTime(RTC_Format_BIN, &RTC_TimeStruct);
-    RTC_GetDate(RTC_Format_BIN, &RTC_DateStruct);
+    long long timestampNow = get_timestamp();
 
-    if(Date_Now_USB != RTC_TimeStruct.RTC_Minutes)// 新的时间创建新的文件
+    if(timestampNow - timestampPre >= TIME_FOR_SAVE)// 新的时间创建新的文件
     {
-        mf_close();
-        Date_Now_USB = RTC_TimeStruct.RTC_Minutes;
         SavePosition = SAVE_USB;
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s",
-        "2:/20", RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        timestampPre = timestampNow;
+
+        mf_close();
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".txt");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_USB)//换了存储位置 打开原有文件
     {
         SavePosition = SAVE_USB;
+
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%02d%02d%02d%02d%02d%02d%s",
-        "2:/20", RTC_DateStruct.RTC_Year, RTC_DateStruct.RTC_Month, RTC_DateStruct.RTC_Date,
-        RTC_TimeStruct.RTC_Hours, RTC_TimeStruct.RTC_Minutes, RTC_TimeStruct.RTC_Seconds, ".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".txt");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 

@@ -35,8 +35,8 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
             case 5:
             case 2:
             case 1:
-                Write_Frequent(values);
                 set_Frequent(values);
+                flash_setValue(FLASH_FREQUENCE, values);
                 USART_Send_Bytes_Directly(usart, CMD_SET_SEQUENCE, NULL, 0);
                 break;
             default:
@@ -50,7 +50,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     {
         USART_Send_Bytes_Directly(usart, CMD_SET_ID, NULL, 0);
         sscanf((const char*)pBuf,"%12s%d", tmp, &values);
-        Write_DeviceID(values);
+        flash_setValue(FLASH_DEVID, values);
     }
 
     pBuf = strstr((char *)buf, "SetCtrlState:");
@@ -58,8 +58,8 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     {
         USART_Send_Bytes_Directly(usart, CMD_SET_CTRL, NULL, 0);
         sscanf((const char*)pBuf, "%13s%x", tmp, &values);
-        Write_CtrlState(values);
         set_CtrlState(values);
+        flash_setValue(FLASH_CTRL, values);
     }
 
     pBuf = strstr((char *)buf, "SetRemoteIP:");
@@ -68,7 +68,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
         sscanf((const char*)pBuf,"%12s%d", tmp, &values);
         if(values >= 0 && values <= 255)
         {
-            Write_IPAddress(values);
+            flash_setValue(FLASH_ADDR, values);
             reset_DeviceState(DEVICE_ETH);
             USART_Send_Bytes_Directly(usart, CMD_SET_ADDR, NULL, 0);
         }
@@ -103,19 +103,19 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     if(pBuf)
     {
         USART_Send_Bytes_Directly(usart, CMD_FACTORY, NULL, 0);
-        Write_Frequent(100);
         set_Frequent(100);
-        Write_CtrlState(0xffff);
-        set_CtrlState(0xffff);
-        Write_DeviceID(1001);
-        Write_IPAddress(1);
+        flash_setValue(FLASH_FREQUENCE, 100);
+        set_CtrlState(0xFFFF);
+        flash_setValue(FLASH_CTRL, 0xFFFF);
+        flash_setValue(FLASH_ADDR, 1);
+        flash_setValue(FLASH_DEVID, 1001);
     }
 
     pBuf = strstr((char *)buf, "GetSampleRate");
     if(pBuf)
     {
         u8 rate = 0;
-        u32 flash = get_FlashState(3);
+        u32 flash = flash_getValue(FLASH_FREQUENCE);
         rate = flash;
         USART_Send_Bytes_Directly(usart, CMD_GET_SEQUENCE, &rate, 1);
     }
@@ -124,7 +124,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     if(pBuf)
     {
         u8 state[2] = {0};
-        u32 flash = get_FlashState(1);
+        u32 flash = flash_getValue(FLASH_CTRL);
         state[0] = (u8)(flash>>8);
         state[1] = (u8)flash;
         USART_Send_Bytes_Directly(usart, CMD_GET_CTRL, state, 2);

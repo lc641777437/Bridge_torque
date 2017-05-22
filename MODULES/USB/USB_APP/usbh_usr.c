@@ -266,8 +266,7 @@ u8 USB_Connected(void)
 
 u8 USB_Disconnected(void)
 {
-    u8 res;
-    res = f_mount(0, "2:", 1);
+    f_mount(0, "2:", 1);
     reset_DeviceState(DEVICE_USB);
 	return 0;
 }
@@ -275,7 +274,6 @@ u8 USB_Disconnected(void)
 
 void USB_Init(void)
 {
-    u8 res;
     USBH_Init(&USB_OTG_Core,USB_OTG_FS_CORE_ID,&USB_Host,&USBH_MSC_cb,&USR_Callbacks);
 }
 

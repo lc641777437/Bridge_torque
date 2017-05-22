@@ -35,7 +35,7 @@ static void SystemConfiguration(void)
     delay_init();
     GPIO_init();
     UART_Init();
-    My_Flash_Read();
+    flash_restore();
     TIM_Init();
     EXTI_Configuration();
     mymem_init(SRAMIN);
@@ -44,9 +44,8 @@ static void SystemConfiguration(void)
     ads1258_Init();
     My_RTC_Init();//≥ı ºªØRTC
     RTC_Set_WakeUp(RTC_WakeUpClock_CK_SPRE_16bits, 59);
-    //RTC_Set_AlarmA(1,0,0,0);
-    lcd12864_GPIO_Init();
-    LCD_Init();
+    //lcd12864_GPIO_Init();
+    //LCD_Init();
     USB_Init();
     TIM14_IT_ENABLE();
 }

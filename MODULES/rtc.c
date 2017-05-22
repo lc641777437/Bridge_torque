@@ -6,9 +6,6 @@
 #include "timer.h"
 
 
-
-NVIC_InitTypeDef   NVIC_InitStructure;
-
 //RTC时间设置
 //hour,min,sec:小时,分钟,秒钟
 //ampm:@RTC_AM_PM_Definitions  :RTC_H12_AM/RTC_H12_PM
@@ -72,7 +69,7 @@ u8 My_RTC_Init(void)
         RTC_Init(&RTC_InitStructure);
 
         RTC_Set_Time(0,0,0,RTC_H12_AM);	//设置时间
-        RTC_Set_Date(0,1,1,1);		//设置日期
+        RTC_Set_Date(0,1,1,1);		//设置日期 2000-01-01
 
         RTC_WriteBackupRegister(RTC_BKP_DR0,0x5050);	//标记已经初始化过了
     }
@@ -86,8 +83,9 @@ u8 My_RTC_Init(void)
 void RTC_Set_AlarmA(u8 week,u8 hour,u8 min,u8 sec)
 {
     EXTI_InitTypeDef   EXTI_InitStructure;
-    RTC_AlarmTypeDef RTC_AlarmTypeInitStructure;
+    NVIC_InitTypeDef   NVIC_InitStructure;
     RTC_TimeTypeDef RTC_TimeTypeInitStructure;
+    RTC_AlarmTypeDef RTC_AlarmTypeInitStructure;
 
     RTC_AlarmCmd(RTC_Alarm_A,DISABLE);//关闭闹钟A
 
@@ -122,6 +120,16 @@ void RTC_Set_AlarmA(u8 week,u8 hour,u8 min,u8 sec)
     NVIC_Init(&NVIC_InitStructure);//配置
 }
 
+//RTC闹钟中断服务函数
+void RTC_Alarm_IRQHandler(void)
+{
+	if(RTC_GetFlagStatus(RTC_FLAG_ALRAF)==SET)//ALARM A中断?
+	{
+		RTC_ClearFlag(RTC_FLAG_ALRAF);//清除中断标志
+	}
+	EXTI_ClearITPendingBit(EXTI_Line17);	//清除中断线17的中断标志
+}
+
 //周期性唤醒定时器设置
 /*wksel:  @ref RTC_Wakeup_Timer_Definitions
 #define RTC_WakeUpClock_RTCCLK_Div16        ((uint32_t)0x00000000)
@@ -135,6 +143,7 @@ void RTC_Set_AlarmA(u8 week,u8 hour,u8 min,u8 sec)
 void RTC_Set_WakeUp(u32 wksel,u16 cnt)//1min
 {
     EXTI_InitTypeDef   EXTI_InitStructure;
+    NVIC_InitTypeDef   NVIC_InitStructure;
 
     RTC_WakeUpCmd(DISABLE);//关闭WAKE UP
 
@@ -161,17 +170,6 @@ void RTC_Set_WakeUp(u32 wksel,u16 cnt)//1min
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x02;//子优先级2
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;//使能外部中断通道
     NVIC_Init(&NVIC_InitStructure);//配置
-}
-
-//RTC闹钟中断服务函数
-void RTC_Alarm_IRQHandler(void)
-{
-
-	if(RTC_GetFlagStatus(RTC_FLAG_ALRAF)==SET)//ALARM A中断?
-	{
-		RTC_ClearFlag(RTC_FLAG_ALRAF);//清除中断标志
-	}
-	EXTI_ClearITPendingBit(EXTI_Line17);	//清除中断线17的中断标志
 }
 
 //RTC WAKE UP中断服务函数

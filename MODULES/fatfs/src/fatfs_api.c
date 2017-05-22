@@ -347,7 +347,7 @@ void fatfs_init_USB(void)
     u32 total,free;
 
   	u8 res = f_mount(fs[2], "2:", 1);//挂载USB卡
-	res = exf_getfree("0", &total, &free);//得到USB卡的总容量和剩余容量
+	res = exf_getfree("2", &total, &free);//得到USB卡的总容量和剩余容量
 	if(res == 0)
 	{
         LOG_DEBUG("FATFS OK!\r\n");

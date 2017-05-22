@@ -57,7 +57,7 @@ void TIM2_IRQHandler(void)//10us
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) //溢出中断
 	{
         ads1258_SampleProc();
-        lcd12864_10us_proc();
+        //lcd12864_10us_proc();
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //清除中断标志位
 }
@@ -215,7 +215,7 @@ void TIM7_IRQHandler(void)
 {
 	if(TIM_GetITStatus(TIM7,TIM_IT_Update)==SET) //溢出中断
 	{
-        LCD_Proc_5ms();
+        //LCD_Proc_5ms();
 	}
 	TIM_ClearITPendingBit(TIM7,TIM_IT_Update);  //清除中断标志位
 }
@@ -274,12 +274,12 @@ void TIM8_UP_TIM13_IRQHandler(void)
     {
         if(PIN_RESET == 0)
         {
-            Write_Frequent(200);
             set_Frequent(200);
-            Write_CtrlState(0xffff);
             set_CtrlState(0xffff);
-            Write_DeviceID(1001);
-            Write_IPAddress(1);
+            flash_setValue(FLASH_ADDR, 1);
+            flash_setValue(FLASH_DEVID, 1001);
+            flash_setValue(FLASH_CTRL, 0xffff);
+            flash_setValue(FLASH_FREQUENCE, 200);
         }
     }
     TIM_Cmd(TIM13,DISABLE);
@@ -320,7 +320,8 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
 {
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
-        show_Update();
+        add_timestamp();
+        //show_Update();
         SD_1s_CheckProc();
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update);

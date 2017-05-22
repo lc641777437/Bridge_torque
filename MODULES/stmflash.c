@@ -5,7 +5,7 @@
 #include "timer.h"
 #include "setting.h"
 
-static u32 Flash_State[4];//0:DEV_ID   1:CTRL_STATE   2:IP_ADDRESS   3:FREQUENCE
+static u32 Flash_State[FLASH_NUM];
 
 //读取指定地址的半字(16位数据)
 //faddr:读地址
@@ -95,13 +95,13 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)
 }
 
 
-void My_Flash_Read(void)
+void flash_restore(void)
 {
-    STMFLASH_Read(FALSH_SAVE_ADDR, Flash_State,4);
-    set_CtrlState(Flash_State[1]);
-    if(Flash_State[3]<500)
+    STMFLASH_Read(FALSH_SAVE_ADDR, Flash_State, FLASH_NUM);
+    set_CtrlState(Flash_State[FLASH_CTRL]);
+    if(Flash_State[FLASH_FREQUENCE] < 500)
     {
-        set_Frequent(Flash_State[3]);
+        set_Frequent(Flash_State[FLASH_FREQUENCE]);
     }
     else
     {
@@ -109,59 +109,15 @@ void My_Flash_Read(void)
     }
 }
 
-u32 get_FlashState(int i)
+void flash_setValue(FLASH_TYPE type, u32 value)
 {
-    if(i>=0&&i<=3)
-    {
-        return Flash_State[i];
-    }
-    else
-    {
-        return 0;
-    }
+    Flash_State[type] = value;
+    STMFLASH_Write(FALSH_SAVE_ADDR, Flash_State, FLASH_NUM);
 }
 
-void Write_DeviceID(u32 DeviceID)
+u32 flash_getValue(FLASH_TYPE type)
 {
-    Flash_State[0]=DeviceID;
-    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
-}
-
-void Write_CtrlState(u32 CtrlState)
-{
-    Flash_State[1]=CtrlState;
-    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
-}
-
-void Write_IPAddress(u32 IPAddress)
-{
-    Flash_State[2]=IPAddress;
-    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
-}
-
-void Write_Frequent(u32 Frequent)
-{
-    Flash_State[3]=Frequent;
-    STMFLASH_Write(FALSH_SAVE_ADDR,Flash_State,4);
-}
-
-void set_CtrlState(u32 CtrlState)
-{
-    CTRL_0=(CtrlState&(1<<0))?1:0;
-    CTRL_1=(CtrlState&(1<<1))?1:0;
-    CTRL_2=(CtrlState&(1<<2))?1:0;
-    CTRL_3=(CtrlState&(1<<3))?1:0;
-    CTRL_4=(CtrlState&(1<<4))?1:0;
-    CTRL_5=(CtrlState&(1<<5))?1:0;
-    CTRL_6=(CtrlState&(1<<6))?1:0;
-    CTRL_7=(CtrlState&(1<<7))?1:0;
-    CTRL_8=(CtrlState&(1<<8))?1:0;
-    CTRL_9=(CtrlState&(1<<9))?1:0;
-    CTRL_10=(CtrlState&(1<<10))?1:0;
-    CTRL_11=(CtrlState&(1<<11))?1:0;
-    CTRL_12=(CtrlState&(1<<12))?1:0;
-    CTRL_13=(CtrlState&(1<<13))?1:0;
-    CTRL_14=(CtrlState&(1<<14))?1:0;
-    CTRL_15=(CtrlState&(1<<15))?1:0;
+    if(type >= FLASH_NUM)return 0;
+    return Flash_State[type];
 }
 

@@ -1,11 +1,12 @@
 /*
- * gpio.c
+ * gpio.h
  *
  *  Created on: 2017/05/18
  *      Author: lc
  */
 #ifndef __GPIO_H__
 #define __GPIO_H__
+#include "sys.h"
 #include "stm32f4xx.h"
 
 #define STATE_15 PFin(2)
