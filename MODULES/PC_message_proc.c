@@ -128,6 +128,12 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
         flash_setValues(1001, 0xFFFF, 200, 1, 200);
     }
 
+
+    pBuf = strstr((char *)buf, CMD_SETSERVER_STR);
+    if(pBuf)
+    {
+    }
+
     memset(buf, 0, USART_MAX_RECV_LEN);
     return;
 }
