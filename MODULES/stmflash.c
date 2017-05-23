@@ -94,19 +94,57 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)
 	}
 }
 
-
 void flash_restore(void)
 {
     STMFLASH_Read(FALSH_SAVE_ADDR, Flash_State, FLASH_NUM);
+
+    if(Flash_State[FLASH_DEVID] < 65536)
+    {
+        set_DevID(Flash_State[FLASH_DEVID]);
+    }
+    else
+    {
+        set_DevID(1001);
+        Flash_State[FLASH_DEVID] = 1001;
+    }
+
+
     set_CtrlState(Flash_State[FLASH_CTRL]);
-    if(Flash_State[FLASH_FREQUENCE] < 500)
+
+
+    if(Flash_State[FLASH_FREQUENCE] < 201)
     {
         set_Frequent(Flash_State[FLASH_FREQUENCE]);
     }
     else
     {
         set_Frequent(200);
+        Flash_State[FLASH_FREQUENCE] = 200;
     }
+
+
+    if(Flash_State[FLASH_SENDTIME_DYNAMIC] < 60)
+    {
+        set_SendTimeDynamic(Flash_State[FLASH_SENDTIME_DYNAMIC]);
+    }
+    else
+    {
+        set_SendTimeDynamic(1);
+        Flash_State[FLASH_SENDTIME_DYNAMIC] = 1;
+    }
+
+
+    if(Flash_State[FLASH_SENDTIME_SERVER] < 60)
+    {
+        set_SendTimeServer(Flash_State[FLASH_SENDTIME_SERVER]);
+    }
+    else
+    {
+        set_SendTimeServer(1);
+        Flash_State[FLASH_SENDTIME_SERVER] = 1;
+    }
+
+    STMFLASH_Write(FALSH_SAVE_ADDR, Flash_State, FLASH_NUM);
 }
 
 void flash_setValue(FLASH_TYPE type, u32 value)
@@ -119,5 +157,16 @@ u32 flash_getValue(FLASH_TYPE type)
 {
     if(type >= FLASH_NUM)return 0;
     return Flash_State[type];
+}
+
+void flash_setValues(u32 devid, u32 ctrl, u32 fre, u32 sendTimeServer, u32 freDynamic)
+{
+    Flash_State[FLASH_DEVID] = devid;
+    Flash_State[FLASH_CTRL] = ctrl;
+    Flash_State[FLASH_FREQUENCE] = fre;
+    Flash_State[FLASH_SENDTIME_SERVER] = sendTimeServer;
+    Flash_State[FLASH_SENDTIME_DYNAMIC] = freDynamic;
+
+    STMFLASH_Write(FALSH_SAVE_ADDR, Flash_State, FLASH_NUM);
 }
 

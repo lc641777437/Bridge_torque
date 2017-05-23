@@ -8,18 +8,26 @@
 #define __PC_MESSAGE_PROC_H__
 #include "stm32f4xx.h"
 typedef enum{
-    CMD_SET_SEQUENCE = 0X10,
-    CMD_SET_ID       = 0X11,
-    CMD_SET_CTRL     = 0X12,
-    CMD_SET_ADDR     = 0X13,
-    CMD_START_SAMPLE = 0X14,
-    CMD_STOP_SAMPLE  = 0X15,
-    CMD_FACTORY      = 0X16,
-    CMD_GET_SEQUENCE = 0X17,
-    CMD_GET_CTRL     = 0X18,
+    CMD_SET_PARAM    = 0X01,
+    CMD_GET_PARAM    = 0X02,
+    CMD_SEND_START   = 0X03,
+    CMD_SEND_STOP    = 0X04,
+    CMD_SET_FACTORY  = 0X05,
 
     CMD_SET_ERROR    = 0X99
 } CMD_TYPE;
+
+typedef struct{
+    u8 devidH;
+    u8 devidL;
+    u8 ctrlH;
+    u8 ctrlL;
+    u8 fre;
+    u8 sendTimeServer;
+    u8 fre_dynamic;
+}MSG_PARAMS;
+
+
 void pc_message_proc(USART_TypeDef *usart, u8 *buf);
 
 #endif/*__PC_MESSAGE_PROC_H__*/

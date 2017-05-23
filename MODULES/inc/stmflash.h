@@ -27,15 +27,17 @@ void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead);   		//´ÓÖ¸¶¨µØÖ·¿ªÊ
 typedef enum{
     FLASH_DEVID = 0,
     FLASH_CTRL,
-    FLASH_ADDR,
     FLASH_FREQUENCE,
+    FLASH_SENDTIME_SERVER,
+    FLASH_SENDTIME_DYNAMIC,
 
     FLASH_NUM
 }FLASH_TYPE;
 
 void flash_restore(void);
-void flash_setValue(FLASH_TYPE type, u32 value);
 u32 flash_getValue(FLASH_TYPE type);
+void flash_setValue(FLASH_TYPE type, u32 value);
+void flash_setValues(u32 devid, u32 ctrl, u32 fre, u32 sendTimeServer, u32 freDynamic);
 
 #endif
 

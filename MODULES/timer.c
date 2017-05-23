@@ -274,12 +274,12 @@ void TIM8_UP_TIM13_IRQHandler(void)
     {
         if(PIN_RESET == 0)
         {
-            set_Frequent(200);
+            set_DevID(1001);
             set_CtrlState(0xFFFF);
-            flash_setValue(FLASH_ADDR, 1);
-            flash_setValue(FLASH_DEVID, 1001);
-            flash_setValue(FLASH_CTRL, 0xFFFF);
-            flash_setValue(FLASH_FREQUENCE, 200);
+            set_Frequent(200);
+            set_SendTimeServer(1);
+            set_SendTimeDynamic(1);
+            flash_setValues(1001, 0xFFFF, 200, 1, 200);
         }
     }
     TIM_Cmd(TIM13,DISABLE);

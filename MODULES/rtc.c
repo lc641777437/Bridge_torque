@@ -1,6 +1,7 @@
 #include "rtc.h"
 #include "delay.h"
 #include "ads1258.h"
+#include "setting.h"
 
 
 //RTC时间设置
@@ -81,10 +82,16 @@ static void RTC_Set_WakeUp(u32 wksel,u16 cnt)//1min
 //RTC WAKE UP中断服务函数
 void RTC_WKUP_IRQHandler(void)//1min
 {
+    static u8 time = 0;
     if(RTC_GetFlagStatus(RTC_FLAG_WUTF)==SET)//WAKE_UP中断
     {
-        upgrateBufferSended2Sim808();
-        ads1258_SendDataBy808();
+        time++;
+        if(time >= get_SendTimeServer())
+        {
+            time = 0;
+            upgrateBufferSended2Sim808();
+            ads1258_SendDataBy808();
+        }
 
         RTC_ClearFlag(RTC_FLAG_WUTF);   //清除中断标志
     }

@@ -1,12 +1,54 @@
 #include "gpio.h"
 #include "setting.h"
 
-static int sample_time = 5 * 100;
+static int devid = 1001;
+
+static int send_time_dynamic = 1;// 1_s 1s
+static int send_time_server = 1;// 1_min 1min
+static int sample_time = 5 * 100; // 10_us 5ms
+
 static long timestamp = ZERO_OF_21_CENTURE;
+
+void set_DevID(int id)
+{
+    devid = id;
+}
+
+int get_DevID(void)
+{
+    return devid;
+}
 
 void set_Frequent(int fre)
 {
     sample_time = US_COUNT_PER_S / fre;
+}
+
+int get_sampleTime(void)
+{
+    return sample_time;
+}
+
+
+void set_SendTimeDynamic(int time)
+{
+    send_time_dynamic = time;
+}
+
+int get_SendTimeDynamic(void)
+{
+    return send_time_dynamic;
+}
+
+
+void set_SendTimeServer(int time)
+{
+    send_time_server = time;
+}
+
+int get_SendTimeServer(void)
+{
+    return send_time_server;
 }
 
 void set_CtrlState(u32 CtrlState)
@@ -28,12 +70,6 @@ void set_CtrlState(u32 CtrlState)
     CTRL_14=(CtrlState&(1<<14))?1:0;
     CTRL_15=(CtrlState&(1<<15))?1:0;
 }
-
-int get_sampleTime(void)
-{
-    return sample_time;
-}
-
 
 void add_timestamp(void)
 {
