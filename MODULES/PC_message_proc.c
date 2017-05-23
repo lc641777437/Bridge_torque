@@ -132,6 +132,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     pBuf = strstr((char *)buf, CMD_SETSERVER_STR);
     if(pBuf)
     {
+        USART_Send_Bytes_Directly(usart, CMD_SET_ERROR, NULL, 0);
     }
 
     memset(buf, 0, USART_MAX_RECV_LEN);

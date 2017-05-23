@@ -13,6 +13,7 @@ typedef enum{
     CMD_SEND_START   = 0X03,
     CMD_SEND_STOP    = 0X04,
     CMD_SET_FACTORY  = 0X05,
+    CMD_SET_SERVER   = 0X06,
 
     CMD_SET_ERROR    = 0X99
 } CMD_TYPE;
