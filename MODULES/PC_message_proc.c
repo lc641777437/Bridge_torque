@@ -14,6 +14,7 @@
 #include "stmflash.h"
 #include "initstate.h"
 #include "PC_message_proc.h"
+#include "Sim808_message_proc.h"
 
 #define CMD_STOPSEND_STR "StopToSend"
 #define CMD_STARTSEND_STR "StartToSend"
@@ -132,7 +133,32 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
     pBuf = strstr((char *)buf, CMD_SETSERVER_STR);
     if(pBuf)
     {
-        USART_Send_Bytes_Directly(usart, CMD_SET_ERROR, NULL, 0);
+        int rc = 0;
+        u32 port = 0;
+        u32 ip[4] = {0};
+        char message[32] = {0};
+        char *server = pBuf + CMD_SETSERVER_LEN;
+
+        rc = sscanf(server,"%u.%u.%u.%u:%d",&ip[0],&ip[1],&ip[2],&ip[3],&port);
+        if(5 == rc)
+        {
+            snprintf(message, 32, "%u.%u.%u.%u:%d",ip[0],ip[1],ip[2],ip[3],port);
+            USART_Send_Bytes_Directly(USART2, SIM808_SET_SERVER, (u8 *)message, strlen(message));
+        }
+        else
+        {
+            char domain[32] = {0};
+            rc = sscanf(server,"%[^:]:%d",domain,&port);
+            if(2 == rc)
+            {
+                snprintf(message, 32, "%s:%d",domain,port);
+                USART_Send_Bytes_Directly(USART2, SIM808_SET_SERVER, (u8 *)message, strlen(message));
+            }
+            else
+            {
+                USART_Send_Bytes_Directly(usart, CMD_SET_ERROR, NULL, 0);
+            }
+        }
     }
 
     memset(buf, 0, USART_MAX_RECV_LEN);
