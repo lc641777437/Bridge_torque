@@ -1,8 +1,14 @@
 #include "rtc.h"
+#include "gpio.h"
 #include "delay.h"
 #include "ads1258.h"
 #include "setting.h"
 
+static u8 dynamicTime = 0;// min
+void resetDynamicTime(void)
+{
+    dynamicTime = 0;
+}
 
 //RTC时间设置
 //hour,min,sec:小时,分钟,秒钟
@@ -91,6 +97,22 @@ void RTC_WKUP_IRQHandler(void)//1min
             time = 0;
             upgradeBufferSended2Sim808();
             ads1258_SendDataBy808();
+        }
+
+        if(get_isDynamic())
+        {
+            if(PIN_TRIGGER == 1)
+            {
+                dynamicTime = 0;
+            }
+            else if(++dynamicTime >= 2)
+            {
+                set_isDynamic(0);
+            }
+        }
+        else
+        {
+            dynamicTime = 0;
         }
 
         RTC_ClearFlag(RTC_FLAG_WUTF);   //清除中断标志

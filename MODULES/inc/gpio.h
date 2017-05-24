@@ -45,6 +45,7 @@
 
 #define START PBout(12)
 #define PIN_RESET PDin(9)
+#define PIN_TRIGGER PEin(9)
 
 void GPIO_init(void);
 

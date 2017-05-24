@@ -1,12 +1,13 @@
-#include "exti.h"
 #include "spi.h"
-#include "ads1258.h"
 #include "sys.h"
+#include "rtc.h"
+#include "gpio.h"
+#include "exti.h"
 #include "usart.h"
 #include "timer.h"
 #include "delay.h"
-#include "gpio.h"
 #include "setting.h"
+#include "ads1258.h"
 
 u8 sample_count = 0;
 
@@ -64,14 +65,14 @@ void EXTI_Configuration(void)
     GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_DOWN;
     GPIO_Init(GPIOG,&GPIO_InitStructure);
 
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG,EXTI_PinSource9);
 
     EXTI_InitStructure.EXTI_Line=EXTI_Line9;
     EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
+    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Rising;// Rising edge
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
 
@@ -134,13 +135,15 @@ void EXTI9_5_IRQHandler(void)
 
     if(EXTI_GetITStatus(EXTI_Line9) != RESET)// system reset
     {
-        if(PDin(9) == 0)
+        if(PIN_RESET == 0)
         {
             TIM13_Enable(1);
         }
-        else if(PEin(9) == 0)
+
+        if(PIN_TRIGGER == 1)
         {
             set_isDynamic(1);
+            resetDynamicTime();
         }
         EXTI_ClearITPendingBit(EXTI_Line9);
     }
