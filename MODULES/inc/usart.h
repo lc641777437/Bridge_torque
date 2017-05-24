@@ -13,6 +13,7 @@
 
 void UART_Init(void);
 void USART2_RECV_Timeout(void);
+void USART2_Send_Bytes_Directly(u8 cmd, u8 *data, int length);
 void USART_Send_Bytes_Directly(USART_TypeDef *uart, u8 cmd, u8 *data, int length);
 
 void select_USART(u8 channel);

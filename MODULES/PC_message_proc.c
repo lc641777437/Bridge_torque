@@ -143,7 +143,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
         if(5 == rc)
         {
             snprintf(message, 32, "%u.%u.%u.%u:%d",ip[0],ip[1],ip[2],ip[3],port);
-            USART_Send_Bytes_Directly(USART2, SIM808_SET_SERVER, (u8 *)message, strlen(message));
+            USART2_Send_Bytes_Directly(SIM808_SET_SERVER, (u8 *)message, strlen(message));
         }
         else
         {
@@ -152,7 +152,7 @@ void pc_message_proc(USART_TypeDef *usart, u8 *buf)
             if(2 == rc)
             {
                 snprintf(message, 32, "%s:%d",domain,port);
-                USART_Send_Bytes_Directly(USART2, SIM808_SET_SERVER, (u8 *)message, strlen(message));
+                USART2_Send_Bytes_Directly(SIM808_SET_SERVER, (u8 *)message, strlen(message));
             }
             else
             {

@@ -338,6 +338,22 @@ void USART_Send_Bytes_Directly(USART_TypeDef *uart, u8 cmd, u8 *data, int length
     }
 }
 
+void USART2_Send_Bytes_Directly(u8 cmd, u8 *data, int length)
+{
+    while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
+    USART_SendData(USART2, 'S');
+    while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
+    USART_SendData(USART2, 'T');
+    while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
+    USART_SendData(USART2, (cmd));
+    for(int i = 0; i < length; i++)
+    {
+        while(USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET);
+        USART_SendData(USART2, *(data + i));
+    }
+}
+
+
 void UART_Init(void)
 {
     USART1_Configuration();

@@ -518,6 +518,11 @@
               <FileType>1</FileType>
               <FilePath>..\MODULES\setting.c</FilePath>
             </File>
+            <File>
+              <FileName>Sim808_message_proc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\MODULES\Sim808_message_proc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
