@@ -19,7 +19,6 @@
 #include "malloc.h"
 #include "exfuns.h"
 #include "ads1258.h"
-#include "lcd12864.h"
 #include "usbh_usr.h"
 #include "stmflash.h"
 #include "initstate.h"
@@ -43,8 +42,6 @@ static void SystemConfiguration(void)
     SD_Card_Init();
     ads1258_Init();
     My_RTC_Init();//≥ı ºªØRTC
-    //lcd12864_GPIO_Init();
-    //LCD_Init();
     USB_Init();
     TIM14_IT_ENABLE();
 }

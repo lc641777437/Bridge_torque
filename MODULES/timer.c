@@ -11,7 +11,6 @@
 #include "setting.h"
 #include "ads1258.h"
 #include "usbh_usr.h"
-#include "lcd12864.h"
 #include "stmflash.h"
 #include "initstate.h"
 #include "fatfs_api.h"
@@ -57,7 +56,6 @@ void TIM2_IRQHandler(void)//10us
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) //溢出中断
 	{
         ads1258_SampleProc();
-        //lcd12864_10us_proc();
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //清除中断标志位
 }
@@ -215,7 +213,6 @@ void TIM7_IRQHandler(void)
 {
 	if(TIM_GetITStatus(TIM7,TIM_IT_Update)==SET) //溢出中断
 	{
-        //LCD_Proc_5ms();
 	}
 	TIM_ClearITPendingBit(TIM7,TIM_IT_Update);  //清除中断标志位
 }
@@ -321,7 +318,6 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
         add_timestamp();
-        //show_Update();
         SD_1s_CheckProc();
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update);
