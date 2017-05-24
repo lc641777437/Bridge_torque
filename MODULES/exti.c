@@ -6,6 +6,7 @@
 #include "timer.h"
 #include "delay.h"
 #include "gpio.h"
+#include "setting.h"
 
 u8 sample_count = 0;
 
@@ -52,28 +53,28 @@ void EXTI_Configuration(void)
 
     EXTI_InitStructure.EXTI_Line=EXTI_Line8;
     EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
 
-    /*SIGNAL IN EXTI*/
-/*  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
+    /*DYNAMIC SAMPLE EXTI*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
-    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9;//SignalIn exti
+    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9;//DYNAMIC exti
     GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_DOWN;
+    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_UP;
     GPIO_Init(GPIOG,&GPIO_InitStructure);
 
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG,EXTI_PinSource9);
 
     EXTI_InitStructure.EXTI_Line=EXTI_Line9;
     EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Rising;
+    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
-*/
+
 
     /*SYSTEM RESET EXTI*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
@@ -89,7 +90,7 @@ void EXTI_Configuration(void)
 
     EXTI_InitStructure.EXTI_Line=EXTI_Line9;
     EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;
+    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
 
@@ -116,7 +117,7 @@ void EXTI9_5_IRQHandler(void)
             {
                 START = 0;
                 sample_count = 0;
-                upgrateBufferSended2Pc();
+                upgradeBufferSended2Pc();
                 if(get_Send_Flag() == SEND_BY_UART1)
                 {
                     ads1258_SendDataBy232();
@@ -133,13 +134,14 @@ void EXTI9_5_IRQHandler(void)
 
     if(EXTI_GetITStatus(EXTI_Line9) != RESET)// system reset
     {
-        /*
-        Sign_OUT=1;
-        Sign_Flag=1;
-        START=1;
-        EXTI_ClearITPendingBit(EXTI_Line9);
-        */
-        TIM13_Enable(1);
+        if(PDin(9) == 0)
+        {
+            TIM13_Enable(1);
+        }
+        else if(PEin(9) == 0)
+        {
+            set_isDynamic(1);
+        }
         EXTI_ClearITPendingBit(EXTI_Line9);
     }
 }

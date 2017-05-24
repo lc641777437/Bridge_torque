@@ -464,11 +464,6 @@
               <FilePath>..\MODULES\initstate.c</FilePath>
             </File>
             <File>
-              <FileName>lcd12864.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\MODULES\lcd12864.c</FilePath>
-            </File>
-            <File>
               <FileName>malloc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\MODULES\malloc.c</FilePath>

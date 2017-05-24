@@ -89,7 +89,7 @@ void RTC_WKUP_IRQHandler(void)//1min
         if(time >= get_SendTimeServer())
         {
             time = 0;
-            upgrateBufferSended2Sim808();
+            upgradeBufferSended2Sim808();
             ads1258_SendDataBy808();
         }
 

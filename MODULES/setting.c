@@ -1,13 +1,37 @@
 #include "gpio.h"
 #include "setting.h"
 
-static int devid = 1001;
+static u8 isDynamic = 0;
+static SEND_TYPE SendingType = SEND_NULL;
 
+static int devid = 1001;
 static int send_time_dynamic = 1;// 1_s 1s
 static int send_time_server = 1;// 1_min 1min
 static int sample_time = 5 * 100; // 10_us 5ms
 
 static long timestamp = ZERO_OF_21_CENTURE;
+
+void set_isDynamic(u8 state)
+{
+    isDynamic = state;
+}
+
+u8 get_isDynamic(void)
+{
+    return isDynamic;
+}
+
+void set_SendingType(SEND_TYPE type)
+{
+    SendingType = type;
+}
+
+u8 get_isSendingType(SEND_TYPE type)
+{
+    if(SendingType == type)return 1;
+    else return 0;
+}
+
 
 void set_DevID(int id)
 {
@@ -19,9 +43,10 @@ int get_DevID(void)
     return devid;
 }
 
+
 void set_Frequent(int fre)
 {
-    sample_time = US_COUNT_PER_S / fre;
+    sample_time = COUNT_10US_PER_S / fre;
 }
 
 int get_sampleTime(void)
@@ -51,6 +76,7 @@ int get_SendTimeServer(void)
     return send_time_server;
 }
 
+
 void set_CtrlState(u32 CtrlState)
 {
     CTRL_0=(CtrlState&(1<<0))?1:0;
@@ -70,6 +96,7 @@ void set_CtrlState(u32 CtrlState)
     CTRL_14=(CtrlState&(1<<14))?1:0;
     CTRL_15=(CtrlState&(1<<15))?1:0;
 }
+
 
 void add_timestamp(void)
 {

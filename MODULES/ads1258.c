@@ -16,31 +16,19 @@
 #include "stmflash.h"
 #include "fatfs_api.h"
 
-#define FILE_NAME_LEN (32)
-#define DeviceID *(vu32*)FALSH_SAVE_ADDR
-
-typedef enum{
-    SAVE_NULL   = 0,
-    SAVE_SD     = 1,
-    SAVE_USB    = 2
-} SAVE_POSITION;
-
 u8 DataSendPosition2PC = 0;
 u8 DataSendPosition2Simcom = 0;
+u8 DataSendDyanamicPosition2Simcom = 0;
 
-static int ad_Data[ADS1258_CHANNEL_NUM];
-static int ad_Data_Min[ADS1258_CHANNEL_NUM];
-static int ad_Data_Max[ADS1258_CHANNEL_NUM];
-static int ad_Data_Num[ADS1258_CHANNEL_NUM];
-static long ad_Data_Sum[ADS1258_CHANNEL_NUM];
+static int ADValue[ADS1258_CHANNEL_NUM];
+static int ADValue_min[ADS1258_CHANNEL_NUM];
+static int ADValue_max[ADS1258_CHANNEL_NUM];
+static int ADValue_count[ADS1258_CHANNEL_NUM];
+static long long ADValue_sum[ADS1258_CHANNEL_NUM];
 
-static u8 Buf_Sended2PC[DATA_2_PC_LEN];// 52 Bytes to send 232
-static u8 BufwithCT_Sended2Sim808[DATA_2_SIMCOM_LEN];// "CT" + 146 Bytes to send to sim808
-static u8 BufwithDT_Sended2Sim808[DATA_2_SIMCOM_DYNAMIC_LEN];// "DT" + 52 Bytes to send sim808
-
-static long long timestampPre = 0;
-static char FileName[FILE_NAME_LEN];
-static SAVE_POSITION SavePosition = SAVE_NULL;
+static u8 ADValueSended2PC[DATA_2_PC_LEN];//  "\XA5\XA5" + 50 Bytes to send 232
+static u8 ADValueSended2Server[DATA_2_SIMCOM_LEN];// "CT" + 146 Bytes to send to sim808
+static u8 ADValueSended2ServerDynamic[DATA_2_SIMCOM_DYNAMIC_LEN];// "DT" + 50 Bytes to send sim808
 
 void ads1258_Init(void)
 {
@@ -69,35 +57,12 @@ void ads1258_WriteRegister(u8 addr,u8 data)
     SPI2_ReadWriteByte(data);
 }
 
-void ad_DataConvert(u8 result[4])
-{
-    ad_Data[result[0]-8] &= 0x00000000;
-    ad_Data[result[0]-8] |= result[1];
-    ad_Data[result[0]-8] <<= 8;
-    ad_Data[result[0]-8] |= result[2];
-    ad_Data[result[0]-8] <<= 8;
-    ad_Data[result[0]-8] |= result[3];
-
-    if(ad_Data[result[0]-8] > ad_Data_Max[result[0]-8])// store max value
-    {
-        ad_Data_Max[result[0]-8] = ad_Data[result[0]-8];
-    }
-
-    if(ad_Data[result[0]-8] < ad_Data_Min[result[0]-8] || ad_Data_Min[result[0]-8] == 0)// store min value
-    {
-        ad_Data_Min[result[0]-8] = ad_Data[result[0]-8];
-    }
-
-    ad_Data_Sum[result[0]-8] += ad_Data[result[0]-8];
-    ad_Data_Num[result[0]-8]++;
-}
-
 void ads1258_ReadData(void)
 {
     SPI_I2S_ITConfig(SPI2,SPI_I2S_IT_TXE,ENABLE);
 }
 
-void ads1258_SampleProc(void)
+void ads1258_SampleProc_10us(void)
 {
     static int time_10us = 0;
 
@@ -112,96 +77,146 @@ void ads1258_SampleProc(void)
     }
 }
 
-void upgrateBufferSended2Sim808(void)
+void ads1258_storeOneChannelData(u8 result[4])
+{
+    ADValue[result[0]-8] &= 0x00000000;
+    ADValue[result[0]-8] |= result[1];
+    ADValue[result[0]-8] <<= 8;
+    ADValue[result[0]-8] |= result[2];
+    ADValue[result[0]-8] <<= 8;
+    ADValue[result[0]-8] |= result[3];
+
+    if(ADValue[result[0]-8] > ADValue_max[result[0]-8])// store max value
+    {
+        ADValue_max[result[0]-8] = ADValue[result[0]-8];
+    }
+
+    if(ADValue[result[0]-8] < ADValue_min[result[0]-8] || ADValue_min[result[0]-8] == 0)// store min value
+    {
+        ADValue_min[result[0]-8] = ADValue[result[0]-8];
+    }
+
+    ADValue_sum[result[0]-8] += ADValue[result[0]-8];
+    ADValue_count[result[0]-8]++;
+}
+
+void upgradeBufferSended2Sim808(void)
 {
     int i;
-    int data_Buf;
+    u32 data;
 
-    BufwithCT_Sended2Sim808[0] = 'C';
-    BufwithCT_Sended2Sim808[1] = 'T';
-    BufwithCT_Sended2Sim808[2] = Buf_Sended2PC[2];
-    BufwithCT_Sended2Sim808[3] = Buf_Sended2PC[3];
+    ADValueSended2Server[0] = 'C';
+    ADValueSended2Server[1] = 'T';
+    ADValueSended2Server[2] = ADValueSended2PC[2];
+    ADValueSended2Server[3] = ADValueSended2PC[3];
 
     for(i = 0;i < ADS1258_CHANNEL_NUM; i++)
     {
-        data_Buf = ad_Data_Max[i];
-        BufwithCT_Sended2Sim808[4 + 9 * i + 0] = data_Buf>>16;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 1] = (data_Buf&0xff00)>>8;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 2] = data_Buf&0xff;
+        data = ADValue_max[i];
+        ADValueSended2Server[4 + 9 * i + 0] = data>>16;
+        ADValueSended2Server[4 + 9 * i + 1] = (data&0xff00)>>8;
+        ADValueSended2Server[4 + 9 * i + 2] = data&0xff;
 
-        data_Buf = ad_Data_Min[i];
-        BufwithCT_Sended2Sim808[4 + 9 * i + 3] = data_Buf>>16;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 4] = (data_Buf&0xff00)>>8;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 5] = data_Buf&0xff;
+        data = ADValue_min[i];
+        ADValueSended2Server[4 + 9 * i + 3] = data>>16;
+        ADValueSended2Server[4 + 9 * i + 4] = (data&0xff00)>>8;
+        ADValueSended2Server[4 + 9 * i + 5] = data&0xff;
 
-        data_Buf = ad_Data_Sum[i] / ad_Data_Num[i];
-        BufwithCT_Sended2Sim808[4 + 9 * i + 6] = data_Buf>>16;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 7] = (data_Buf&0xff00)>>8;
-        BufwithCT_Sended2Sim808[4 + 9 * i + 8] = data_Buf&0xff;
+        data = ADValue_sum[i] / ADValue_count[i];
+        ADValueSended2Server[4 + 9 * i + 6] = data>>16;
+        ADValueSended2Server[4 + 9 * i + 7] = (data&0xff00)>>8;
+        ADValueSended2Server[4 + 9 * i + 8] = data&0xff;
 
-        ad_Data_Sum[i]=0;
-        ad_Data_Max[i]=0;
-        ad_Data_Min[i]=0;
-        ad_Data_Num[i]=0;
+        ADValue_sum[i]=0;
+        ADValue_max[i]=0;
+        ADValue_min[i]=0;
+        ADValue_count[i]=0;
     }
 }
 
-void upgrateBufferSended2Pc(void)
+void upgradeBufferSended2Sim808Dynamic(void)
 {
     int i;
-    int data_Buf;
-    u8 ad_State_send[2];
-    Buf_Sended2PC[0] = 0xA5;
-    Buf_Sended2PC[1] = 0xA5;
-    ad_State_send[0]=STATE_0;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_1;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_2;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_3;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_4;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_5;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_6;
-    ad_State_send[0]=(ad_State_send[0]<<1)|STATE_7;
-    ad_State_send[1]=STATE_8;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_9;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_10;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_11;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_12;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_13;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_14;
-    ad_State_send[1]=(ad_State_send[1]<<1)|STATE_15;
-    Buf_Sended2PC[2] = ad_State_send[0];
-    Buf_Sended2PC[3] = ad_State_send[1];
+    u32 data;
+
+    ADValueSended2ServerDynamic[0] = 'D';
+    ADValueSended2ServerDynamic[1] = 'T';
+    ADValueSended2ServerDynamic[2] = ADValueSended2PC[2];
+    ADValueSended2ServerDynamic[3] = ADValueSended2PC[3];
+
     for(i = 0;i < ADS1258_CHANNEL_NUM; i++)
     {
-        data_Buf = ad_Data[i];
-        Buf_Sended2PC[4 + 3 * i + 0] = data_Buf>>16;
-        data_Buf = ad_Data[i];
-        Buf_Sended2PC[4 + 3 * i + 1] = (data_Buf&0xff00)>>8;
-        data_Buf = ad_Data[i];
-        Buf_Sended2PC[4 + 3 * i + 2] = data_Buf&0xff;
+        data = ADValue_sum[i] / ADValue_count[i];
+        ADValueSended2ServerDynamic[4 + 3 * i + 0] = data>>16;
+        ADValueSended2ServerDynamic[4 + 3 * i + 1] = (data&0xff00)>>8;
+        ADValueSended2ServerDynamic[4 + 3 * i + 2] = data&0xff;
+
+        ADValue_sum[i]=0;
+        ADValue_max[i]=0;
+        ADValue_min[i]=0;
+        ADValue_count[i]=0;
     }
 }
 
-u8 *ads1258_getSendData(void)
+
+void upgradeBufferSended2Pc(void)
 {
-    return Buf_Sended2PC;
+    int i = 0;
+    u32 data = 0;
+    u8 state[2] = {0};
+
+    state[0]=STATE_0;
+    state[0]=(state[0]<<1)|STATE_1;
+    state[0]=(state[0]<<1)|STATE_2;
+    state[0]=(state[0]<<1)|STATE_3;
+    state[0]=(state[0]<<1)|STATE_4;
+    state[0]=(state[0]<<1)|STATE_5;
+    state[0]=(state[0]<<1)|STATE_6;
+    state[0]=(state[0]<<1)|STATE_7;
+    state[1]=STATE_8;
+    state[1]=(state[1]<<1)|STATE_9;
+    state[1]=(state[1]<<1)|STATE_10;
+    state[1]=(state[1]<<1)|STATE_11;
+    state[1]=(state[1]<<1)|STATE_12;
+    state[1]=(state[1]<<1)|STATE_13;
+    state[1]=(state[1]<<1)|STATE_14;
+    state[1]=(state[1]<<1)|STATE_15;
+
+    ADValueSended2PC[0] = 0xA5;
+    ADValueSended2PC[1] = 0xA5;
+    ADValueSended2PC[2] = state[0];
+    ADValueSended2PC[3] = state[1];
+    for(i = 0;i < ADS1258_CHANNEL_NUM; i++)
+    {
+        data = ADValue[i];
+        ADValueSended2PC[4 + 3 * i + 0] = data>>16;
+        data = ADValue[i];
+        ADValueSended2PC[4 + 3 * i + 1] = (data&0xff00)>>8;
+        data = ADValue[i];
+        ADValueSended2PC[4 + 3 * i + 2] = data&0xff;
+    }
 }
 
-u8 *ads1258_getSendDataAvr(void)
+u8 *ads1258_getADValueSended2PC(void)
 {
-    return BufwithCT_Sended2Sim808;
+    return ADValueSended2PC;
 }
+
+u8 *ads1258_getADValueSended2Server(void)
+{
+    return ADValueSended2Server;
+}
+
+u8 *ads1258_getADValueSended2ServerDynamic(void)
+{
+    return ADValueSended2ServerDynamic;
+}
+
 
 void ads1258_SendDataBy232(void)// wired 232
 {
     DataSendPosition2PC= 0;
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);//open the Tx interrupt
-}
-
-void ads1258_SendDataBy808(void)// simcom
-{
-    DataSendPosition2Simcom = 0;
-	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);//open the Tx interrupt
 }
 
 void ads1258_SendDataBy433(void)// wireless 433
@@ -210,6 +225,35 @@ void ads1258_SendDataBy433(void)// wireless 433
 	USART_ITConfig(USART3, USART_IT_TXE, ENABLE);//open the Tx interrupt
 }
 
+void ads1258_SendDataBy808(void)// simcom
+{
+    if(get_isSendingType(SEND_NULL))
+    {
+        set_SendingType(SEND_CT);
+        DataSendPosition2Simcom = 0;
+    	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);//open the Tx interrupt
+    }
+}
+
+void ads1258_SendDynamicDataBy808(void)// simcom
+{
+    if(get_isSendingType(SEND_NULL))
+    {
+        set_SendingType(SEND_DT);
+        DataSendDyanamicPosition2Simcom = 0;
+    	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);//open the Tx interrupt
+    }
+}
+
+typedef enum{
+    SAVE_NULL   = 0,
+    SAVE_SD     = 1,
+    SAVE_USB    = 2
+} SAVE_POSITION;
+#define FILE_NAME_LEN (32)
+static long long timestampPre = 0;
+static char FileName[FILE_NAME_LEN] = {0};
+static SAVE_POSITION SavePosition = SAVE_NULL;
 void Save_AD_RawData_SD(void)
 {
     long long timestampNow = get_timestamp();
@@ -232,7 +276,7 @@ void Save_AD_RawData_SD(void)
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
-    mf_write((u8 *)Buf_Sended2PC, DATA_2_PC_LEN);
+    mf_write((u8 *)ADValueSended2PC, DATA_2_PC_LEN);
     mf_write("\r\n", 2);
     return;
 }
@@ -259,7 +303,7 @@ void Save_AD_RawData_USB(void)
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
-    mf_write((u8 *)Buf_Sended2PC, DATA_2_PC_LEN);
+    mf_write((u8 *)ADValueSended2PC, DATA_2_PC_LEN);
     mf_write("\r\n", 2);
     return;
 }

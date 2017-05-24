@@ -51,12 +51,6 @@ void GPIO_init(void)
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(GPIOD, &GPIO_InitStructure);
 
-    /*SingnalOut initial*/
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_Init(GPIOF, &GPIO_InitStructure);
-
     CTRL_0=0;
     CTRL_1=0;
     CTRL_2=0;

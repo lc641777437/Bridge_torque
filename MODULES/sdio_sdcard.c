@@ -1759,11 +1759,7 @@ void SD_Card_Init(void)
 void SD_1s_CheckProc(void)
 {
     static u8 time_s = 0;
-    if(time_s < 19)
-    {
-        time_s++;
-    }
-    else
+    if(++time_s >= 30)
     {
         time_s=0;
         if(get_DeviceState(DEVICE_SD) == ON && get_DeviceState(DEVICE_FATFS_SD) == ON )
@@ -1771,7 +1767,6 @@ void SD_1s_CheckProc(void)
             if(SD_GetState() == SD_CARD_ERROR)
             {
                 reset_DeviceState(DEVICE_SD);
-                LOG_DEBUG("SD LOST\r\n");
             }
         }
         else

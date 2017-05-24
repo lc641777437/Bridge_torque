@@ -154,7 +154,7 @@ void SPI2_IRQHandler(void)
             spi_Count_S = 0;
             iData[0] &= 0x1f;
             sample_count++;
-            ad_DataConvert(iData);// one channel value into ad adta
+            ads1258_storeOneChannelData(iData);// one channel value into ad adta
             SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_TXE, DISABLE);
         }
     }

@@ -55,19 +55,19 @@ void TIM2_IRQHandler(void)//10us
 {
 	if(TIM_GetITStatus(TIM2, TIM_IT_Update) == SET) //溢出中断
 	{
-        ads1258_SampleProc();
+        ads1258_SampleProc_10us();
 	}
 	TIM_ClearITPendingBit(TIM2, TIM_IT_Update);  //清除中断标志位
 }
 
-void TIM3_Init(void)//10ms for identify uart3 end
+void TIM3_Init(void)// 1s for check SD card
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 100 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1;
     TIM_TimeBaseInitStructure.TIM_Prescaler = 8400 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up;
     TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
@@ -81,27 +81,14 @@ void TIM3_Init(void)//10ms for identify uart3 end
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    TIM_Cmd(TIM3,ENABLE);
+    TIM_Cmd(TIM3,DISABLE);
 }
 
-void TIM3_set(u8 sta)
-{
-    TIM3->CNT=0;
-    if(sta)
-    {
-        TIM3->CR1|=1<<0;
-    }
-    else
-    {
-        TIM3->CR1&=~(1<<0);
-    }
-}
-
-void TIM3_IRQHandler(void)
+void TIM3_IRQHandler(void)// 1s for check SD card
 {
     if(TIM_GetITStatus(TIM3,TIM_IT_Update)==SET)
     {
-        TIM3_set(0);
+        SD_1s_CheckProc();
     }
     TIM_ClearITPendingBit(TIM3,TIM_IT_Update);
 }
@@ -174,10 +161,10 @@ void TIM5_Init(void)//10ms
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    TIM_Cmd(TIM5,ENABLE);
+    TIM_Cmd(TIM5,DISABLE);
 }
 
-void TIM5_IRQHandler(void)
+void TIM5_IRQHandler(void)//10ms
 {
 	if(TIM_GetITStatus(TIM5,TIM_IT_Update)==SET) //溢出中断
 	{
@@ -209,7 +196,7 @@ void TIM7_Init(void)//5ms
     TIM_Cmd(TIM7,DISABLE);
 }
 
-void TIM7_IRQHandler(void)
+void TIM7_IRQHandler(void)//5ms
 {
 	if(TIM_GetITStatus(TIM7,TIM_IT_Update)==SET) //溢出中断
 	{
@@ -250,6 +237,8 @@ void TIM13_Init(void)//2s: for system reset
     NVIC_InitStructure.NVIC_IRQChannelSubPriority=0x02;
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
+
+    TIM_Cmd(TIM13,DISABLE);
 }
 
 void TIM13_Enable(u8 state)
@@ -265,7 +254,7 @@ void TIM13_Enable(u8 state)
     TIM13->CNT = 0;
 }
 
-void TIM8_UP_TIM13_IRQHandler(void)
+void TIM8_UP_TIM13_IRQHandler(void)// 2s: for system reset
 {
     if(TIM_GetITStatus(TIM13,TIM_IT_Update)==SET)
     {
@@ -279,21 +268,21 @@ void TIM8_UP_TIM13_IRQHandler(void)
             flash_setValues(1001, 0xFFFF, 200, 1, 200);
         }
     }
-    TIM_Cmd(TIM13,DISABLE);
+    TIM13_Enable(0);
     TIM_ClearITPendingBit(TIM13,TIM_IT_Update);
 }
 
-void TIM14_Init(void)//1s: for check the state of SD card and eth
+void TIM14_Init(void)//1s: for check the state of SD card
 {
     TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14,ENABLE);
 
-    TIM_TimeBaseInitStructure.TIM_Period = 5000 - 1;
+    TIM_TimeBaseInitStructure.TIM_Period = 10000 - 1;
     TIM_TimeBaseInitStructure.TIM_Prescaler= 8400 - 1;
     TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up;
-    TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV1;
+    TIM_TimeBaseInitStructure.TIM_ClockDivision=TIM_CKD_DIV4;
     TIM_TimeBaseInit(TIM14,&TIM_TimeBaseInitStructure);
 
     TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE);
@@ -313,12 +302,21 @@ void TIM14_IT_ENABLE(void)
     TIM_ITConfig(TIM14,TIM_IT_Update,ENABLE);
 }
 
-void TIM8_TRG_COM_TIM14_IRQHandler(void)
+void TIM8_TRG_COM_TIM14_IRQHandler(void)// 1s
 {
+    static int time_s = 0;
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
         add_timestamp();
-        SD_1s_CheckProc();
+        if(++time_s >= get_SendTimeDynamic())
+        {
+            time_s = 0;
+            if(get_isDynamic())
+            {
+                upgradeBufferSended2Sim808Dynamic();
+                ads1258_SendDynamicDataBy808();
+            }
+        }
     }
     TIM_ClearITPendingBit(TIM14,TIM_IT_Update);
 }

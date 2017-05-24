@@ -9,16 +9,12 @@
 #include "usart.h"
 #include "timer.h"
 #include "ads1258.h"
+#include "setting.h"
 #include "stmflash.h"
 #include "initstate.h"
 #include "PC_message_proc.h"
 #include "Sim808_message_proc.h"
-/*
-    USART1 232
-    USART2 SIM808
-    USART3 433
-*/
-static u8 printf_channel;
+
 
 /*receive state flag*/
 static u16 USART1_RX_STA = 0;//接收状态标记
@@ -29,40 +25,6 @@ static u16 USART3_RX_STA = 0;//接收状态标记
 static u8 USART1_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART2_RX_BUF[USART_MAX_RECV_LEN];
 static u8 USART3_RX_BUF[USART_MAX_RECV_LEN];
-
-#pragma import(__use_no_semihosting)
-struct __FILE
-{
-	int handle;
-};
-FILE __stdout;
-//重定义fputc函数
-int fputc(int ch, FILE *f)
-{
-    switch(printf_channel)
-    {
-        case 1:
-            while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
-            USART_SendData(USART1, (uint8_t)ch);
-            break;
-
-        case 2:
-            while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
-            USART_SendData(USART2, (uint8_t)ch);
-            break;
-
-        case 3:
-            while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
-            USART_SendData(USART3, (uint8_t)ch);
-            break;
-    }
-	return ch;
-}
-
-void select_USART(u8 channel)
-{
-	printf_channel = channel;
-}
 
 void USART1_Configuration(void)
 {
@@ -137,7 +99,7 @@ void USART1_IRQHandler(void)
 
     if( USART_GetITStatus(USART1, USART_IT_TXE) == SET )
     {
-        u8 *data = ads1258_getSendData();
+        u8 *data = ads1258_getADValueSended2PC();
         USART_SendData(USART1, *(data + DataSendPosition2PC));
         if(++DataSendPosition2PC >= DATA_2_PC_LEN)
         {
@@ -222,7 +184,7 @@ void USART3_IRQHandler(void)
     {
         if( USART_GetITStatus(USART3, USART_IT_TXE) == SET )
         {
-            u8 *data = ads1258_getSendData();
+            u8 *data = ads1258_getADValueSended2PC();
             USART_SendData(USART3, *(data + DataSendPosition2PC));
             if(++DataSendPosition2PC >= DATA_2_PC_LEN)
             {
@@ -311,12 +273,23 @@ void USART2_IRQHandler(void)
 
     if( USART_GetITStatus(USART2, USART_IT_TXE) == SET )
     {
-        if( USART_GetITStatus(USART2, USART_IT_TXE) == SET )
+        if(get_isSendingType(SEND_CT))
         {
-            u8 *data = ads1258_getSendDataAvr();
+            u8 *data = ads1258_getADValueSended2Server();
             USART_SendData(USART2, *(data + DataSendPosition2Simcom));
             if(++DataSendPosition2Simcom >= DATA_2_SIMCOM_LEN)
             {
+                set_SendingType(SEND_NULL);
+                USART_ITConfig(USART2, USART_IT_TXE, DISABLE);//close the Tx interrupt
+            }
+        }
+        else if (get_isSendingType(SEND_DT))
+        {
+            u8 *data = ads1258_getADValueSended2ServerDynamic();
+            USART_SendData(USART2, *(data + DataSendDyanamicPosition2Simcom));
+            if(++DataSendDyanamicPosition2Simcom >= DATA_2_SIMCOM_DYNAMIC_LEN)
+            {
+                set_SendingType(SEND_NULL);
                 USART_ITConfig(USART2, USART_IT_TXE, DISABLE);//close the Tx interrupt
             }
         }
@@ -360,3 +333,37 @@ void UART_Init(void)
     USART2_Configuration();
 	USART3_Configuration();
 }
+
+#ifdef __DEBUG__
+static u8 printf_channel;
+
+#pragma import(__use_no_semihosting)
+void select_USART(u8 channel)
+{
+	printf_channel = channel;
+}
+struct __FILE{int handle;};
+FILE __stdout;
+int fputc(int ch, FILE *f)//重定义fputc函数
+{
+    switch(printf_channel)
+    {
+        case 1:
+            while(USART_GetFlagStatus(USART1,USART_FLAG_TC) == RESET);
+            USART_SendData(USART1, (uint8_t)ch);
+            break;
+
+        case 2:
+            while (USART_GetFlagStatus(USART2,USART_FLAG_TC) == RESET);
+            USART_SendData(USART2, (uint8_t)ch);
+            break;
+
+        case 3:
+            while (USART_GetFlagStatus(USART3,USART_FLAG_TC) == RESET);
+            USART_SendData(USART3, (uint8_t)ch);
+            break;
+    }
+	return ch;
+}
+#endif/*__DEBUG__*/
+
