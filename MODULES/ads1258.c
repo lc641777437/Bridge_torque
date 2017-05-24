@@ -105,6 +105,8 @@ void upgradeBufferSended2Sim808(void)
     int i;
     u32 data;
 
+    if(ADValue_count[0] == 0)return;
+
     ADValueSended2Server[0] = 'C';
     ADValueSended2Server[1] = 'T';
     ADValueSended2Server[2] = ADValueSended2PC[2];
@@ -138,6 +140,8 @@ void upgradeBufferSended2Sim808Dynamic(void)
 {
     int i;
     u32 data;
+
+    if(ADValue_count[0] == 0)return;
 
     ADValueSended2ServerDynamic[0] = 'D';
     ADValueSended2ServerDynamic[1] = 'T';
