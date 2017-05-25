@@ -1,6 +1,9 @@
 #include "gpio.h"
 #include "setting.h"
 
+static u8 save_Flag = 0;
+static SEND_BY_WHO send_Flag = SEND_BY_NULL;
+
 static u8 isDynamic = 0;
 static SEND_TYPE SendingType = SEND_NULL;
 
@@ -10,6 +13,26 @@ static int send_time_server = 1;// 1_min 1min
 static int sample_time = 5 * 100; // 10_us 5ms
 
 static long timestamp = ZERO_OF_21_CENTURE;
+
+void set_Save_Flag(u8 flag)
+{
+    save_Flag = flag;
+}
+
+u8 get_Save_Flag(void)
+{
+    return save_Flag;
+}
+
+void set_Send_Flag(SEND_BY_WHO who)
+{
+    send_Flag = who;
+}
+
+SEND_BY_WHO get_Send_Flag(void)
+{
+    return send_Flag;
+}
 
 void set_isDynamic(u8 state)
 {

@@ -7,6 +7,18 @@ typedef enum{
     SEND_DT   = 2
 } SEND_TYPE;
 
+typedef enum{
+    SEND_BY_NULL = 0,
+    SEND_BY_UART1= 1,
+    SEND_BY_UART3= 2
+} SEND_BY_WHO;
+
+void set_Save_Flag(u8 flag);
+u8 get_Save_Flag(void);
+
+void set_Send_Flag(SEND_BY_WHO who);
+SEND_BY_WHO get_Send_Flag(void);
+
 u8 get_isDynamic(void);
 void set_isDynamic(u8 state);
 void set_SendingType(SEND_TYPE type);

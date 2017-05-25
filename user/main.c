@@ -18,6 +18,7 @@
 #include "timer.h"
 #include "malloc.h"
 #include "exfuns.h"
+#include "setting.h"
 #include "ads1258.h"
 #include "usbh_usr.h"
 #include "stmflash.h"

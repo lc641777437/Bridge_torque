@@ -11,28 +11,6 @@
 
 u8 sample_count = 0;
 
-static int save_Flag = SAVE_BY_NULL;
-static SEND_BY_WHO send_Flag = SEND_BY_NULL;
-
-void set_Save_Flag(int flag)
-{
-    save_Flag = flag;
-}
-
-int get_Save_Flag(void)
-{
-    return save_Flag;
-}
-
-void set_Send_Flag(SEND_BY_WHO who)
-{
-    send_Flag = who;
-}
-
-SEND_BY_WHO get_Send_Flag(void)
-{
-    return send_Flag;
-}
 
 void EXTI_Configuration(void)
 {
