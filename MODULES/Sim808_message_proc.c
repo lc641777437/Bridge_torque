@@ -108,12 +108,12 @@ static void sim808_get_param(USART_TypeDef *usart, u8 *buf)
 
 static void sim808_start_dynamic(USART_TypeDef *usart, u8 *buf)
 {
-    USART2_Send_Bytes_Directly(SIM808_GET_PARAM, NULL, 0);
+    USART2_Send_Bytes_Directly(SIM808_START_DYNAMIC, NULL, 0);
 }
 
 static void sim808_stop_dynamic(USART_TypeDef *usart, u8 *buf)
 {
-    USART2_Send_Bytes_Directly(SIM808_GET_PARAM, NULL, 0);
+    USART2_Send_Bytes_Directly(SIM808_STOP_DYNAMIC, NULL, 0);
 }
 
 static void sim808_set_factory(USART_TypeDef *usart, u8 *buf)

@@ -268,7 +268,7 @@ void Save_AD_RawData_SD(void)
         timestampPre = timestampNow;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_SD)//换了存储位置 打开原有文件
@@ -276,7 +276,7 @@ void Save_AD_RawData_SD(void)
         SavePosition = SAVE_SD;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
@@ -295,7 +295,7 @@ void Save_AD_RawData_USB(void)
         timestampPre = timestampNow;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_USB)//换了存储位置 打开原有文件
@@ -303,7 +303,7 @@ void Save_AD_RawData_USB(void)
         SavePosition = SAVE_USB;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".txt");
+        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
