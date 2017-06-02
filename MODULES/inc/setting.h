@@ -42,6 +42,10 @@ long get_timestamp(void);
 void add_timestamp(void);
 void set_timestamp(long NewTimestamp);
 
+void add_timestampDynamic(void);
+long get_timestampDynamic(void);
+void reset_timestampDynamic(void);
+
 #define TIME_FOR_SAVE (60)
 #define COUNT_10US_PER_S (100000)
 #define ZERO_OF_21_CENTURE (946656000)

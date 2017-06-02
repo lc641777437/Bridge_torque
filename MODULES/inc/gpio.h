@@ -7,7 +7,6 @@
 #ifndef __GPIO_H__
 #define __GPIO_H__
 #include "sys.h"
-#include "stm32f4xx.h"
 
 #define STATE_15 PFin(2)
 #define STATE_14 PFin(1)
@@ -45,7 +44,7 @@
 
 #define START PBout(12)
 #define PIN_RESET PDin(9)
-#define PIN_TRIGGER PEin(9)
+#define PIN_TRIGGER PGin(10)
 
 void GPIO_init(void);
 

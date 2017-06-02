@@ -13,6 +13,7 @@ static int send_time_server = 1;// 1_min 1min
 static int sample_time = 5 * 100; // 10_us 5ms
 
 static long timestamp = ZERO_OF_21_CENTURE;
+static int timestampDynamic = 0;
 
 void set_Save_Flag(u8 flag)
 {
@@ -134,5 +135,21 @@ long get_timestamp(void)
 void set_timestamp(long NewTimestamp)
 {
     timestamp = NewTimestamp;
+}
+
+
+void add_timestampDynamic(void)
+{
+    timestampDynamic++;
+}
+
+long get_timestampDynamic(void)
+{
+    return timestampDynamic;
+}
+
+void reset_timestampDynamic(void)
+{
+    timestampDynamic = 0;
 }
 

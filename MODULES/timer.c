@@ -308,6 +308,13 @@ void TIM8_TRG_COM_TIM14_IRQHandler(void)// 1s
     if(TIM_GetITStatus(TIM14,TIM_IT_Update)==SET)
     {
         add_timestamp();
+
+        add_timestampDynamic();
+        if(get_timestampDynamic() >= 60)
+        {
+            set_isDynamic(0);
+        }
+
         if(++time_s >= get_SendTimeDynamic())
         {
             time_s = 0;

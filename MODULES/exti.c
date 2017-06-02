@@ -18,42 +18,17 @@ void EXTI_Configuration(void)
     EXTI_InitTypeDef EXTI_InitStructure;
     NVIC_InitTypeDef NVIC_InitStructure;
 
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
+
     /*AD DRDY EXTI*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
     GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8;//nDRDY exti
     GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_UP;
     GPIO_Init(GPIOD,&GPIO_InitStructure);
-
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD,EXTI_PinSource8);
-
-    EXTI_InitStructure.EXTI_Line=EXTI_Line8;
-    EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
-    EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&EXTI_InitStructure);
-
-    /*DYNAMIC SAMPLE EXTI*/
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG,ENABLE);
-    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9;//DYNAMIC exti
-    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_DOWN;
-    GPIO_Init(GPIOG,&GPIO_InitStructure);
-
-    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG,EXTI_PinSource9);
-
-    EXTI_InitStructure.EXTI_Line=EXTI_Line9;
-    EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Rising;// Rising edge
-    EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-    EXTI_Init(&EXTI_InitStructure);
-
 
     /*SYSTEM RESET EXTI*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);
@@ -64,12 +39,22 @@ void EXTI_Configuration(void)
     GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_UP;
     GPIO_Init(GPIOD,&GPIO_InitStructure);
-
     SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOD,EXTI_PinSource9);
 
-    EXTI_InitStructure.EXTI_Line=EXTI_Line9;
+    /*DYNAMIC SAMPLE EXTI*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
+    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_9 | GPIO_Pin_10;//DYNAMIC exti
+    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_DOWN;
+    GPIO_Init(GPIOG, &GPIO_InitStructure);
+    SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG,EXTI_PinSource10);
+
+
+    EXTI_InitStructure.EXTI_Line= EXTI_Line8 | EXTI_Line9 |EXTI_Line10;
     EXTI_InitStructure.EXTI_Mode=EXTI_Mode_Interrupt;
-    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// falling edge
+    EXTI_InitStructure.EXTI_Trigger=EXTI_Trigger_Falling;// Falling edge
     EXTI_InitStructure.EXTI_LineCmd = ENABLE;
     EXTI_Init(&EXTI_InitStructure);
 
@@ -79,7 +64,11 @@ void EXTI_Configuration(void)
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-
+    NVIC_InitStructure.NVIC_IRQChannel=EXTI15_10_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1;
+    NVIC_InitStructure.NVIC_IRQChannelSubPriority =2;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStructure);
 }
 
 void EXTI9_5_IRQHandler(void)
@@ -118,13 +107,20 @@ void EXTI9_5_IRQHandler(void)
             TIM13_Enable(1);
         }
 
-        if(PIN_TRIGGER == 1)
-        {
-            set_isDynamic(1);
-            resetDynamicTime();
-        }
         EXTI_ClearITPendingBit(EXTI_Line9);
     }
 }
 
+void EXTI15_10_IRQHandler(void)
+{
+    if(EXTI_GetITStatus(EXTI_Line10) != RESET)// system reset
+    {
+        if(PIN_TRIGGER == 0)
+        {
+            set_isDynamic(1);
+            reset_timestampDynamic();
+        }
+        EXTI_ClearITPendingBit(EXTI_Line10);
+    }
+}
 
