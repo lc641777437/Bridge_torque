@@ -38,6 +38,7 @@ SEND_BY_WHO get_Send_Flag(void)
 void set_isDynamic(u8 state)
 {
     isDynamic = state;
+    reset_timestampDynamic();
 }
 
 u8 get_isDynamic(void)

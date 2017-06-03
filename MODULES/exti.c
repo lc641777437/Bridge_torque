@@ -118,7 +118,6 @@ void EXTI15_10_IRQHandler(void)
         if(PIN_TRIGGER == 0)
         {
             set_isDynamic(1);
-            reset_timestampDynamic();
         }
         EXTI_ClearITPendingBit(EXTI_Line10);
     }
