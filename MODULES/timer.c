@@ -81,7 +81,7 @@ void TIM3_Init(void)// 1s for check SD card
     NVIC_InitStructure.NVIC_IRQChannelCmd=ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    TIM_Cmd(TIM3,DISABLE);
+    TIM_Cmd(TIM3,ENABLE);
 }
 
 void TIM3_IRQHandler(void)// 1s for check SD card

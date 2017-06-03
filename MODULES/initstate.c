@@ -24,7 +24,7 @@ void set_DeviceState(DEVICE device)
     }
     else if(device == DEVICE_FATFS_SD)
     {
-        usb_face = ON;
+        sd_fatfs_sd = ON;
     }
     else if(device == DEVICE_FATFS_USB)
     {
@@ -44,7 +44,7 @@ void reset_DeviceState(DEVICE device)
     }
     else if(device == DEVICE_FATFS_SD)
     {
-        usb_face = OFF;
+        sd_fatfs_sd = OFF;
     }
     else if(device == DEVICE_FATFS_USB)
     {
