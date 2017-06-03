@@ -169,7 +169,7 @@ void upgradeBufferSended2Pc(void)
 {
     int i = 0;
     u32 data = 0;
-    u8 state[2] = {0};
+    u8 state[2] = {0, 0};
 
     state[0]=STATE_0;
     state[0]=(state[0]<<1)|STATE_1;
