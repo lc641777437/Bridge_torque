@@ -38,9 +38,9 @@ int get_SendTimeServer(void);
 
 void set_CtrlState(u32 CtrlState);
 
-long get_timestamp(void);
+u32 get_timestamp(void);
 void add_timestamp(void);
-void set_timestamp(long NewTimestamp);
+void set_timestamp(u32 NewTimestamp);
 
 void add_timestampDynamic(void);
 long get_timestampDynamic(void);

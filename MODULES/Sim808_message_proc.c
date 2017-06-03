@@ -19,13 +19,13 @@
 static void sim808_set_timestamp(USART_TypeDef *usart, u8 *buf)
 {
     u32 timestamp = 0;
-    timestamp = buf[0];
+    timestamp = (buf[0]&0XFF);
     timestamp <<= 8;
-    timestamp |= buf[1];
+    timestamp |= (buf[1]&0XFF);
     timestamp <<= 8;
-    timestamp |= buf[2];
+    timestamp |= (buf[2]&0XFF);
     timestamp <<= 8;
-    timestamp |= buf[3];
+    timestamp |= (buf[3]&0XFF);
     if(timestamp > ZERO_OF_21_CENTURE && timestamp < END_OF_21_CENTURE)
     {
         set_timestamp(timestamp);

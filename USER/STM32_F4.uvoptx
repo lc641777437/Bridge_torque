@@ -277,7 +277,7 @@
         <Ww>
           <count>13</count>
           <WinNumber>1</WinNumber>
-          <ItemText>ADValue</ItemText>
+          <ItemText>ADValue,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

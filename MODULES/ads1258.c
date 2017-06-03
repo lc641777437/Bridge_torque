@@ -262,7 +262,7 @@ static char FileName[FILE_NAME_LEN] = {0};
 static SAVE_POSITION SavePosition = SAVE_NULL;
 void Save_AD_RawData_SD(void)
 {
-    long long timestampNow = get_timestamp();
+    u32 timestampNow = get_timestamp();
 
     if(timestampNow - timestampPre >= TIME_FOR_SAVE)// 新的时间创建新的文件
     {
@@ -270,7 +270,7 @@ void Save_AD_RawData_SD(void)
         timestampPre = timestampNow;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".dat");
+        snprintf(FileName, FILE_NAME_LEN, "%s%d%s", "0:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_SD)//换了存储位置 打开原有文件
@@ -278,7 +278,7 @@ void Save_AD_RawData_SD(void)
         SavePosition = SAVE_SD;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "0:", timestampNow,".dat");
+        snprintf(FileName, FILE_NAME_LEN, "%s%d%s", "0:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
@@ -289,7 +289,7 @@ void Save_AD_RawData_SD(void)
 
 void Save_AD_RawData_USB(void)
 {
-    long long timestampNow = get_timestamp();
+    u32 timestampNow = get_timestamp();
 
     if(timestampNow - timestampPre >= TIME_FOR_SAVE)// 新的时间创建新的文件
     {
@@ -297,7 +297,7 @@ void Save_AD_RawData_USB(void)
         timestampPre = timestampNow;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".dat");
+        snprintf(FileName, FILE_NAME_LEN, "%s%d%s", "2:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_CREATE_NEW | FA_WRITE);
     }
     else if(SavePosition != SAVE_USB)//换了存储位置 打开原有文件
@@ -305,7 +305,7 @@ void Save_AD_RawData_USB(void)
         SavePosition = SAVE_USB;
 
         mf_close();
-        snprintf(FileName, FILE_NAME_LEN, "%s%lld%s", "2:", timestampNow,".dat");
+        snprintf(FileName, FILE_NAME_LEN, "%s%d%s", "2:", timestampNow,".dat");
         mf_open((u8 *)FileName, FA_WRITE);
     }
 
